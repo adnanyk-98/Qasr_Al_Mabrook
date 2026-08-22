@@ -32,6 +32,12 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      - name: Tests
+        run: npm test
+
+      - name: Migration consistency check
+        run: npm run db:migration:check
+
       - name: Build
         run: npm run build
         env:

@@ -1,0 +1,131 @@
+{
+  "common": {
+    "home": "الرئيسية",
+    "catalogue": "الكتالوج",
+    "categories": "الفئات",
+    "search": "بحث",
+    "contact": "تواصل معنا",
+    "requestQuote": "طلب عرض سعر",
+    "backToCatalogue": "العودة إلى الكتالوج",
+    "viewDetails": "عرض التفاصيل",
+    "noImage": "لا توجد صورة",
+    "categoryImage": "صورة الفئة",
+    "previous": "السابق",
+    "next": "التالي",
+    "results": "نتيجة",
+    "sku": "رمز المنتج",
+    "category": "الفئة",
+    "english": "الإنجليزية",
+    "arabic": "العربية"
+  },
+  "header": {
+    "mainNavigation": "التنقل الرئيسي",
+    "openMenu": "فتح قائمة التنقل",
+    "logoAlt": "شعار قصر المبارك"
+  },
+  "footer": {
+    "description": "كتالوج ومنصة تواصل متقدمة لاكتشاف المنتجات باللغتين الإنجليزية والعربية.",
+    "explore": "استكشف",
+    "contact": "تواصل معنا",
+    "salesEnquiries": "استفسارات المبيعات",
+    "languageSupport": "دعم بالإنجليزية والعربية",
+    "responsiveDiscovery": "اكتشاف متجاوب للمنتجات"
+  },
+  "home": {
+    "eyebrow": "تجربة كتالوج متقدمة",
+    "title": "اكتشف المنتج المناسب بسرعة.",
+    "description": "تجربة عصرية لاكتشاف المنتجات تدعم التصفح والتصفية والتواصل السريع مع المبيعات.",
+    "browse": "تصفح الكتالوج",
+    "explore": "استعرض الفئات",
+    "productsStat": "المنتجات",
+    "supportStat": "الدعم",
+    "localesStat": "اللغات",
+    "categoriesEyebrow": "الفئات",
+    "categoriesTitle": "تصفح حسب الفئة",
+    "featuredEyebrow": "منتجات مختارة",
+    "featuredTitle": "أبرز المنتجات",
+    "viewAll": "عرض الكل",
+    "featuredCollection": "مجموعة مختارة",
+    "promotionalSection": "قسم ترويجي",
+    "heroAlt": "مقدمة الكتالوج"
+  },
+  "categories": {
+    "eyebrow": "الفئات",
+    "title": "استكشف الفئات",
+    "detailEyebrow": "الفئة",
+    "allCategories": "جميع الفئات",
+    "empty": "لا توجد منتجات متاحة حالياً في هذه الفئة."
+  },
+  "products": {
+    "eyebrow": "المنتجات",
+    "title": "كتالوج المنتجات",
+    "emptyTitle": "لا توجد منتجات",
+    "emptyDescription": "حاول تعديل البحث أو المرشحات."
+  },
+  "product": {
+    "products": "المنتجات",
+    "selectVariant": "تحديد المتغير",
+    "selectedVariant": "المتغير المحدد",
+    "noVariants": "لا توجد متغيرات متاحة",
+    "noOptions": "لا توجد خيارات متاحة",
+    "noImage": "لا توجد صور متاحة",
+    "noSummary": "لا يوجد ملخص متاح.",
+    "noDescription": "لا يوجد وصف تفصيلي متاح.",
+    "specifications": "المواصفات",
+    "details": "معلومات المنتج",
+    "related": "منتجات ذات صلة"
+  },
+  "search": {
+    "eyebrow": "بحث",
+    "title": "ابحث عن المنتجات",
+    "placeholder": "ابحث عن المنتجات",
+    "label": "بحث المنتجات",
+    "emptyTitle": "أدخل كلمة بحث",
+    "emptyDescription": "استخدم البحث للعثور على المنتجات المناسبة.",
+    "noResultsTitle": "لا توجد نتائج",
+    "noResultsDescription": "حاول كتابة كلمة أخرى أو تعديل البحث."
+  },
+  "enquiry": {
+    "getInTouch": "تواصل معنا",
+    "requestTitle": "طلب عرض سعر",
+    "requestDescription": "أرسل بياناتك وسيتواصل معك فريق المبيعات.",
+    "contactEyebrow": "تواصل معنا",
+    "contactTitle": "كيف يمكننا مساعدتك؟",
+    "contactDescription": "أرسل استفسارك العام إلى فريقنا.",
+    "fullName": "الاسم الكامل",
+    "email": "البريد الإلكتروني",
+    "phone": "رقم الهاتف",
+    "company": "اسم الشركة",
+    "city": "المدينة",
+    "country": "الدولة",
+    "message": "الرسالة",
+    "submit": "إرسال الطلب",
+    "submitted": "تم إرسال طلبك",
+    "messageSubmitted": "تم إرسال رسالتك",
+    "reference": "رقم المرجع",
+    "continueBrowsing": "متابعة التصفح",
+    "validationError": "يرجى مراجعة البيانات المدخلة.",
+    "submissionError": "تعذر إرسال الطلب.",
+    "productUnavailable": "المنتج المطلوب غير متاح.",
+    "phoneContact": "الهاتف",
+    "emailContact": "البريد الإلكتروني"
+  },
+  "sales": {
+    "whatsapp": "واتساب",
+    "call": "اتصل بالمبيعات",
+    "email": "البريد الإلكتروني",
+    "subject": "استفسار عن {productName}"
+  },
+  "metadata": {
+    "siteTitle": "قصر المبارك",
+    "siteDescription": "كتالوج ومنصة تواصل قصر المبارك.",
+    "productsTitle": "كتالوج المنتجات",
+    "productsDescription": "تصفح كتالوج منتجات قصر المبارك.",
+    "categoriesTitle": "استكشف الفئات",
+    "categoriesDescription": "تصفح المنتجات حسب الفئة.",
+    "searchTitle": "ابحث عن المنتجات",
+    "searchDescription": "ابحث في كتالوج منتجات قصر المبارك.",
+    "requestQuoteTitle": "طلب عرض سعر",
+    "contactTitle": "تواصل معنا"
+  }
+}

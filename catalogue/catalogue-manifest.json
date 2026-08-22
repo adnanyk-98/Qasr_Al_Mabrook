@@ -1,0 +1,71 @@
+{
+  "products": [
+    {
+      "category": "Adivasi Oil",
+      "name": "Adivasi Oil",
+      "images": ["Adivasi Oil-#01.jpg", "Adivasi Oil-#02.jpg"],
+      "primaryImage": "Adivasi Oil-#01.jpg"
+    },
+    {
+      "category": "Cloth Piece",
+      "name": "Cloth Piece",
+      "images": ["Cloth Piece-#01.jpg", "Cloth Piece-#02.jpg", "Cloth Piece-WEB.jpg"],
+      "primaryImage": "Cloth Piece-#01.jpg"
+    },
+    {
+      "category": "FANCY SUIT",
+      "name": "Fancy Suit",
+      "images": ["FANCY SUIT-#01.jpg", "FANCY SUIT-#02.jpg", "FANCY SUIT-#03.jpg"],
+      "primaryImage": "FANCY SUIT-#01.jpg"
+    },
+    {
+      "category": "Measuring Tape",
+      "name": "5.5M Measuring Tape Green",
+      "images": [
+        "5.5M-Measuring-Tape-Green-#01.jpg",
+        "5.5M-Measuring-Tape-Green-#02.jpg"
+      ],
+      "primaryImage": "5.5M-Measuring-Tape-Green-#01.jpg"
+    },
+    {
+      "category": "Measuring Tape",
+      "name": "5M Measuring Tape Green",
+      "images": ["5M-Measuring-Tape-Green-#01.jpg", "5M-Measuring-Tape-Green-#02.jpg"],
+      "primaryImage": "5M-Measuring-Tape-Green-#01.jpg"
+    },
+    {
+      "category": "Measuring Tape",
+      "name": "5M Measuring Tape Orange",
+      "images": [
+        "5M-Measuring-Tape-Orange-#01.jpg",
+        "5M-Measuring-Tape-Orange-#02.jpg"
+      ],
+      "primaryImage": "5M-Measuring-Tape-Orange-#01.jpg"
+    },
+    {
+      "category": "Measuring Tape",
+      "name": "7.5M Measuring Tape Green",
+      "images": [
+        "7.5M-Measuring-Tape-Green-#01.jpg",
+        "7.5M-Measuring-Tape-Green-#02.jpg"
+      ],
+      "primaryImage": "7.5M-Measuring-Tape-Green-#01.jpg"
+    },
+    {
+      "category": "Pajama",
+      "name": "Pajama",
+      "images": [
+        "Pajama-#01.jpg",
+        "Pajama-#02.jpg",
+        "Pajama-#03.jpg",
+        "Pajama-#04.jpg"
+      ],
+      "primaryImage": "Pajama-#01.jpg"
+    }
+  ],
+  "unresolvedImages": [
+    "Measuring Tape/Measuring-Tape-GalleryImage.jpg",
+    "Measuring Tape/Measuring-Tape-WebBanner.jpg",
+    "Measuring Tape/Product_photo_studio_editing_2K_202608191510.jpeg"
+  ]
+}

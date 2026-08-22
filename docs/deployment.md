@@ -70,6 +70,35 @@ Production build must:
 
 Do not automatically perform destructive database migrations during a web-server boot.
 
+### Repository readiness commands
+
+These commands do not select a provider or contact production services:
+
+```text
+npm run readiness:check -- --stage=local
+npm run db:migration:check
+npm test
+npm run typecheck
+npm run lint
+npm run build
+```
+
+The readiness checker accepts `local`, `staging`, or `production`. Staging and production require HTTPS, database, authentication, R2, and SMTP configuration. It validates configuration only; it does not test connectivity or deploy anything.
+
+Migration application is explicitly guarded and must be run as a separate deployment step:
+
+```text
+DEPLOYMENT_STAGE=staging MIGRATION_CONFIRMATION=APPLY_MIGRATIONS npm run db:migration:apply
+```
+
+The web server must never run this command automatically. The initial administrator bootstrap is also explicit:
+
+```text
+DEPLOYMENT_STAGE=staging ADMIN_BOOTSTRAP_CONFIRMATION=BOOTSTRAP_ADMIN npm run db:bootstrap-admin
+```
+
+Use injected staging/production environment variables or an explicitly selected dotenv path. Never place credentials in repository files.
+
 ## 6. Database Migrations
 
 Use Drizzle migrations.
@@ -119,6 +148,8 @@ CI should run:
 - Migration validation where appropriate
 
 Preview deployments should use isolated/non-production data.
+
+The repository CI baseline now runs formatting, lint, typecheck, tests, migration consistency validation, and build. Provider-specific deployment, promotion, preview isolation, approvals, and rollback remain blocked until a hosting provider is selected.
 
 ## 10. Backups
 

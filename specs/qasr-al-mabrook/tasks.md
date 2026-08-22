@@ -68,87 +68,87 @@ Status symbols:
 
 ## Phase 3 - Authentication/Admin
 
-- [ ] TASK-300 Implement authentication
-- [ ] TASK-301 Implement session management
-- [ ] TASK-302 Implement Super Admin/Admin authorization
-- [ ] TASK-303 Implement admin shell
-- [ ] TASK-304 Product CRUD
-- [ ] TASK-305 Category CRUD
-- [ ] TASK-306 Brand CRUD
-- [ ] TASK-307 Attribute CRUD
-- [ ] TASK-308 Variant management
-- [ ] TASK-309 Specification management
-- [ ] TASK-310 Image upload/reorder
-- [ ] TASK-311 Translation management
-- [ ] TASK-312 Enquiry console
-- [ ] TASK-313 Homepage configuration
+- [x] TASK-300 Implement authentication
+- [x] TASK-301 Implement session management
+- [!] TASK-302 Implement Super Admin/Admin authorization (accepted partial: server-side role enforcement is present and validated, but no dedicated Super Admin-only route was implemented for end-to-end runtime validation without inventing a synthetic route)
+- [x] TASK-303 Implement admin shell
+- [x] TASK-304 Product CRUD
+- [x] TASK-305 Category CRUD
+- [x] TASK-306 Brand CRUD
+- [x] TASK-307 Attribute CRUD
+- [x] TASK-308 Variant management
+- [x] TASK-309 Specification management
+- [x] TASK-310 Image upload/reorder
+- [x] TASK-311 Translation management
+- [x] TASK-312 Enquiry console
+- [x] TASK-313 Homepage configuration
 
 ## Phase 4 - Public Catalogue
 
-- [ ] TASK-400 Public layout
-- [ ] TASK-401 Homepage
-- [ ] TASK-402 Category pages
-- [ ] TASK-403 Product listing
-- [ ] TASK-404 Product card
-- [ ] TASK-405 Product detail
-- [ ] TASK-406 Variant selector
-- [ ] TASK-407 Product image gallery
-- [ ] TASK-408 Search
-- [ ] TASK-409 Dynamic filters
-- [ ] TASK-410 Pagination
-- [ ] TASK-411 Related products
-- [ ] TASK-412 Empty/loading/error states
+- [x] TASK-400 Public layout
+- [x] TASK-401 Homepage
+- [x] TASK-402 Category pages
+- [x] TASK-403 Product listing
+- [x] TASK-404 Product card
+- [x] TASK-405 Product detail
+- [x] TASK-406 Variant selector
+- [x] TASK-407 Product image gallery
+- [x] TASK-408 Search
+- [x] TASK-409 Dynamic filters
+- [x] TASK-410 Pagination
+- [x] TASK-411 Related products
+- [x] TASK-412 Empty/loading/error states (server-rendered empty/loading states implemented; no dedicated client-side error boundary was introduced)
 
 ## Phase 5 - Enquiries
 
-- [ ] TASK-500 Request Quote page
-- [ ] TASK-501 Product-to-quote prepopulation
-- [ ] TASK-502 Variant-to-quote prepopulation
-- [ ] TASK-503 Persist quote request
-- [ ] TASK-504 Admin quote view
-- [ ] TASK-505 Quote status workflow
-- [ ] TASK-506 Email notification
-- [ ] TASK-507 WhatsApp enquiry
-- [ ] TASK-508 Call Sales
-- [ ] TASK-509 Email Enquiry
-- [ ] TASK-510 Contact form
+- [x] TASK-500 Request Quote page
+- [x] TASK-501 Product-to-quote prepopulation
+- [x] TASK-502 Variant-to-quote prepopulation
+- [x] TASK-503 Persist quote request
+- [x] TASK-504 Admin quote view
+- [x] TASK-505 Quote status workflow
+- [x] TASK-506 Email notification (SMTP delivery implemented; requires valid SMTP and recipient configuration)
+- [x] TASK-507 WhatsApp enquiry
+- [x] TASK-508 Call Sales
+- [x] TASK-509 Email Enquiry
+- [x] TASK-510 Contact form
 
 ## Phase 6 - Internationalization
 
-- [ ] TASK-600 Configure next-intl
-- [ ] TASK-601 Implement `/en`
-- [ ] TASK-602 Implement `/ar`
-- [ ] TASK-603 Implement locale switcher
-- [ ] TASK-604 Implement RTL
-- [ ] TASK-605 Product translations
-- [ ] TASK-606 Category translations
-- [ ] TASK-607 Static content translations
-- [ ] TASK-608 Localized metadata
+- [x] TASK-600 Configure next-intl
+- [x] TASK-601 Implement `/en`
+- [x] TASK-602 Implement `/ar`
+- [x] TASK-603 Implement locale switcher
+- [x] TASK-604 Implement RTL
+- [x] TASK-605 Product translations
+- [x] TASK-606 Category translations
+- [x] TASK-607 Static content translations
+- [x] TASK-608 Localized metadata
 
 ## Phase 7 - SEO
 
-- [ ] TASK-700 Metadata framework
-- [ ] TASK-701 Product metadata
-- [ ] TASK-702 Category metadata
-- [ ] TASK-703 Canonicals
-- [ ] TASK-704 Hreflang
-- [ ] TASK-705 Sitemap
-- [ ] TASK-706 Robots
-- [ ] TASK-707 Structured data
-- [ ] TASK-708 Filter indexing controls
-- [ ] TASK-709 SEO validation
+- [x] TASK-700 Metadata framework
+- [x] TASK-701 Product metadata
+- [x] TASK-702 Category metadata
+- [x] TASK-703 Canonicals
+- [x] TASK-704 Hreflang
+- [x] TASK-705 Sitemap
+- [x] TASK-706 Robots
+- [x] TASK-707 Structured data
+- [x] TASK-708 Filter indexing controls
+- [x] TASK-709 SEO validation
 
 ## Phase 8 - Hardening
 
-- [ ] TASK-800 Security review
-- [ ] TASK-801 Rate limiting
-- [ ] TASK-802 Spam protection
-- [ ] TASK-803 Upload security
-- [ ] TASK-804 Accessibility audit
-- [ ] TASK-805 Responsive audit
-- [ ] TASK-806 Performance audit
-- [ ] TASK-807 Database/query review
-- [ ] TASK-808 Error monitoring
+- [x] TASK-800 Security review
+- [x] TASK-801 Rate limiting
+- [x] TASK-802 Spam protection
+- [x] TASK-803 Upload security
+- [x] TASK-804 Accessibility audit
+- [x] TASK-805 Responsive audit
+- [x] TASK-806 Performance audit
+- [x] TASK-807 Database/query review
+- [x] TASK-808 Error monitoring
 
 ## Phase 9 - Production
 
@@ -162,6 +162,8 @@ Status symbols:
 - [ ] TASK-907 Configure backups
 - [ ] TASK-908 Production UAT
 - [ ] TASK-909 Go-live
+
+Phase 9 status: repository groundwork is in progress. TASK-900, TASK-904, TASK-907, TASK-908, and TASK-909 remain blocked by external decisions or deployment evidence. TASK-901, TASK-903, and TASK-906 are partially ready; TASK-902 remains blocked pending the approved production image/R2 strategy. No Phase 9 task is complete.
 
 ## Task Update Rule
 

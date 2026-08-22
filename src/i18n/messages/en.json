@@ -1,0 +1,131 @@
+{
+  "common": {
+    "home": "Home",
+    "catalogue": "Catalogue",
+    "categories": "Categories",
+    "search": "Search",
+    "contact": "Contact",
+    "requestQuote": "Request Quote",
+    "backToCatalogue": "Back to catalogue",
+    "viewDetails": "View details",
+    "noImage": "No image",
+    "categoryImage": "Category image",
+    "previous": "Previous",
+    "next": "Next",
+    "results": "results",
+    "sku": "SKU",
+    "category": "Category",
+    "english": "English",
+    "arabic": "Arabic"
+  },
+  "header": {
+    "mainNavigation": "Main navigation",
+    "openMenu": "Open navigation menu",
+    "logoAlt": "Qasr Al Mabrook logo"
+  },
+  "footer": {
+    "description": "Premium catalogue and enquiry platform for product discovery across English and Arabic experiences.",
+    "explore": "Explore",
+    "contact": "Contact",
+    "salesEnquiries": "Sales enquiries",
+    "languageSupport": "English / Arabic support",
+    "responsiveDiscovery": "Responsive product discovery"
+  },
+  "home": {
+    "eyebrow": "Premium catalogue experience",
+    "title": "Discover the right product faster.",
+    "description": "A polished product discovery experience designed to support browsing, filtering, and rapid sales enquiry workflows.",
+    "browse": "Browse Catalogue",
+    "explore": "Explore Categories",
+    "productsStat": "Products",
+    "supportStat": "Support",
+    "localesStat": "Locales",
+    "categoriesEyebrow": "Categories",
+    "categoriesTitle": "Browse by category",
+    "featuredEyebrow": "Featured products",
+    "featuredTitle": "Popular picks",
+    "viewAll": "View all",
+    "featuredCollection": "Featured collection",
+    "promotionalSection": "Promotional section",
+    "heroAlt": "Catalogue introduction"
+  },
+  "categories": {
+    "eyebrow": "Categories",
+    "title": "Explore categories",
+    "detailEyebrow": "Category",
+    "allCategories": "All categories",
+    "empty": "No products are available in this category yet."
+  },
+  "products": {
+    "eyebrow": "Products",
+    "title": "Product catalogue",
+    "emptyTitle": "No products available",
+    "emptyDescription": "Try a different search or clear the filters."
+  },
+  "product": {
+    "products": "Products",
+    "selectVariant": "Select variant",
+    "selectedVariant": "Selected variant",
+    "noVariants": "No variants available",
+    "noOptions": "No options available",
+    "noImage": "No image available",
+    "noSummary": "No summary available.",
+    "noDescription": "No detailed description is available.",
+    "specifications": "Specifications",
+    "details": "Product details",
+    "related": "Related products"
+  },
+  "search": {
+    "eyebrow": "Search",
+    "title": "Search products",
+    "placeholder": "Search products",
+    "label": "Product search",
+    "emptyTitle": "Enter a search term",
+    "emptyDescription": "Use the search form to find the right products.",
+    "noResultsTitle": "No results found",
+    "noResultsDescription": "Try another keyword or broaden the query."
+  },
+  "enquiry": {
+    "getInTouch": "Get in touch",
+    "requestTitle": "Request a quote",
+    "requestDescription": "Share your details and our sales team will follow up with you.",
+    "contactEyebrow": "Contact us",
+    "contactTitle": "How can we help?",
+    "contactDescription": "Send a general enquiry to our team.",
+    "fullName": "Full name",
+    "email": "Email",
+    "phone": "Phone",
+    "company": "Company",
+    "city": "City",
+    "country": "Country",
+    "message": "Message",
+    "submit": "Submit enquiry",
+    "submitted": "Enquiry submitted",
+    "messageSubmitted": "Message submitted",
+    "reference": "Reference number",
+    "continueBrowsing": "Continue browsing",
+    "validationError": "Please review the form fields.",
+    "submissionError": "The request could not be submitted.",
+    "productUnavailable": "The requested product is not available.",
+    "phoneContact": "Phone",
+    "emailContact": "Email"
+  },
+  "sales": {
+    "whatsapp": "WhatsApp",
+    "call": "Call Sales",
+    "email": "Email Enquiry",
+    "subject": "Enquiry about {productName}"
+  },
+  "metadata": {
+    "siteTitle": "Qasr Al Mabrook",
+    "siteDescription": "Qasr Al Mabrook catalogue and enquiry platform.",
+    "productsTitle": "Product catalogue",
+    "productsDescription": "Browse the Qasr Al Mabrook product catalogue.",
+    "categoriesTitle": "Explore categories",
+    "categoriesDescription": "Browse products by category.",
+    "searchTitle": "Search products",
+    "searchDescription": "Search the Qasr Al Mabrook product catalogue.",
+    "requestQuoteTitle": "Request a quote",
+    "contactTitle": "Contact us"
+  }
+}

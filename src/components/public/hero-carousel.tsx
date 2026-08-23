@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -9,18 +10,20 @@ export function HeroCarousel({
   id,
   locale,
   banners,
-  autoplay = false,
+  overlay,
+  autoplay = true,
   autoplayInterval = 6000,
 }: {
   id: string;
   locale: "en" | "ar";
   banners: Array<{ imageUrl?: string | null; imageAlt?: string; title?: string; subtitle?: string; ctaLabel?: string; ctaHref?: string }>;
+  overlay?: ReactNode;
   autoplay?: boolean;
   autoplayInterval?: number;
 }) {
-  const scrollerRef = useRef<HTMLDivElement | null>(null);
   const [active, setActive] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const rootRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -30,88 +33,129 @@ export function HeroCarousel({
     return () => mediaQuery.removeEventListener("change", sync);
   }, []);
 
-  useEffect(() => {
-    const el = scrollerRef.current;
-    if (!el) return;
+  const goTo = useCallback(
+    (index: number) => {
+      setActive(Math.max(0, Math.min(index, banners.length - 1)));
+    },
+    [banners.length],
+  );
 
-    const onScroll = () => {
-      const idx = Math.round(el.scrollLeft / el.clientWidth);
-      setActive(Math.max(0, Math.min(banners.length - 1, idx)));
-    };
-
-    el.addEventListener("scroll", onScroll, { passive: true });
-    return () => el.removeEventListener("scroll", onScroll);
-  }, [banners.length]);
+  const prev = useCallback(() => goTo(active - 1), [active, goTo]);
+  const next = useCallback(() => goTo(active + 1), [active, goTo]);
 
   useEffect(() => {
     if (!autoplay || reducedMotion || banners.length <= 1) return;
-    const idt = setInterval(() => {
-      const next = (active + 1) % banners.length;
-      scrollToIndex(next);
+    const timer = window.setInterval(() => {
+      setActive((current) => (current + 1) % banners.length);
     }, autoplayInterval);
-    return () => clearInterval(idt);
-  }, [active, autoplay, autoplayInterval, reducedMotion, banners.length]);
+    return () => window.clearInterval(timer);
+  }, [autoplay, autoplayInterval, banners.length, reducedMotion]);
 
-  const scrollToIndex = useCallback(
-    (index: number) => {
-      const el = scrollerRef.current;
-      if (!el) return;
-      el.scrollTo({ left: el.clientWidth * index, behavior: reducedMotion ? "auto" : "smooth" });
-      setActive(index);
-    },
-    [reducedMotion],
-  );
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (!rootRef.current || !rootRef.current.contains(document.activeElement)) return;
+      if (event.key === "ArrowRight" || event.key === "PageDown") {
+        event.preventDefault();
+        next();
+      }
+      if (event.key === "ArrowLeft" || event.key === "PageUp") {
+        event.preventDefault();
+        prev();
+      }
+      if (event.key === "Home") {
+        event.preventDefault();
+        goTo(0);
+      }
+      if (event.key === "End") {
+        event.preventDefault();
+        goTo(banners.length - 1);
+      }
+    };
 
-  const prev = useCallback(() => scrollToIndex(Math.max(0, active - 1)), [active, scrollToIndex]);
-  const next = useCallback(() => scrollToIndex(Math.min(banners.length - 1, active + 1)), [active, banners.length, scrollToIndex]);
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [banners.length, goTo, next, prev]);
+
+  if (!banners.length) {
+    return null;
+  }
 
   return (
-    <div className="space-y-4">
-      <div className="relative">
+    <div
+      ref={rootRef}
+      dir={locale === "ar" ? "rtl" : "ltr"}
+      className="relative isolate overflow-hidden rounded-[var(--radius-2xl)] border border-[var(--brand-border)] bg-[var(--brand-surface-alt)] shadow-[var(--shadow-md)]"
+      tabIndex={0}
+      role="region"
+      aria-roledescription="carousel"
+      aria-label={id}
+      aria-live="polite"
+    >
+      <div className="relative overflow-hidden">
         <div
-          id={id}
-          ref={scrollerRef}
-          dir={locale === "ar" ? "rtl" : "ltr"}
-          tabIndex={0}
-          role="region"
-          aria-roledescription="carousel"
-          aria-label={id}
-          className="overflow-x-auto snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-          style={{ scrollSnapType: "x mandatory" }}
+          className="flex transition-transform duration-500 ease-out"
+          style={{ transform: `translateX(-${active * 100}%)` }}
         >
-          <div className="flex w-full">
-            {banners.map((b, i) => (
-              <div key={i} className="shrink-0 w-full snap-start">
-                {b.imageUrl ? (
-                  <PublicImageSlot src={b.imageUrl} alt={b.imageAlt ?? b.title ?? `banner-${i}`} variant="homepage-hero" sizes="100vw" />
-                ) : null}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="absolute left-3 top-1/2 -translate-y-1/2">
-          <Button variant="outline" size="sm" aria-label="Previous banner" onClick={prev} disabled={active === 0}>
-            ‹
-          </Button>
-        </div>
-        <div className="absolute right-3 top-1/2 -translate-y-1/2">
-          <Button variant="outline" size="sm" aria-label="Next banner" onClick={next} disabled={active === banners.length - 1}>
-            ›
-          </Button>
-        </div>
-
-        <div className="absolute left-1/2 top-auto bottom-3 -translate-x-1/2 flex gap-2">
-          {banners.map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              aria-label={`Go to slide ${i + 1}`}
-              onClick={() => scrollToIndex(i)}
-              className={`h-2 w-8 rounded-full ${i === active ? "bg-[var(--brand-primary)]" : "bg-[var(--brand-border)]"}`}
-            />
+          {banners.map((banner, index) => (
+            <div key={`${id}-${index}`} className="min-w-full shrink-0">
+              {banner.imageUrl ? (
+                <PublicImageSlot
+                  src={banner.imageUrl}
+                  alt={banner.imageAlt ?? banner.title ?? `Hero banner ${index + 1}`}
+                  variant="homepage-hero"
+                  sizes="100vw"
+                  priority={index === 0}
+                />
+              ) : null}
+            </div>
           ))}
         </div>
+      </div>
+
+      <div className="absolute inset-0 z-10 bg-gradient-to-r from-[rgba(15,23,42,0.78)] via-[rgba(15,23,42,0.36)] to-[rgba(15,23,42,0.18)]" />
+
+      <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-start px-4 py-5 sm:px-6 lg:px-10">
+        <div className="max-w-xl pointer-events-auto">{overlay}</div>
+      </div>
+
+      <div className="absolute left-3 top-1/2 z-30 -translate-y-1/2 sm:left-5 lg:left-7">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          aria-label={locale === "ar" ? "الشريحة السابقة" : "Previous slide"}
+          onClick={prev}
+          disabled={active === 0}
+          className="h-10 w-10 rounded-full border-white/60 bg-white/15 text-white backdrop-blur-sm hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          {locale === "ar" ? "‹" : "‹"}
+        </Button>
+      </div>
+
+      <div className="absolute right-3 top-1/2 z-30 -translate-y-1/2 sm:right-5 lg:right-7">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          aria-label={locale === "ar" ? "الشريحة التالية" : "Next slide"}
+          onClick={next}
+          disabled={active === banners.length - 1}
+          className="h-10 w-10 rounded-full border-white/60 bg-white/15 text-white backdrop-blur-sm hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          {locale === "ar" ? "›" : "›"}
+        </Button>
+      </div>
+
+      <div className="absolute inset-x-0 bottom-4 z-30 flex items-center justify-center gap-2 sm:bottom-5">
+        {banners.map((banner, index) => (
+          <button
+            key={`${id}-dot-${index}`}
+            type="button"
+            aria-label={locale === "ar" ? `الانتقال إلى الشريحة ${index + 1}` : `Go to slide ${index + 1}`}
+            onClick={() => goTo(index)}
+            className={`h-2.5 rounded-full transition-[width,background-color] ${index === active ? "w-9 bg-white" : "w-2.5 bg-white/50 hover:bg-white/80"}`}
+          />
+        ))}
       </div>
     </div>
   );

@@ -35,36 +35,38 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ loc
   return (
     <PublicShell locale={currentLocale} path="/">
       <main>
-        <Section className="bg-[var(--brand-surface)] py-10 sm:py-14">
-          <Container className={heroSections.length > 0 ? "grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center" : "space-y-6"}>
-            <div className="space-y-6">
-              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">
-                {t("eyebrow")}
-              </p>
-              <h1 className="max-w-2xl text-4xl font-semibold tracking-tight text-[var(--foreground)] sm:text-5xl">
-                {t("title")}
-              </h1>
-              <p className="max-w-xl text-base leading-7 text-[var(--text-muted)]">
-                {t("description")}
-              </p>
-              <div className="flex flex-wrap items-center gap-3">
-                <Link href={localePath(currentLocale, "/products")}>
-                  <Button variant="primary" size="lg">
-                    {t("browse")}
-                  </Button>
-                </Link>
-                <Link href={localePath(currentLocale, "/categories")}>
-                  <Button variant="outline" size="lg">
-                    {t("explore")}
-                  </Button>
-                </Link>
-              </div>
-            </div>
-
+        <Section className="bg-[var(--brand-surface)] py-8 sm:py-10 lg:py-12">
+          <Container>
             {heroSections.length > 0 ? (
               <HeroCarousel
                 id="homepage-hero"
                 locale={currentLocale}
+                autoplay
+                overlay={
+                  <div className="space-y-4 sm:space-y-5 lg:space-y-6" dir={currentLocale === "ar" ? "rtl" : "ltr"}>
+                    <p className="text-sm font-semibold uppercase tracking-[0.14em] text-white/85">
+                      {t("eyebrow")}
+                    </p>
+                    <h1 className="max-w-xl text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl">
+                      {t("title")}
+                    </h1>
+                    <p className="max-w-lg text-sm leading-6 text-white/85 sm:text-base">
+                      {t("description")}
+                    </p>
+                    <div className="flex flex-wrap items-center gap-3 pt-1">
+                      <Link href={localePath(currentLocale, "/products")}>
+                        <Button variant="primary" size="lg" className="bg-[var(--brand-primary)] shadow-[var(--shadow-sm)] hover:bg-[var(--brand-primary-dark)]">
+                          {t("browse")}
+                        </Button>
+                      </Link>
+                      <Link href={localePath(currentLocale, "/categories")}>
+                        <Button variant="outline" size="lg" className="border-white/60 bg-white/12 text-white hover:border-white hover:bg-white/18 hover:text-white">
+                          {t("explore")}
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                }
                 banners={heroSections.map((section) => ({
                   imageUrl: readLocalizedConfigString(section.configurationJson, "imageUrl", currentLocale) ?? readLocalizedConfigString(section.configurationJson, "image", currentLocale) ?? null,
                   imageAlt: readLocalizedConfigString(section.configurationJson, "imageAlt", currentLocale) ?? t("heroAlt"),
@@ -74,7 +76,33 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ loc
                   ctaHref: readLocalizedConfigString(section.configurationJson, "ctaHref", currentLocale) ?? undefined,
                 }))}
               />
-            ) : null}
+            ) : (
+              <div className="space-y-6 rounded-[var(--radius-xl)] border border-[var(--brand-border)] bg-white p-6 shadow-[var(--shadow-sm)] sm:p-8">
+                <div className="space-y-4">
+                  <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">
+                    {t("eyebrow")}
+                  </p>
+                  <h1 className="max-w-2xl text-4xl font-semibold tracking-tight text-[var(--foreground)] sm:text-5xl">
+                    {t("title")}
+                  </h1>
+                  <p className="max-w-xl text-base leading-7 text-[var(--text-muted)]">
+                    {t("description")}
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-3">
+                  <Link href={localePath(currentLocale, "/products")}>
+                    <Button variant="primary" size="lg">
+                      {t("browse")}
+                    </Button>
+                  </Link>
+                  <Link href={localePath(currentLocale, "/categories")}>
+                    <Button variant="outline" size="lg">
+                      {t("explore")}
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            )}
           </Container>
         </Section>
 

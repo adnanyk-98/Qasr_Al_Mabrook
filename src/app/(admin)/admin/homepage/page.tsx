@@ -1,22 +1,25 @@
 import Link from "next/link";
 
+import { HeroImageField } from "@/components/admin/hero-image-field";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Input, Label, Select } from "@/components/ui/form";
 import { getHomepageSectionById, listHomepageSections } from "@/server/repositories/catalog-admin";
 import { requireAdminSession } from "@/server/services/admin-auth";
-import { setHomepageSectionStatusAction, upsertHomepageSectionAction } from "@/server/services/admin-catalog";
+import { setHomepageSectionStatusAction } from "@/server/services/admin-catalog";
 
 type PageProps = {
-  searchParams: Promise<{ edit?: string }>;
+  searchParams: Promise<{ edit?: string; error?: string }>;
 };
 
 export default async function HomepagePage({ searchParams }: PageProps) {
   await requireAdminSession();
-  const homepageSections = await listHomepageSections();
   const params = await searchParams;
+  const homepageSections = await listHomepageSections();
   const editingSection = params.edit ? await getHomepageSectionById(params.edit) : null;
   const config = (editingSection?.configurationJson ?? {}) as Record<string, string | boolean | undefined>;
+  const currentImageUrl = typeof config.imageUrl === "string" && config.imageUrl.trim() ? config.imageUrl : undefined;
+  const formError = params.error ? decodeURIComponent(params.error) : null;
 
   return (
     <main className="min-h-screen bg-[var(--brand-surface)] p-6">
@@ -34,7 +37,13 @@ export default async function HomepagePage({ searchParams }: PageProps) {
               </h2>
             </CardHeader>
             <CardBody>
-              <form action={upsertHomepageSectionAction} className="space-y-4">
+              {formError ? (
+                <div className="mb-4 rounded-[var(--radius-md)] border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                  {formError}
+                </div>
+              ) : null}
+
+              <form action="/api/admin/homepage" method="POST" encType="multipart/form-data" className="space-y-4">
                 {editingSection ? <input type="hidden" name="sectionId" value={editingSection.id} /> : null}
 
                 <div>
@@ -72,15 +81,7 @@ export default async function HomepagePage({ searchParams }: PageProps) {
                   <Input id="description" name="description" placeholder="Supporting copy" defaultValue={String(config.description ?? "")} />
                 </div>
 
-                <div>
-                  <Label htmlFor="imageUrl">Hero image URL</Label>
-                  <Input id="imageUrl" name="imageUrl" placeholder="https://..." defaultValue={String(config.imageUrl ?? "")} />
-                </div>
-
-                <div>
-                  <Label htmlFor="imageFile">Or upload hero image</Label>
-                  <input id="imageFile" name="imageFile" type="file" accept="image/*" className="block w-full text-sm" />
-                </div>
+                <HeroImageField currentImageUrl={currentImageUrl} currentAlt={String(config.imageAlt ?? "Hero banner preview")} />
 
                 <div>
                   <Label htmlFor="imageAlt">Image alt text</Label>

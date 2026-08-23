@@ -153,35 +153,12 @@ export async function importLocalCatalogue(report: DiscoveryReport) {
         throw new Error(`Failed to read local image ${localPath}: ${String(err)}`);
       }
 
-      // Normalize image (conservative). If analyzer decides unsafe, use original buffer.
-      const { analyzeImage } = await import("@/lib/image-normalize");
-      const analysis = await analyzeImage(localPath, { previewMaxSize: 500, paddingPct: 0.05 });
+      // Preserve source image bytes and dimensions without any destructive trimming or normalization.
+      const sharpMod = (await import("sharp")).default;
+      const finalBuffer = srcBuffer;
+      const finalMeta = await sharpMod(finalBuffer).metadata();
 
-      let finalBuffer = srcBuffer;
-      let finalMeta = await (await import("sharp")).default(finalBuffer).metadata();
-
-      if (analysis.trimBox && !analysis.reason) {
-        const tb = analysis.trimBox;
-        try {
-          const sharpMod = (await import("sharp")).default;
-          let img = sharpMod(srcBuffer).extract({ left: tb.left, top: tb.top, width: tb.width, height: tb.height });
-          // Re-encode conservatively based on original format
-          const origMeta = await sharpMod(srcBuffer).metadata();
-          const fmt = origMeta.format ?? "jpeg";
-          if (fmt === "jpeg" || fmt === "jpg") img = img.jpeg({ quality: 82 });
-          else if (fmt === "png") img = img.png();
-          else if (fmt === "webp") img = img.webp({ quality: 82 });
-          const buf = await img.toBuffer();
-          finalBuffer = buf;
-          finalMeta = await sharpMod(finalBuffer).metadata();
-        } catch (err) {
-          // On any normalization failure, fallback to original buffer
-          finalBuffer = srcBuffer;
-          finalMeta = await (await import("sharp")).default(finalBuffer).metadata();
-        }
-      }
-
-      // Record normalized dimensions for DB use
+      // Record original dimensions for DB use without altering the stored asset.
       normalizedSizes.set(key, { width: finalMeta.width ?? null, height: finalMeta.height ?? null });
 
       // Check if object exists in R2 (head)

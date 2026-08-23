@@ -1,0 +1,867 @@
+[
+  {
+    "page": "home-en-390",
+    "title": "Home EN mobile",
+    "status": 200,
+    "errors": [],
+    "metrics": {
+      "pageWidth": 390,
+      "pageHeight": 1802,
+      "viewportWidth": 390,
+      "viewportHeight": 844,
+      "imgs": [
+        {
+          "src": "brand/logo-color.svg",
+          "naturalWidth": 167,
+          "naturalHeight": 150,
+          "clientWidth": 112,
+          "clientHeight": 101,
+          "objectFit": "fill",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "visible",
+          "parentClassName": "flex shrink-0 items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2"
+        },
+        {
+          "src": "banners/Cloth%20Piece-WEB.jpg",
+          "naturalWidth": 1920,
+          "naturalHeight": 1080,
+          "clientWidth": 358,
+          "clientHeight": 201,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative aspect-[16/9] overflow-hidden rounded-[var(--radius-2xl)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "adivasi-oil/Adivasi-Oil-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "cloth-piece/Cloth-Piece-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "fancy-suit/FANCY-SUIT-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        }
+      ]
+    },
+    "image": "D:\\Adnan\\Project\\Qasr_Al_Mabrook\\audit\\home-en-390.png"
+  },
+  {
+    "page": "home-en-768",
+    "title": "Home EN tablet",
+    "status": 200,
+    "errors": [],
+    "metrics": {
+      "pageWidth": 768,
+      "pageHeight": 2006,
+      "viewportWidth": 768,
+      "viewportHeight": 1024,
+      "imgs": [
+        {
+          "src": "brand/logo-color.svg",
+          "naturalWidth": 167,
+          "naturalHeight": 150,
+          "clientWidth": 144,
+          "clientHeight": 129,
+          "objectFit": "fill",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "visible",
+          "parentClassName": "flex shrink-0 items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2"
+        },
+        {
+          "src": "banners/Cloth%20Piece-WEB.jpg",
+          "naturalWidth": 1920,
+          "naturalHeight": 1080,
+          "clientWidth": 718,
+          "clientHeight": 404,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative aspect-[16/9] overflow-hidden rounded-[var(--radius-2xl)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "adivasi-oil/Adivasi-Oil-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "cloth-piece/Cloth-Piece-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "fancy-suit/FANCY-SUIT-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        }
+      ]
+    },
+    "image": "D:\\Adnan\\Project\\Qasr_Al_Mabrook\\audit\\home-en-768.png"
+  },
+  {
+    "page": "home-en-1280",
+    "title": "Home EN desktop small",
+    "status": 200,
+    "errors": [],
+    "metrics": {
+      "pageWidth": 1280,
+      "pageHeight": 2277,
+      "viewportWidth": 1280,
+      "viewportHeight": 800,
+      "imgs": [
+        {
+          "src": "brand/logo-color.svg",
+          "naturalWidth": 167,
+          "naturalHeight": 150,
+          "clientWidth": 144,
+          "clientHeight": 129,
+          "objectFit": "fill",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "visible",
+          "parentClassName": "flex shrink-0 items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2"
+        },
+        {
+          "src": "banners/Cloth%20Piece-WEB.jpg",
+          "naturalWidth": 1920,
+          "naturalHeight": 1080,
+          "clientWidth": 1214,
+          "clientHeight": 683,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative aspect-[16/9] overflow-hidden rounded-[var(--radius-2xl)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "adivasi-oil/Adivasi-Oil-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "cloth-piece/Cloth-Piece-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "fancy-suit/FANCY-SUIT-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        }
+      ]
+    },
+    "image": "D:\\Adnan\\Project\\Qasr_Al_Mabrook\\audit\\home-en-1280.png"
+  },
+  {
+    "page": "home-en-1440",
+    "title": "Home EN desktop",
+    "status": 200,
+    "errors": [],
+    "metrics": {
+      "pageWidth": 1440,
+      "pageHeight": 2297,
+      "viewportWidth": 1440,
+      "viewportHeight": 900,
+      "imgs": [
+        {
+          "src": "brand/logo-color.svg",
+          "naturalWidth": 167,
+          "naturalHeight": 150,
+          "clientWidth": 144,
+          "clientHeight": 129,
+          "objectFit": "fill",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "visible",
+          "parentClassName": "flex shrink-0 items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2"
+        },
+        {
+          "src": "banners/Cloth%20Piece-WEB.jpg",
+          "naturalWidth": 1920,
+          "naturalHeight": 1080,
+          "clientWidth": 1214,
+          "clientHeight": 683,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative aspect-[16/9] overflow-hidden rounded-[var(--radius-2xl)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "adivasi-oil/Adivasi-Oil-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "cloth-piece/Cloth-Piece-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "fancy-suit/FANCY-SUIT-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        }
+      ]
+    },
+    "image": "D:\\Adnan\\Project\\Qasr_Al_Mabrook\\audit\\home-en-1440.png"
+  },
+  {
+    "page": "home-ar-1440",
+    "title": "Home AR desktop",
+    "status": 200,
+    "errors": [],
+    "metrics": {
+      "pageWidth": 1440,
+      "pageHeight": 2297,
+      "viewportWidth": 1440,
+      "viewportHeight": 900,
+      "imgs": [
+        {
+          "src": "brand/logo-color.svg",
+          "naturalWidth": 167,
+          "naturalHeight": 150,
+          "clientWidth": 144,
+          "clientHeight": 129,
+          "objectFit": "fill",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "visible",
+          "parentClassName": "flex shrink-0 items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2"
+        },
+        {
+          "src": "banners/Cloth%20Piece-WEB.jpg",
+          "naturalWidth": 1920,
+          "naturalHeight": 1080,
+          "clientWidth": 1214,
+          "clientHeight": 683,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative aspect-[16/9] overflow-hidden rounded-[var(--radius-2xl)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "adivasi-oil/Adivasi-Oil-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "cloth-piece/Cloth-Piece-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "fancy-suit/FANCY-SUIT-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        }
+      ]
+    },
+    "image": "D:\\Adnan\\Project\\Qasr_Al_Mabrook\\audit\\home-ar-1440.png"
+  },
+  {
+    "page": "products-en-1280",
+    "title": "Products EN",
+    "status": 200,
+    "errors": [],
+    "metrics": {
+      "pageWidth": 1280,
+      "pageHeight": 1727,
+      "viewportWidth": 1280,
+      "viewportHeight": 800,
+      "imgs": [
+        {
+          "src": "brand/logo-color.svg",
+          "naturalWidth": 167,
+          "naturalHeight": 150,
+          "clientWidth": 144,
+          "clientHeight": 129,
+          "objectFit": "fill",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "visible",
+          "parentClassName": "flex shrink-0 items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2"
+        },
+        {
+          "src": "adivasi-oil/Adivasi-Oil-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "cloth-piece/Cloth-Piece-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "fancy-suit/FANCY-SUIT-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "pajama/Pajama-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        }
+      ]
+    },
+    "image": "D:\\Adnan\\Project\\Qasr_Al_Mabrook\\audit\\products-en-1280.png"
+  },
+  {
+    "page": "products-ar-1280",
+    "title": "Products AR",
+    "status": 200,
+    "errors": [],
+    "metrics": {
+      "pageWidth": 1280,
+      "pageHeight": 1727,
+      "viewportWidth": 1280,
+      "viewportHeight": 800,
+      "imgs": [
+        {
+          "src": "brand/logo-color.svg",
+          "naturalWidth": 167,
+          "naturalHeight": 150,
+          "clientWidth": 144,
+          "clientHeight": 129,
+          "objectFit": "fill",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "visible",
+          "parentClassName": "flex shrink-0 items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2"
+        },
+        {
+          "src": "adivasi-oil/Adivasi-Oil-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "cloth-piece/Cloth-Piece-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "fancy-suit/FANCY-SUIT-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "pajama/Pajama-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        }
+      ]
+    },
+    "image": "D:\\Adnan\\Project\\Qasr_Al_Mabrook\\audit\\products-ar-1280.png"
+  },
+  {
+    "page": "product-detail-1280",
+    "title": "Product detail",
+    "status": 200,
+    "errors": [],
+    "metrics": {
+      "pageWidth": 1280,
+      "pageHeight": 1436,
+      "viewportWidth": 1280,
+      "viewportHeight": 800,
+      "imgs": [
+        {
+          "src": "brand/logo-color.svg",
+          "naturalWidth": 167,
+          "naturalHeight": 150,
+          "clientWidth": 144,
+          "clientHeight": 129,
+          "objectFit": "fill",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "visible",
+          "parentClassName": "flex shrink-0 items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2"
+        },
+        {
+          "src": "adivasi-oil/Adivasi-Oil-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 500,
+          "clientHeight": 500,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,500px)] aspect-square overflow-hidden rounded-[var(--radius-xl)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "adivasi-oil/Adivasi-Oil-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 78,
+          "clientHeight": 78,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative aspect-square overflow-hidden rounded-[var(--radius-sm)] bg-[var(--brand-surface-alt)]"
+        },
+        {
+          "src": "adivasi-oil/Adivasi-Oil-02.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 78,
+          "clientHeight": 78,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative aspect-square overflow-hidden rounded-[var(--radius-sm)] bg-[var(--brand-surface-alt)]"
+        }
+      ]
+    },
+    "image": "D:\\Adnan\\Project\\Qasr_Al_Mabrook\\audit\\product-detail-1280.png"
+  },
+  {
+    "page": "category-list-768",
+    "title": "Category list",
+    "status": 200,
+    "errors": [],
+    "metrics": {
+      "pageWidth": 768,
+      "pageHeight": 1620,
+      "viewportWidth": 768,
+      "viewportHeight": 1024,
+      "imgs": [
+        {
+          "src": "brand/logo-color.svg",
+          "naturalWidth": 167,
+          "naturalHeight": 150,
+          "clientWidth": 144,
+          "clientHeight": 129,
+          "objectFit": "fill",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "visible",
+          "parentClassName": "flex shrink-0 items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2"
+        }
+      ]
+    },
+    "image": "D:\\Adnan\\Project\\Qasr_Al_Mabrook\\audit\\category-list-768.png"
+  },
+  {
+    "page": "category-detail-1440",
+    "title": "Category detail",
+    "status": 200,
+    "errors": [],
+    "metrics": {
+      "pageWidth": 1440,
+      "pageHeight": 1039,
+      "viewportWidth": 1440,
+      "viewportHeight": 900,
+      "imgs": [
+        {
+          "src": "brand/logo-color.svg",
+          "naturalWidth": 167,
+          "naturalHeight": 150,
+          "clientWidth": 144,
+          "clientHeight": 129,
+          "objectFit": "fill",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "visible",
+          "parentClassName": "flex shrink-0 items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2"
+        },
+        {
+          "src": "adivasi-oil/Adivasi-Oil-01.jpg",
+          "naturalWidth": 2500,
+          "naturalHeight": 2500,
+          "clientWidth": 220,
+          "clientHeight": 220,
+          "objectFit": "contain",
+          "objectPosition": "50% 50%",
+          "parentOverflow": "hidden",
+          "parentClassName": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]"
+        }
+      ]
+    },
+    "image": "D:\\Adnan\\Project\\Qasr_Al_Mabrook\\audit\\category-detail-1440.png"
+  }
+]

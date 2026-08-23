@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
+import { CatalogueCarousel } from "@/components/public/catalogue-carousel";
 import { CategoryCard } from "@/components/public/category-card";
 import { Container, Section } from "@/components/ui/layout";
 import { ProductCard } from "@/components/public/product-card";
@@ -88,48 +89,71 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ loc
 
         <Section>
           <Container className="space-y-6">
-            <div className="flex items-end justify-between gap-4">
-              <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">
-                  {t("categoriesEyebrow")}
-                </p>
-                <h2 className="mt-1 text-3xl font-semibold text-[var(--foreground)]">
-                  {t("categoriesTitle")}
-                </h2>
-              </div>
-            </div>
-
-            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-              {categories.map((category) => <CategoryCard key={category.id} locale={currentLocale} slug={category.slug} name={category.name} description={category.description} />)}
-            </div>
+            <CatalogueCarousel
+              id="homepage-categories-carousel"
+              locale={currentLocale}
+              title={
+                <div>
+                  <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">
+                    {t("categoriesEyebrow")}
+                  </p>
+                  <h2 className="mt-1 text-3xl font-semibold text-[var(--foreground)]">
+                    {t("categoriesTitle")}
+                  </h2>
+                </div>
+              }
+              viewAllLink={
+                <Link href={localePath(currentLocale, "/categories")} className="text-sm font-medium text-[var(--brand-primary)] hover:text-[var(--brand-primary-dark)]">
+                  {t("viewAll")}
+                </Link>
+              }
+              prevLabel={currentLocale === "ar" ? "السابق" : "Previous categories"}
+              nextLabel={currentLocale === "ar" ? "التالي" : "Next categories"}
+              itemClassName="min-w-[72%] sm:min-w-[calc(50%-0.625rem)] xl:min-w-[calc(25%-0.75rem)]"
+              items={categories.map((category) => (
+                <CategoryCard
+                  key={category.id}
+                  locale={currentLocale}
+                  slug={category.slug}
+                  name={category.name}
+                  description={category.description}
+                />
+              ))}
+            />
           </Container>
         </Section>
 
         <Section className="pt-0">
           <Container className="space-y-6">
-            <div className="flex items-end justify-between gap-4">
-              <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">
-                  {t("featuredEyebrow")}
-                </p>
-                <h2 className="mt-1 text-3xl font-semibold text-[var(--foreground)]">
-                  {t("featuredTitle")}
-                </h2>
-              </div>
-              <Link href={localePath(currentLocale, "/products")} className="text-sm font-medium text-[var(--brand-primary)] hover:text-[var(--brand-primary-dark)]">
-                {t("viewAll")}
-              </Link>
-            </div>
-
-            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-              {featuredProducts.map((product) => (
+            <CatalogueCarousel
+              id="homepage-featured-products-carousel"
+              locale={currentLocale}
+              title={
+                <div>
+                  <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">
+                    {t("featuredEyebrow")}
+                  </p>
+                  <h2 className="mt-1 text-3xl font-semibold text-[var(--foreground)]">
+                    {t("featuredTitle")}
+                  </h2>
+                </div>
+              }
+              viewAllLink={
+                <Link href={localePath(currentLocale, "/products")} className="text-sm font-medium text-[var(--brand-primary)] hover:text-[var(--brand-primary-dark)]">
+                  {t("viewAll")}
+                </Link>
+              }
+              prevLabel={currentLocale === "ar" ? "السابق" : "Previous products"}
+              nextLabel={currentLocale === "ar" ? "التالي" : "Next products"}
+              itemClassName="min-w-[84%] sm:min-w-[calc(50%-0.625rem)] xl:min-w-[calc(33.333%-1rem)]"
+              items={featuredProducts.map((product) => (
                 <ProductCard
                   key={product.id}
                   locale={currentLocale}
                   product={product}
                 />
               ))}
-            </div>
+            />
           </Container>
         </Section>
       </main>

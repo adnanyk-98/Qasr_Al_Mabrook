@@ -17,7 +17,16 @@ export function HeroCarousel({
 }: {
   id: string;
   locale: "en" | "ar";
-  banners: Array<{ imageUrl?: string | null; imageAlt?: string; title?: string; subtitle?: string; ctaLabel?: string; ctaHref?: string }>;
+  banners: Array<{
+    imageUrl?: string | null;
+    desktopImageUrl?: string | null;
+    mobileImageUrl?: string | null;
+    imageAlt?: string;
+    title?: string;
+    subtitle?: string;
+    ctaLabel?: string;
+    ctaHref?: string;
+  }>;
   overlay?: ReactNode;
   autoplay?: boolean;
   autoplayInterval?: number;
@@ -84,6 +93,7 @@ export function HeroCarousel({
   return (
     <div
       ref={rootRef}
+      id={id}
       dir={locale === "ar" ? "rtl" : "ltr"}
       className="relative isolate overflow-hidden rounded-[var(--radius-2xl)] border border-[var(--brand-border)] bg-[var(--brand-surface-alt)] shadow-[var(--shadow-md)]"
       tabIndex={0}
@@ -92,37 +102,32 @@ export function HeroCarousel({
       aria-label={id}
       aria-live="polite"
     >
-      <div className="relative overflow-hidden">
+      <div className="relative w-full overflow-hidden">
         <div
-          className="flex transition-transform duration-500 ease-out"
+          className="w-full flex transition-transform duration-500 ease-out"
           style={{ transform: `translateX(-${active * 100}%)` }}
         >
           {banners.map((banner, index) => (
-            <div key={`${id}-${index}`} className="min-w-full shrink-0 relative">
-              {banner.imageUrl ? (
+            <div key={`${id}-${index}`} className="min-w-full w-full shrink-0 relative">
+              {(banner.desktopImageUrl || banner.imageUrl) ? (
                 banner.ctaHref ? (
-                  <Link
-                    href={banner.ctaHref}
-                    aria-label={banner.title ?? banner.imageAlt ?? `Hero banner ${index + 1}`}
-                    className="block w-full h-full"
-                  >
-                    <PublicImageSlot
-                      src={banner.imageUrl}
-                      alt={banner.imageAlt ?? banner.title ?? `Hero banner ${index + 1}`}
-                      variant="homepage-hero"
-                      sizes="100vw"
-                      priority={index === 0}
-                    />
+                  <Link href={banner.ctaHref} aria-label={banner.title ?? banner.imageAlt ?? `Hero banner ${index + 1}`} className="block w-full h-full">
+                    {/* Responsive picture: mobile source first, desktop as fallback */}
+                    <div className="relative w-full aspect-[9/10] md:aspect-[8/3] overflow-hidden rounded-[var(--radius-2xl)]">
+                      <picture>
+                        {banner.mobileImageUrl ? <source media="(max-width: 767px)" srcSet={banner.mobileImageUrl} /> : null}
+                        <img src={banner.desktopImageUrl ?? banner.imageUrl ?? ''} alt={banner.imageAlt ?? banner.title ?? `Hero banner ${index + 1}`} className="w-full h-full object-contain object-center" />
+                      </picture>
+                    </div>
                   </Link>
                 ) : (
                   <div className="block w-full h-full">
-                    <PublicImageSlot
-                      src={banner.imageUrl}
-                      alt={banner.imageAlt ?? banner.title ?? `Hero banner ${index + 1}`}
-                      variant="homepage-hero"
-                      sizes="100vw"
-                      priority={index === 0}
-                    />
+                    <div className="relative w-full aspect-[9/10] md:aspect-[8/3] overflow-hidden rounded-[var(--radius-2xl)]">
+                      <picture>
+                        {banner.mobileImageUrl ? <source media="(max-width: 767px)" srcSet={banner.mobileImageUrl} /> : null}
+                        <img src={banner.desktopImageUrl ?? banner.imageUrl ?? ''} alt={banner.imageAlt ?? banner.title ?? `Hero banner ${index + 1}`} className="w-full h-full object-contain object-center" />
+                      </picture>
+                    </div>
                   </div>
                 )
               ) : null}

@@ -36,10 +36,16 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ loc
     <PublicShell locale={currentLocale} path="/">
       <main>
         <Section className="bg-[var(--brand-surface)] py-8 sm:py-10 lg:py-12">
-          <Container>
-            {heroSections.length > 0 ? (
-              <HeroCarousel id="homepage-hero" locale={currentLocale} autoplay
+          {heroSections.length > 0 ? (
+            // Full-bleed hero: render outside the standard centered Container
+            <div className="w-full">
+              <HeroCarousel
+                id="homepage-hero"
+                locale={currentLocale}
+                autoplay
                 banners={heroSections.map((section) => ({
+                  desktopImageUrl: readLocalizedConfigString(section.configurationJson, "desktopImageUrl", currentLocale) ?? readLocalizedConfigString(section.configurationJson, "imageUrl", currentLocale) ?? null,
+                  mobileImageUrl: readLocalizedConfigString(section.configurationJson, "mobileImageUrl", currentLocale) ?? null,
                   imageUrl: readLocalizedConfigString(section.configurationJson, "imageUrl", currentLocale) ?? readLocalizedConfigString(section.configurationJson, "image", currentLocale) ?? null,
                   imageAlt: readLocalizedConfigString(section.configurationJson, "imageAlt", currentLocale) ?? t("heroAlt"),
                   title: readLocalizedConfigString(section.configurationJson, "title", currentLocale) ?? undefined,
@@ -48,7 +54,8 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ loc
                   ctaHref: readLocalizedConfigString(section.configurationJson, "ctaHref", currentLocale) ?? undefined,
                 }))}
               />
-            ) : (
+            </div>
+          ) : (
               <div className="space-y-6 rounded-[var(--radius-xl)] border border-[var(--brand-border)] bg-white p-6 shadow-[var(--shadow-sm)] sm:p-8">
                 <div className="space-y-4">
                   <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">
@@ -75,7 +82,6 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ loc
                 </div>
               </div>
             )}
-          </Container>
         </Section>
 
         {promotionalSections.length > 0 ? (

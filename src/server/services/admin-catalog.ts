@@ -27,6 +27,8 @@ import {
 import { getProductById, updateCategory, getCategoryById } from "@/server/repositories/catalog-admin";
 import { requireAdminSession } from "@/server/services/admin-auth";
 import { serverEnv } from "@/config/env";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { generateR2PublicUrl, readOriginalProductImageMetadata } from "@/lib/catalogue-import";
 
 const idSchema = z.string().uuid();
 const localeSchema = z.enum(["en", "ar"]);
@@ -336,7 +338,7 @@ export async function upsertHomepageSectionAction(formData: FormData) {
   const sectionType = String(formData.get("sectionType") ?? "").trim();
   const status = String(formData.get("status") ?? "DRAFT");
   const sortOrder = String(formData.get("sortOrder") ?? "0");
-  const configurationJson = {
+  const configurationJson: Record<string, unknown> = {
     title: String(formData.get("title") ?? ""),
     subtitle: String(formData.get("subtitle") ?? ""),
     description: String(formData.get("description") ?? ""),
@@ -346,6 +348,46 @@ export async function upsertHomepageSectionAction(formData: FormData) {
     ctaHref: String(formData.get("ctaHref") ?? ""),
     enabled: String(formData.get("enabled") ?? "") === "on",
   };
+
+  // Support direct file upload for hero/banner images via FormData field `imageFile`.
+  const file = formData.get("imageFile") as File | null;
+  if (file && file.size > 0 && file.name) {
+    const r2AccountId = serverEnv.R2_ACCOUNT_ID;
+    const bucket = serverEnv.R2_BUCKET_NAME;
+    const publicBase = serverEnv.R2_PUBLIC_BASE_URL;
+
+    if (!r2AccountId || !bucket || !publicBase) {
+      // R2 not configured — skip upload and rely on imageUrl field.
+    } else {
+      const endpoint = `https://${r2AccountId}.r2.cloudflarestorage.com`;
+      const s3 = new S3Client({ region: "auto", endpoint, credentials: { accessKeyId: serverEnv.R2_ACCESS_KEY_ID ?? "", secretAccessKey: serverEnv.R2_SECRET_ACCESS_KEY ?? "" } });
+
+      // sanitize filename and object key
+      const safeFilename = file.name.trim().replace(/\s+/g, "-").replace(/[^a-zA-Z0-9.\-_%]/g, "");
+      const key = `catalogue/banners/${safeFilename}`;
+      const buffer = Buffer.from(await file.arrayBuffer());
+
+      // Upload to R2
+      try {
+        await s3.send(new PutObjectCommand({ Bucket: bucket, Key: key, Body: buffer, ContentType: file.type }));
+        const publicUrl = generateR2PublicUrl(publicBase, key);
+
+        // try to read dimensions (if sharp available)
+        try {
+          const dims = await readOriginalProductImageMetadata(buffer as Buffer);
+          configurationJson.imageWidth = dims.width;
+          configurationJson.imageHeight = dims.height;
+        } catch (err) {
+          // ignore metadata errors
+        }
+
+        configurationJson.imageUrl = publicUrl;
+        configurationJson.imageObjectKey = key;
+      } catch (err) {
+        // upload failed; continue without interrupting admin flow
+      }
+    }
+  }
 
   if (sectionId) {
     await updateHomepageSection({

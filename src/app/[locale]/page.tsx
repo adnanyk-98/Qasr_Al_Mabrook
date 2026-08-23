@@ -8,6 +8,7 @@ import { Container, Section } from "@/components/ui/layout";
 import { ProductCard } from "@/components/public/product-card";
 import { PromotionalBanner } from "@/components/public/promotional-banner";
 import { PublicImageSlot } from "@/components/public/public-image-slot";
+import { HeroCarousel } from "@/components/public/hero-carousel";
 import { PublicShell } from "@/components/public/public-shell";
 import { listPublishedCategories, listPublishedHomepageSections, listPublishedProducts } from "@/server/repositories/public-catalog";
 import { localePath, locales, type Locale } from "@/lib/locales";
@@ -28,16 +29,14 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ loc
     listPublishedCategories(currentLocale),
     listPublishedProducts(currentLocale, { limit: 6 }),
   ]);
-  const heroSection = sections.find((section) => section.sectionType.toUpperCase() === "HERO");
-  const heroImageUrl = readLocalizedConfigString(heroSection?.configurationJson, "imageUrl", currentLocale) ?? readLocalizedConfigString(heroSection?.configurationJson, "image", currentLocale);
-  const heroImageAlt = readLocalizedConfigString(heroSection?.configurationJson, "imageAlt", currentLocale) ?? t("heroAlt");
-  const promotionalSections = sections.filter((section) => section !== heroSection);
+  const heroSections = sections.filter((section) => section.sectionType.toUpperCase() === "HERO");
+  const promotionalSections = sections.filter((section) => !heroSections.includes(section));
 
   return (
     <PublicShell locale={currentLocale} path="/">
       <main>
         <Section className="bg-[var(--brand-surface)] py-10 sm:py-14">
-          <Container className={heroImageUrl ? "grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center" : "space-y-6"}>
+          <Container className={heroSections.length > 0 ? "grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center" : "space-y-6"}>
             <div className="space-y-6">
               <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">
                 {t("eyebrow")}
@@ -62,10 +61,19 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ loc
               </div>
             </div>
 
-            {heroImageUrl ? (
-              <div className="rounded-[var(--radius-xl)] border border-[var(--brand-border)] bg-white p-3 shadow-[var(--shadow-sm)]">
-                <PublicImageSlot src={heroImageUrl} alt={heroImageAlt} variant="homepage-hero" sizes="(max-width: 1024px) 100vw, 40vw" priority />
-              </div>
+            {heroSections.length > 0 ? (
+              <HeroCarousel
+                id="homepage-hero"
+                locale={currentLocale}
+                banners={heroSections.map((section) => ({
+                  imageUrl: readLocalizedConfigString(section.configurationJson, "imageUrl", currentLocale) ?? readLocalizedConfigString(section.configurationJson, "image", currentLocale) ?? null,
+                  imageAlt: readLocalizedConfigString(section.configurationJson, "imageAlt", currentLocale) ?? t("heroAlt"),
+                  title: readLocalizedConfigString(section.configurationJson, "title", currentLocale) ?? undefined,
+                  subtitle: readLocalizedConfigString(section.configurationJson, "subtitle", currentLocale) ?? undefined,
+                  ctaLabel: readLocalizedConfigString(section.configurationJson, "ctaLabel", currentLocale) ?? undefined,
+                  ctaHref: readLocalizedConfigString(section.configurationJson, "ctaHref", currentLocale) ?? undefined,
+                }))}
+              />
             ) : null}
           </Container>
         </Section>

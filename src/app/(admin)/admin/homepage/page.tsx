@@ -78,6 +78,11 @@ export default async function HomepagePage({ searchParams }: PageProps) {
                 </div>
 
                 <div>
+                  <Label htmlFor="imageFile">Or upload hero image</Label>
+                  <input id="imageFile" name="imageFile" type="file" accept="image/*" className="block w-full text-sm" />
+                </div>
+
+                <div>
                   <Label htmlFor="imageAlt">Image alt text</Label>
                   <Input id="imageAlt" name="imageAlt" placeholder="Hero banner alt text" defaultValue={String(config.imageAlt ?? "")} />
                 </div>

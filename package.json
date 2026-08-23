@@ -14,6 +14,7 @@
     "db:migration:check": "drizzle-kit check",
     "db:migration:apply": "tsx scripts/apply-migrations.ts",
     "db:bootstrap-admin": "tsx scripts/bootstrap-admin.ts",
+    "db:reset-admin-password": "tsx scripts/reset-admin-password.ts",
     "catalogue:import": "tsx scripts/import-catalogue.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

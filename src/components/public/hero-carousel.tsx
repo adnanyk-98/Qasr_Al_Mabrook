@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { PublicImageSlot } from "@/components/public/public-image-slot";
 
@@ -97,25 +98,37 @@ export function HeroCarousel({
           style={{ transform: `translateX(-${active * 100}%)` }}
         >
           {banners.map((banner, index) => (
-            <div key={`${id}-${index}`} className="min-w-full shrink-0">
+            <div key={`${id}-${index}`} className="min-w-full shrink-0 relative">
               {banner.imageUrl ? (
-                <PublicImageSlot
-                  src={banner.imageUrl}
-                  alt={banner.imageAlt ?? banner.title ?? `Hero banner ${index + 1}`}
-                  variant="homepage-hero"
-                  sizes="100vw"
-                  priority={index === 0}
-                />
+                banner.ctaHref ? (
+                  <Link
+                    href={banner.ctaHref}
+                    aria-label={banner.title ?? banner.imageAlt ?? `Hero banner ${index + 1}`}
+                    className="block w-full h-full"
+                  >
+                    <PublicImageSlot
+                      src={banner.imageUrl}
+                      alt={banner.imageAlt ?? banner.title ?? `Hero banner ${index + 1}`}
+                      variant="homepage-hero"
+                      sizes="100vw"
+                      priority={index === 0}
+                    />
+                  </Link>
+                ) : (
+                  <div className="block w-full h-full">
+                    <PublicImageSlot
+                      src={banner.imageUrl}
+                      alt={banner.imageAlt ?? banner.title ?? `Hero banner ${index + 1}`}
+                      variant="homepage-hero"
+                      sizes="100vw"
+                      priority={index === 0}
+                    />
+                  </div>
+                )
               ) : null}
             </div>
           ))}
         </div>
-      </div>
-
-      <div className="absolute inset-0 z-10 bg-gradient-to-r from-[rgba(15,23,42,0.78)] via-[rgba(15,23,42,0.36)] to-[rgba(15,23,42,0.18)]" />
-
-      <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-start px-4 py-5 sm:px-6 lg:px-10">
-        <div className="max-w-xl pointer-events-auto">{overlay}</div>
       </div>
 
       <div className="absolute left-3 top-1/2 z-30 -translate-y-1/2 sm:left-5 lg:left-7">

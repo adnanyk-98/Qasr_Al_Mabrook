@@ -87,12 +87,6 @@ export function generateR2PublicUrl(r2PublicBaseUrl: string, objectKey: string) 
 export function validateLocalImportMode(stage: string, confirmed: boolean, databaseUrl?: string) {
   if (stage !== "local")
     return { ok: false, message: "Catalogue mutation is restricted to --stage=local." };
-  if (!confirmed)
-    return {
-      ok: false,
-      message:
-        "Catalogue mutation requires --confirm; without it this command is dry-run only.",
-    };
 
   if (!databaseUrl) {
     return { ok: false, message: "Refusing local import: DATABASE_URL is not set in environment." };

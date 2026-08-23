@@ -9,12 +9,12 @@ type PublicImageVariant =
   | "category-card";
 
 const variantClasses: Record<PublicImageVariant, string> = {
-  "product-card": "relative h-56 overflow-hidden bg-[var(--brand-surface-alt)]",
-  "product-detail-main": "relative h-[440px] overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]",
-  "product-detail-thumbnail": "relative h-20 overflow-hidden rounded-[var(--radius-sm)] bg-[var(--brand-surface-alt)]",
-  "homepage-hero": "relative aspect-[4/3] overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)] lg:aspect-[16/10]",
-  "homepage-banner": "relative aspect-[3/1] overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]",
-  "category-card": "relative aspect-[4/3] overflow-hidden rounded-[var(--radius-md)] bg-[var(--brand-surface-alt)]",
+  "product-card": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]",
+  "product-detail-main": "relative mx-auto w-full max-w-[min(100%,500px)] aspect-square overflow-hidden rounded-[var(--radius-xl)] bg-[var(--brand-surface-alt)]",
+  "product-detail-thumbnail": "relative mx-auto w-full max-w-[88px] aspect-square overflow-hidden rounded-[var(--radius-sm)] bg-[var(--brand-surface-alt)]",
+  "homepage-hero": "relative aspect-[4/3] overflow-hidden rounded-[var(--radius-xl)] bg-[var(--brand-surface-alt)] lg:aspect-[16/10]",
+  "homepage-banner": "relative aspect-[3/1] overflow-hidden rounded-[var(--radius-xl)] bg-[var(--brand-surface-alt)]",
+  "category-card": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]",
 };
 
 export function PublicImageSlot({

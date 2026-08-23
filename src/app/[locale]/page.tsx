@@ -36,7 +36,7 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ loc
     <PublicShell locale={currentLocale} path="/">
       <main>
         <Section className="bg-[var(--brand-surface)] py-10 sm:py-14">
-          <Container className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+          <Container className={heroImageUrl ? "grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center" : "space-y-6"}>
             <div className="space-y-6">
               <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">
                 {t("eyebrow")}
@@ -65,22 +65,7 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ loc
               <div className="rounded-[var(--radius-xl)] border border-[var(--brand-border)] bg-white p-3 shadow-[var(--shadow-sm)]">
                 <PublicImageSlot src={heroImageUrl} alt={heroImageAlt} variant="homepage-hero" sizes="(max-width: 1024px) 100vw, 40vw" priority />
               </div>
-            ) : (
-              <div className="rounded-[var(--radius-xl)] border border-[var(--brand-border)] bg-white p-6 shadow-[var(--shadow-sm)]">
-                <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
-                  {[
-                    { value: "150+", label: t("productsStat") },
-                    { value: "24/7", label: t("supportStat") },
-                    { value: "AR / EN", label: t("localesStat") },
-                  ].map((stat) => (
-                    <div key={stat.label} className="rounded-[var(--radius-md)] bg-[var(--brand-surface-alt)] p-4">
-                      <div className="text-2xl font-semibold text-[var(--brand-primary)]">{stat.value}</div>
-                      <div className="mt-1 text-sm text-[var(--text-muted)]">{stat.label}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            ) : null}
           </Container>
         </Section>
 

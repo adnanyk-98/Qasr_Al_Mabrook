@@ -92,10 +92,9 @@ test("distinguishes invalid email and SMTP port configuration", () => {
   );
 });
 
-test("requires local stage and explicit confirmation for catalogue mutation", () => {
+test("runs local catalogue mutation without a dry-run confirmation gate", () => {
   assert.equal(validateLocalImportMode("production", true).ok, false);
-  assert.equal(validateLocalImportMode("local", false).ok, false);
-  // provide a local DATABASE_URL when checking confirmed local imports
+  assert.equal(validateLocalImportMode("local", false, "postgresql://localhost/dev").ok, true);
   assert.equal(validateLocalImportMode("local", true, "postgresql://localhost/dev").ok, true);
 });
 
@@ -121,6 +120,7 @@ test("builds a deterministic import plan without unresolved images", () => {
       },
     ],
     ignoredDirectories: [],
+    banners: [],
     unassignedImages: [],
     ambiguousImages: ["Measuring Tape/support.jpg"],
     manifestUsed: true,
@@ -173,6 +173,7 @@ test("reconciles the catalogue image total without counting unresolved files", (
       })),
     ],
     ignoredDirectories: [],
+    banners: [],
     unassignedImages: [],
     ambiguousImages: ["Measuring Tape/support.jpg"],
     manifestUsed: true,

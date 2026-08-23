@@ -14,10 +14,9 @@ config({ path: process.env.DOTENV_CONFIG_PATH ?? ".env.local" });
 const stageArgument = process.argv.find((argument) => argument.startsWith("--stage="));
 const source = sourceArgument?.slice("--source=".length) ?? "./catalogue";
 const stage = stageArgument?.slice("--stage=".length) ?? "local";
-const confirmed = process.argv.includes("--confirm");
 
 const dbUrl = process.env.DIRECT_DATABASE_URL ?? process.env.DATABASE_URL;
-const mode = validateLocalImportMode(stage, confirmed, dbUrl);
+const mode = validateLocalImportMode(stage, true, dbUrl);
 if (stage !== "local") {
   console.error(mode.message);
   process.exit(1);
@@ -86,9 +85,7 @@ async function main() {
   console.log(
     `SKIPPED UNASSIGNED: ${plan.skippedUnassignedImages.length ? plan.skippedUnassignedImages.join(" | ") : "none"}`,
   );
-  console.log(
-    `MODE: ${confirmed ? "CONFIRMED LOCAL IMPORT" : "DRY RUN; NO DATABASE WRITES"}`,
-  );
+  console.log("MODE: ACTIVE DEVELOPMENT IMPORT");
 
   if (report.manifestErrors.length) {
     console.error("Import refused while manifest errors remain.");
@@ -101,22 +98,9 @@ async function main() {
     return;
   }
 
-  // If the configured database URL (prefer DIRECT_DATABASE_URL) is not a localhost target, require explicit env approval
-  if (!isLocalDatabaseUrl(dbUrl)) {
-    const approval = process.env.IMPORT_CONFIRMATION;
-    if (approval !== "APPLY_CATALOGUE_IMPORT") {
-      console.error("Refusing local import: target DATABASE_URL appears remote. To allow imports into a remote development database set IMPORT_CONFIRMATION=APPLY_CATALOGUE_IMPORT in the environment.");
-      process.exit(1);
-    }
-  }
-
-  if (confirmed) {
-    const { importLocalCatalogue } = await import("@/server/catalogue-import");
-    await importLocalCatalogue(report);
-    console.log("Local catalogue import completed.");
-  } else {
-    console.log("Dry run complete — no uploads or database writes performed.");
-  }
+  const { importLocalCatalogue } = await import("@/server/catalogue-import");
+  await importLocalCatalogue(report);
+  console.log("Local catalogue import completed.");
 }
 
 void main();

@@ -43,57 +43,57 @@
   ],
   "products": [
     {
-      "id": "b7ebca52-e897-4ae9-827d-6f1104692f5a",
+      "id": "0262f76e-3e32-492e-94fa-f32ca314b2a4",
       "slug": "adivasi-oil"
     },
     {
-      "id": "03f340ff-f005-42a5-a985-86281da54b05",
+      "id": "28d2ce82-5f5f-44af-8c74-43bc2b70d527",
       "slug": "cloth-piece"
     },
     {
-      "id": "65b0c478-775d-4d16-840e-f6b53547554a",
+      "id": "e6dac6a3-22a7-4943-bfa4-7c1855aa203d",
       "slug": "fancy-suit"
     },
     {
-      "id": "87caeca4-76aa-4066-9875-b517d381cc29",
+      "id": "373c5414-c423-466a-90ef-484a84afbcc9",
       "slug": "5-5m-measuring-tape-green"
     },
     {
-      "id": "099ef58b-b8f7-4bc2-877d-d79262f1963e",
+      "id": "3b0ad40a-949a-40a7-865a-e93fe15c1a00",
       "slug": "5m-measuring-tape-green"
     },
     {
-      "id": "c515d4ad-fb05-42d4-b52a-de2a51a8f170",
+      "id": "eb94f581-ec4e-4a0f-b3df-a3e2e8a6222f",
       "slug": "5m-measuring-tape-orange"
     },
     {
-      "id": "ad34a5c3-4b55-43d1-ba2e-88adcdba0501",
+      "id": "c44be4d4-f5ef-41be-875a-d1d8a6b85158",
       "slug": "7-5m-measuring-tape-green"
     },
     {
-      "id": "ff3daa8c-ce3c-4234-9f4b-e5e76fedc431",
+      "id": "1d51dc3d-7ec4-4672-88b6-ba1a16f4b88f",
       "slug": "pajama"
     }
   ],
   "categories": [
     {
-      "id": "857a159b-7e6f-4d65-bf2b-f34cb28ab537",
+      "id": "9c63ae52-6468-4a21-b8a3-c08ae78c3d3d",
       "slug": "adivasi-oil"
     },
     {
-      "id": "680a15cc-c979-4437-8bab-b046a8c155b2",
+      "id": "3703a065-d590-4335-80d3-fcebdaf5dd61",
       "slug": "cloth-piece"
     },
     {
-      "id": "517bcdab-b11a-4097-a3e9-5234a9cf41fa",
+      "id": "fe12dc19-cd89-452b-83d0-f6aedd948386",
       "slug": "fancy-suit"
     },
     {
-      "id": "c955feb9-b504-4874-bbcd-5395f51261fc",
+      "id": "f4b74bfb-a999-416e-8402-f48bea7c3f36",
       "slug": "measuring-tape"
     },
     {
-      "id": "16f78c93-e2e2-4abd-856f-9c16c0bd3dbf",
+      "id": "a8d36d07-3881-410a-a8a5-cb81ba72dc00",
       "slug": "pajama"
     }
   ],
@@ -101,3866 +101,602 @@
     {
       "route": "/en",
       "viewport": "desktop",
-      "path": "http://localhost:3000/en",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-01.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 984
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-01.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2388
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-01.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 1299
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en",
       "viewport": "tablet",
-      "path": "http://localhost:3000/en",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-01.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 984
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-01.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2388
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-01.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 1299
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en",
       "viewport": "mobile",
-      "path": "http://localhost:3000/en",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-01.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 984
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-01.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2388
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-01.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 1299
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 0
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 0
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar",
       "viewport": "desktop",
-      "path": "http://localhost:3000/ar",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-01.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 984
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-01.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2388
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-01.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 1299
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar",
       "viewport": "tablet",
-      "path": "http://localhost:3000/ar",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-01.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 984
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-01.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2388
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-01.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 1299
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar",
       "viewport": "mobile",
-      "path": "http://localhost:3000/ar",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-01.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 984
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-01.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2388
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-01.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 1299
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 0
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 0
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/products",
       "viewport": "desktop",
-      "path": "http://localhost:3000/en/products",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-01.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 984
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-01.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2388
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-01.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 1299
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-01.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2029
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/products\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/products\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/products",
       "viewport": "tablet",
-      "path": "http://localhost:3000/en/products",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-01.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 984
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-01.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2388
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-01.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 1299
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-01.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2029
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/products\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/products\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/products",
       "viewport": "mobile",
-      "path": "http://localhost:3000/en/products",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-01.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 984
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-01.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2388
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-01.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 1299
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-01.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2029
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/products\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/products\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/products",
       "viewport": "desktop",
-      "path": "http://localhost:3000/ar/products",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-01.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 984
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-01.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2388
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-01.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 1299
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-01.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2029
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/products\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/products\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/products",
       "viewport": "tablet",
-      "path": "http://localhost:3000/ar/products",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-01.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 984
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-01.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2388
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-01.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 1299
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-01.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2029
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/products\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/products\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/products",
       "viewport": "mobile",
-      "path": "http://localhost:3000/ar/products",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-01.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 984
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-01.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2388
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-01.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 1299
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-01.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2029
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/products\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/products\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/categories",
       "viewport": "desktop",
-      "path": "http://localhost:3000/en/categories",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/categories\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/categories\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/categories",
       "viewport": "tablet",
-      "path": "http://localhost:3000/en/categories",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/categories\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/categories\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/categories",
       "viewport": "mobile",
-      "path": "http://localhost:3000/en/categories",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/categories\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/categories\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/categories",
       "viewport": "desktop",
-      "path": "http://localhost:3000/ar/categories",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/categories\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/categories\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/categories",
       "viewport": "tablet",
-      "path": "http://localhost:3000/ar/categories",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/categories\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/categories\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/categories",
       "viewport": "mobile",
-      "path": "http://localhost:3000/ar/categories",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/categories\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/categories\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/search?q=test",
       "viewport": "desktop",
-      "path": "http://localhost:3000/en/search?q=test",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/search?q=test\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/search?q=test\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/search?q=test",
       "viewport": "tablet",
-      "path": "http://localhost:3000/en/search?q=test",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/search?q=test\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/search?q=test\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/search?q=test",
       "viewport": "mobile",
-      "path": "http://localhost:3000/en/search?q=test",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/search?q=test\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/search?q=test\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/search?q=test",
       "viewport": "desktop",
-      "path": "http://localhost:3000/ar/search?q=test",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/search?q=test\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/search?q=test\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/search?q=test",
       "viewport": "tablet",
-      "path": "http://localhost:3000/ar/search?q=test",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/search?q=test\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/search?q=test\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/search?q=test",
       "viewport": "mobile",
-      "path": "http://localhost:3000/ar/search?q=test",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/search?q=test\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/search?q=test\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/request-quote",
       "viewport": "desktop",
-      "path": "http://localhost:3000/en/request-quote",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/request-quote\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/request-quote\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/request-quote",
       "viewport": "tablet",
-      "path": "http://localhost:3000/en/request-quote",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/request-quote\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/request-quote\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/request-quote",
       "viewport": "mobile",
-      "path": "http://localhost:3000/en/request-quote",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/request-quote\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/request-quote\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/request-quote",
       "viewport": "desktop",
-      "path": "http://localhost:3000/ar/request-quote",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/request-quote\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/request-quote\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/request-quote",
       "viewport": "tablet",
-      "path": "http://localhost:3000/ar/request-quote",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/request-quote\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/request-quote\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/request-quote",
       "viewport": "mobile",
-      "path": "http://localhost:3000/ar/request-quote",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/request-quote\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/request-quote\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/contact-us",
       "viewport": "desktop",
-      "path": "http://localhost:3000/en/contact-us",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/contact-us\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/contact-us\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/contact-us",
       "viewport": "tablet",
-      "path": "http://localhost:3000/en/contact-us",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/contact-us\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/contact-us\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/contact-us",
       "viewport": "mobile",
-      "path": "http://localhost:3000/en/contact-us",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/contact-us\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/contact-us\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/contact-us",
       "viewport": "desktop",
-      "path": "http://localhost:3000/ar/contact-us",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/contact-us\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/contact-us\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/contact-us",
       "viewport": "tablet",
-      "path": "http://localhost:3000/ar/contact-us",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/contact-us\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/contact-us\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/contact-us",
       "viewport": "mobile",
-      "path": "http://localhost:3000/ar/contact-us",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/contact-us\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/contact-us\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/about-us",
       "viewport": "desktop",
-      "path": "http://localhost:3000/en/about-us",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/about-us\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/about-us\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/about-us",
       "viewport": "tablet",
-      "path": "http://localhost:3000/en/about-us",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/about-us\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/about-us\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/about-us",
       "viewport": "mobile",
-      "path": "http://localhost:3000/en/about-us",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/about-us\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/about-us\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/about-us",
       "viewport": "desktop",
-      "path": "http://localhost:3000/ar/about-us",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/about-us\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/about-us\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/about-us",
       "viewport": "tablet",
-      "path": "http://localhost:3000/ar/about-us",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/about-us\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/about-us\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/about-us",
       "viewport": "mobile",
-      "path": "http://localhost:3000/ar/about-us",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/about-us\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/about-us\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/products/adivasi-oil",
       "viewport": "desktop",
-      "path": "http://localhost:3000/en/products/adivasi-oil",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-01.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 984
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-01.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 984
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-02.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 2500
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/products/adivasi-oil\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/products/adivasi-oil\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/products/adivasi-oil",
       "viewport": "tablet",
-      "path": "http://localhost:3000/en/products/adivasi-oil",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-01.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 984
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-01.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 984
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-02.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 2500
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/products/adivasi-oil\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/products/adivasi-oil\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/products/adivasi-oil",
       "viewport": "mobile",
-      "path": "http://localhost:3000/en/products/adivasi-oil",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-01.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 984
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-01.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 984
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-02.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 2500
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/products/adivasi-oil\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/products/adivasi-oil\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/products/adivasi-oil",
       "viewport": "desktop",
-      "path": "http://localhost:3000/ar/products/adivasi-oil",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-01.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 984
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-01.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 984
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-02.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 2500
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/products/adivasi-oil\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/products/adivasi-oil\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/products/adivasi-oil",
       "viewport": "tablet",
-      "path": "http://localhost:3000/ar/products/adivasi-oil",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-01.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 984
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-01.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 984
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-02.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 2500
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/products/adivasi-oil\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/products/adivasi-oil\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/products/adivasi-oil",
       "viewport": "mobile",
-      "path": "http://localhost:3000/ar/products/adivasi-oil",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-01.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 984
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-01.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 984
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-02.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 2500
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/products/adivasi-oil\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/products/adivasi-oil\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/products/cloth-piece",
       "viewport": "desktop",
-      "path": "http://localhost:3000/en/products/cloth-piece",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-01.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2388
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-01.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2388
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-02.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2483
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-WEB.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 1920
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/products/cloth-piece\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/products/cloth-piece\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/products/cloth-piece",
       "viewport": "tablet",
-      "path": "http://localhost:3000/en/products/cloth-piece",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-01.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2388
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-01.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2388
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-02.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2483
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-WEB.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 1920
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/products/cloth-piece\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/products/cloth-piece\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/products/cloth-piece",
       "viewport": "mobile",
-      "path": "http://localhost:3000/en/products/cloth-piece",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-01.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2388
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-01.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2388
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-02.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2483
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-WEB.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 1920
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/products/cloth-piece\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/products/cloth-piece\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/products/cloth-piece",
       "viewport": "desktop",
-      "path": "http://localhost:3000/ar/products/cloth-piece",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-01.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2388
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-01.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2388
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-02.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2483
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-WEB.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 1920
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/products/cloth-piece\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/products/cloth-piece\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/products/cloth-piece",
       "viewport": "tablet",
-      "path": "http://localhost:3000/ar/products/cloth-piece",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-01.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2388
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-01.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2388
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-02.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2483
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-WEB.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 1920
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/products/cloth-piece\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/products/cloth-piece\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/products/cloth-piece",
       "viewport": "mobile",
-      "path": "http://localhost:3000/ar/products/cloth-piece",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-01.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2388
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-01.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2388
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-02.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2483
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-WEB.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 1920
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/products/cloth-piece\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/products/cloth-piece\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/products/fancy-suit",
       "viewport": "desktop",
-      "path": "http://localhost:3000/en/products/fancy-suit",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-01.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 1299
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-01.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 1299
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-02.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 2500
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-03.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 2500
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/products/fancy-suit\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/products/fancy-suit\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/products/fancy-suit",
       "viewport": "tablet",
-      "path": "http://localhost:3000/en/products/fancy-suit",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-01.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 1299
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-01.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 1299
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-02.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 2500
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-03.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 2500
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/products/fancy-suit\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/products/fancy-suit\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/products/fancy-suit",
       "viewport": "mobile",
-      "path": "http://localhost:3000/en/products/fancy-suit",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-01.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 1299
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-01.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 1299
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-02.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 2500
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-03.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 2500
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/products/fancy-suit\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/products/fancy-suit\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/products/fancy-suit",
       "viewport": "desktop",
-      "path": "http://localhost:3000/ar/products/fancy-suit",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-01.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 1299
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-01.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 1299
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-02.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 2500
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-03.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 2500
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/products/fancy-suit\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/products/fancy-suit\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/products/fancy-suit",
       "viewport": "tablet",
-      "path": "http://localhost:3000/ar/products/fancy-suit",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-01.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 1299
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-01.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 1299
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-02.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 2500
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-03.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 2500
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/products/fancy-suit\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/products/fancy-suit\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/products/fancy-suit",
       "viewport": "mobile",
-      "path": "http://localhost:3000/ar/products/fancy-suit",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-01.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 1299
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-01.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 1299
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-02.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 2500
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-03.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 2500
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/products/fancy-suit\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/products/fancy-suit\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/products/5-5m-measuring-tape-green",
       "viewport": "desktop",
-      "path": "http://localhost:3000/en/products/5-5m-measuring-tape-green",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-02.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1201
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/products/5-5m-measuring-tape-green\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/products/5-5m-measuring-tape-green\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/products/5-5m-measuring-tape-green",
       "viewport": "tablet",
-      "path": "http://localhost:3000/en/products/5-5m-measuring-tape-green",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-02.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1201
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/products/5-5m-measuring-tape-green\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/products/5-5m-measuring-tape-green\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/products/5-5m-measuring-tape-green",
       "viewport": "mobile",
-      "path": "http://localhost:3000/en/products/5-5m-measuring-tape-green",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-02.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1201
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/products/5-5m-measuring-tape-green\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/products/5-5m-measuring-tape-green\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/products/5-5m-measuring-tape-green",
       "viewport": "desktop",
-      "path": "http://localhost:3000/ar/products/5-5m-measuring-tape-green",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-02.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1201
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/products/5-5m-measuring-tape-green\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/products/5-5m-measuring-tape-green\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/products/5-5m-measuring-tape-green",
       "viewport": "tablet",
-      "path": "http://localhost:3000/ar/products/5-5m-measuring-tape-green",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-02.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1201
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/products/5-5m-measuring-tape-green\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/products/5-5m-measuring-tape-green\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/products/5-5m-measuring-tape-green",
       "viewport": "mobile",
-      "path": "http://localhost:3000/ar/products/5-5m-measuring-tape-green",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-02.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1201
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/products/5-5m-measuring-tape-green\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/products/5-5m-measuring-tape-green\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/products/5m-measuring-tape-green",
       "viewport": "desktop",
-      "path": "http://localhost:3000/en/products/5m-measuring-tape-green",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-02.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1201
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/products/5m-measuring-tape-green\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/products/5m-measuring-tape-green\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/products/5m-measuring-tape-green",
       "viewport": "tablet",
-      "path": "http://localhost:3000/en/products/5m-measuring-tape-green",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-02.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1201
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/products/5m-measuring-tape-green\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/products/5m-measuring-tape-green\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/products/5m-measuring-tape-green",
       "viewport": "mobile",
-      "path": "http://localhost:3000/en/products/5m-measuring-tape-green",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-02.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1201
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/products/5m-measuring-tape-green\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/products/5m-measuring-tape-green\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/products/5m-measuring-tape-green",
       "viewport": "desktop",
-      "path": "http://localhost:3000/ar/products/5m-measuring-tape-green",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-02.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1201
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/products/5m-measuring-tape-green\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/products/5m-measuring-tape-green\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/products/5m-measuring-tape-green",
       "viewport": "tablet",
-      "path": "http://localhost:3000/ar/products/5m-measuring-tape-green",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-02.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1201
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/products/5m-measuring-tape-green\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/products/5m-measuring-tape-green\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/products/5m-measuring-tape-green",
       "viewport": "mobile",
-      "path": "http://localhost:3000/ar/products/5m-measuring-tape-green",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-02.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1201
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/products/5m-measuring-tape-green\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/products/5m-measuring-tape-green\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/products/5m-measuring-tape-orange",
       "viewport": "desktop",
-      "path": "http://localhost:3000/en/products/5m-measuring-tape-orange",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-02.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1206
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/products/5m-measuring-tape-orange\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/products/5m-measuring-tape-orange\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/products/5m-measuring-tape-orange",
       "viewport": "tablet",
-      "path": "http://localhost:3000/en/products/5m-measuring-tape-orange",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-02.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1206
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/products/5m-measuring-tape-orange\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/products/5m-measuring-tape-orange\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/products/5m-measuring-tape-orange",
       "viewport": "mobile",
-      "path": "http://localhost:3000/en/products/5m-measuring-tape-orange",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-02.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1206
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/products/5m-measuring-tape-orange\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/products/5m-measuring-tape-orange\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/products/5m-measuring-tape-orange",
       "viewport": "desktop",
-      "path": "http://localhost:3000/ar/products/5m-measuring-tape-orange",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-02.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1206
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/products/5m-measuring-tape-orange\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/products/5m-measuring-tape-orange\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/products/5m-measuring-tape-orange",
       "viewport": "tablet",
-      "path": "http://localhost:3000/ar/products/5m-measuring-tape-orange",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-02.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1206
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/products/5m-measuring-tape-orange\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/products/5m-measuring-tape-orange\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/products/5m-measuring-tape-orange",
       "viewport": "mobile",
-      "path": "http://localhost:3000/ar/products/5m-measuring-tape-orange",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-02.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1206
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/products/5m-measuring-tape-orange\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/products/5m-measuring-tape-orange\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/products/7-5m-measuring-tape-green",
       "viewport": "desktop",
-      "path": "http://localhost:3000/en/products/7-5m-measuring-tape-green",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-02.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1201
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/products/7-5m-measuring-tape-green\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/products/7-5m-measuring-tape-green\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/products/7-5m-measuring-tape-green",
       "viewport": "tablet",
-      "path": "http://localhost:3000/en/products/7-5m-measuring-tape-green",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-02.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1201
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/products/7-5m-measuring-tape-green\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/products/7-5m-measuring-tape-green\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/products/7-5m-measuring-tape-green",
       "viewport": "mobile",
-      "path": "http://localhost:3000/en/products/7-5m-measuring-tape-green",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-02.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1201
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/products/7-5m-measuring-tape-green\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/products/7-5m-measuring-tape-green\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/products/7-5m-measuring-tape-green",
       "viewport": "desktop",
-      "path": "http://localhost:3000/ar/products/7-5m-measuring-tape-green",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-02.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1201
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/products/7-5m-measuring-tape-green\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/products/7-5m-measuring-tape-green\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/products/7-5m-measuring-tape-green",
       "viewport": "tablet",
-      "path": "http://localhost:3000/ar/products/7-5m-measuring-tape-green",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-02.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1201
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/products/7-5m-measuring-tape-green\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/products/7-5m-measuring-tape-green\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/products/7-5m-measuring-tape-green",
       "viewport": "mobile",
-      "path": "http://localhost:3000/ar/products/7-5m-measuring-tape-green",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-02.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1201
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/products/7-5m-measuring-tape-green\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/products/7-5m-measuring-tape-green\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/products/pajama",
       "viewport": "desktop",
-      "path": "http://localhost:3000/en/products/pajama",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-01.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2029
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-01.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2029
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-02.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2500
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-03.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2500
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-04.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 1712
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/products/pajama\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/products/pajama\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/products/pajama",
       "viewport": "tablet",
-      "path": "http://localhost:3000/en/products/pajama",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-01.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2029
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-01.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2029
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-02.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2500
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-03.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2500
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-04.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 1712
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/products/pajama\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/products/pajama\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/products/pajama",
       "viewport": "mobile",
-      "path": "http://localhost:3000/en/products/pajama",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-01.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2029
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-01.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2029
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-02.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2500
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-03.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2500
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-04.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 1712
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/products/pajama\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/products/pajama\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/products/pajama",
       "viewport": "desktop",
-      "path": "http://localhost:3000/ar/products/pajama",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-01.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2029
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-01.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2029
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-02.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2500
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-03.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2500
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-04.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 1712
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/products/pajama\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/products/pajama\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/products/pajama",
       "viewport": "tablet",
-      "path": "http://localhost:3000/ar/products/pajama",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-01.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2029
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-01.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2029
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-02.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2500
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-03.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2500
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-04.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 1712
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/products/pajama\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/products/pajama\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/products/pajama",
       "viewport": "mobile",
-      "path": "http://localhost:3000/ar/products/pajama",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-01.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2029
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-01.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2029
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-02.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2500
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-03.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2500
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-04.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 1712
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/products/pajama\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/products/pajama\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/categories/adivasi-oil",
       "viewport": "desktop",
-      "path": "http://localhost:3000/en/categories/adivasi-oil",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-01.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 984
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/categories/adivasi-oil\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/categories/adivasi-oil\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/categories/adivasi-oil",
       "viewport": "tablet",
-      "path": "http://localhost:3000/en/categories/adivasi-oil",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-01.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 984
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/categories/adivasi-oil\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/categories/adivasi-oil\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/categories/adivasi-oil",
       "viewport": "mobile",
-      "path": "http://localhost:3000/en/categories/adivasi-oil",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-01.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 984
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/categories/adivasi-oil\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/categories/adivasi-oil\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/categories/adivasi-oil",
       "viewport": "desktop",
-      "path": "http://localhost:3000/ar/categories/adivasi-oil",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-01.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 984
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/categories/adivasi-oil\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/categories/adivasi-oil\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/categories/adivasi-oil",
       "viewport": "tablet",
-      "path": "http://localhost:3000/ar/categories/adivasi-oil",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-01.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 984
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/categories/adivasi-oil\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/categories/adivasi-oil\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/categories/adivasi-oil",
       "viewport": "mobile",
-      "path": "http://localhost:3000/ar/categories/adivasi-oil",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/adivasi-oil/Adivasi-Oil-01.jpg",
-          "alt": "Adivasi Oil",
-          "naturalWidth": 984
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/categories/adivasi-oil\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/categories/adivasi-oil\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/categories/cloth-piece",
       "viewport": "desktop",
-      "path": "http://localhost:3000/en/categories/cloth-piece",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-01.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2388
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/categories/cloth-piece\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/categories/cloth-piece\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/categories/cloth-piece",
       "viewport": "tablet",
-      "path": "http://localhost:3000/en/categories/cloth-piece",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-01.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2388
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/categories/cloth-piece\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/categories/cloth-piece\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/categories/cloth-piece",
       "viewport": "mobile",
-      "path": "http://localhost:3000/en/categories/cloth-piece",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-01.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2388
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/categories/cloth-piece\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/categories/cloth-piece\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/categories/cloth-piece",
       "viewport": "desktop",
-      "path": "http://localhost:3000/ar/categories/cloth-piece",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-01.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2388
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/categories/cloth-piece\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/categories/cloth-piece\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/categories/cloth-piece",
       "viewport": "tablet",
-      "path": "http://localhost:3000/ar/categories/cloth-piece",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-01.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2388
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/categories/cloth-piece\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/categories/cloth-piece\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/categories/cloth-piece",
       "viewport": "mobile",
-      "path": "http://localhost:3000/ar/categories/cloth-piece",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/cloth-piece/Cloth-Piece-01.jpg",
-          "alt": "Cloth Piece",
-          "naturalWidth": 2388
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/categories/cloth-piece\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/categories/cloth-piece\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/categories/fancy-suit",
       "viewport": "desktop",
-      "path": "http://localhost:3000/en/categories/fancy-suit",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-01.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 1299
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/categories/fancy-suit\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/categories/fancy-suit\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/categories/fancy-suit",
       "viewport": "tablet",
-      "path": "http://localhost:3000/en/categories/fancy-suit",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-01.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 1299
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/categories/fancy-suit\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/categories/fancy-suit\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/categories/fancy-suit",
       "viewport": "mobile",
-      "path": "http://localhost:3000/en/categories/fancy-suit",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-01.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 1299
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/categories/fancy-suit\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/categories/fancy-suit\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/categories/fancy-suit",
       "viewport": "desktop",
-      "path": "http://localhost:3000/ar/categories/fancy-suit",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-01.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 1299
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/categories/fancy-suit\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/categories/fancy-suit\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/categories/fancy-suit",
       "viewport": "tablet",
-      "path": "http://localhost:3000/ar/categories/fancy-suit",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-01.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 1299
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/categories/fancy-suit\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/categories/fancy-suit\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/categories/fancy-suit",
       "viewport": "mobile",
-      "path": "http://localhost:3000/ar/categories/fancy-suit",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/fancy-suit/FANCY-SUIT-01.jpg",
-          "alt": "Fancy Suit",
-          "naturalWidth": 1299
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/categories/fancy-suit\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/categories/fancy-suit\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/categories/measuring-tape",
       "viewport": "desktop",
-      "path": "http://localhost:3000/en/categories/measuring-tape",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/categories/measuring-tape\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/categories/measuring-tape\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/categories/measuring-tape",
       "viewport": "tablet",
-      "path": "http://localhost:3000/en/categories/measuring-tape",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/categories/measuring-tape\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/categories/measuring-tape\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/categories/measuring-tape",
       "viewport": "mobile",
-      "path": "http://localhost:3000/en/categories/measuring-tape",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/categories/measuring-tape\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/categories/measuring-tape\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/categories/measuring-tape",
       "viewport": "desktop",
-      "path": "http://localhost:3000/ar/categories/measuring-tape",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/categories/measuring-tape\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/categories/measuring-tape\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/categories/measuring-tape",
       "viewport": "tablet",
-      "path": "http://localhost:3000/ar/categories/measuring-tape",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/categories/measuring-tape\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/categories/measuring-tape\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/categories/measuring-tape",
       "viewport": "mobile",
-      "path": "http://localhost:3000/ar/categories/measuring-tape",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5-5m-measuring-tape-green/5.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-green/5M-Measuring-Tape-Green-01.jpg",
-          "alt": "5M Measuring Tape Green",
-          "naturalWidth": 1843
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/5m-measuring-tape-orange/5M-Measuring-Tape-Orange-01.jpg",
-          "alt": "5M Measuring Tape Orange",
-          "naturalWidth": 1848
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/7-5m-measuring-tape-green/7.5M-Measuring-Tape-Green-01.jpg",
-          "alt": "7.5M Measuring Tape Green",
-          "naturalWidth": 1843
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/categories/measuring-tape\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/categories/measuring-tape\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/categories/pajama",
       "viewport": "desktop",
-      "path": "http://localhost:3000/en/categories/pajama",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-01.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2029
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/categories/pajama\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/categories/pajama\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/categories/pajama",
       "viewport": "tablet",
-      "path": "http://localhost:3000/en/categories/pajama",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-01.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2029
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/categories/pajama\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/categories/pajama\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/en/categories/pajama",
       "viewport": "mobile",
-      "path": "http://localhost:3000/en/categories/pajama",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "Qasr Al Mabrook logo",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-01.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2029
-        }
-      ],
-      "lang": "en",
-      "dir": "ltr",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en/categories/pajama\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/en/categories/pajama\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/categories/pajama",
       "viewport": "desktop",
-      "path": "http://localhost:3000/ar/categories/pajama",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-01.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2029
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/categories/pajama\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/categories/pajama\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/categories/pajama",
       "viewport": "tablet",
-      "path": "http://localhost:3000/ar/categories/pajama",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-01.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2029
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/categories/pajama\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/categories/pajama\", waiting until \"networkidle\"\u001b[22m\n"
     },
     {
       "route": "/ar/categories/pajama",
       "viewport": "mobile",
-      "path": "http://localhost:3000/ar/categories/pajama",
-      "status": 200,
-      "consoleErrors": [],
-      "images": [
-        {
-          "src": "http://localhost:3000/brand/logo-color.svg",
-          "alt": "شعار قصر المبارك",
-          "naturalWidth": 167
-        },
-        {
-          "src": "https://media.qasralmabrook.com/catalogue/pajama/Pajama-01.jpg",
-          "alt": "Pajama",
-          "naturalWidth": 2029
-        }
-      ],
-      "lang": "ar",
-      "dir": "rtl",
-      "overflow": false
+      "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/categories/pajama\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/categories/pajama\", waiting until \"networkidle\"\u001b[22m\n"
     }
   ],
   "failures": []

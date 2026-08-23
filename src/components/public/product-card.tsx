@@ -27,15 +27,17 @@ export async function ProductCard({ locale, product, imageUrl, categoryName, sho
   const resolvedImageUrl = imageUrl ?? product.primaryImageUrl ?? null;
 
   return (
-    <article className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-white shadow-[var(--shadow-sm)]">
-      <PublicImageSlot
-        src={resolvedImageUrl}
-        alt={product.primaryImageAlt ?? product.name}
-        variant="product-card"
-        sizes="(max-width: 768px) 100vw, 33vw"
-      />
+    <article className="flex h-full flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-white shadow-[var(--shadow-sm)]">
+      <div className="px-2 pb-0 pt-2">
+        <PublicImageSlot
+          src={resolvedImageUrl}
+          alt={product.primaryImageAlt ?? product.name}
+          variant="product-card"
+          sizes="(max-width: 768px) 100vw, 33vw"
+        />
+      </div>
 
-      <div className="space-y-4 p-5">
+      <div className="flex flex-1 flex-col justify-between space-y-4 p-5 pt-4">
         {showCategory && categoryName ? (
           <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--brand-primary)]">{categoryName}</p>
         ) : null}

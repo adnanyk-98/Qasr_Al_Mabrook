@@ -47,23 +47,23 @@ export default function ProductGallery({
     <div>
       <div className="overflow-hidden rounded-[var(--radius-xl)] border border-[var(--brand-border)] bg-white p-3 shadow-[var(--shadow-sm)]">
         {displayed ? (
-          <div className="relative h-[440px] overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]">
+          <div className="relative mx-auto w-full max-w-[min(100%,500px)] aspect-square overflow-hidden rounded-[var(--radius-xl)] bg-[var(--brand-surface-alt)]">
             <Image
               src={displayed.publicUrl}
               alt={locale === "ar" ? displayed.altTextAr ?? displayed.altTextEn ?? productName ?? "" : displayed.altTextEn ?? displayed.altTextAr ?? productName ?? ""}
               fill
-              sizes="(max-width: 768px) 100vw, 60vw"
+              sizes="(max-width: 768px) 100vw, 50vw"
               unoptimized
               className="object-contain object-center"
             />
           </div>
         ) : (
-          <div className="flex h-[440px] items-center justify-center rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)] text-[var(--text-muted)]">No image</div>
+          <div className="flex aspect-square items-center justify-center rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)] text-[var(--text-muted)]">No image</div>
         )}
       </div>
 
       {filtered.length > 1 ? (
-        <div className="grid grid-cols-4 gap-3 mt-3">
+        <div className="mt-3 grid grid-cols-4 gap-3">
           {filtered.map((image) => {
             const isSelected = image.id === selectedId;
             return (
@@ -77,9 +77,9 @@ export default function ProductGallery({
                 }}
                 onMouseEnter={() => setHoveredId(image.id)}
                 onMouseLeave={() => setHoveredId(null)}
-                className={`overflow-hidden rounded-[var(--radius-md)] border p-1 text-left transition ${isSelected ? 'border-[var(--brand-primary)]' : 'border-[var(--brand-border)]'}`}
+                className={`mx-auto w-full max-w-[88px] overflow-hidden rounded-[var(--radius-md)] border p-1 text-left transition ${isSelected ? 'border-[var(--brand-primary)]' : 'border-[var(--brand-border)]'}`}
               >
-                <div className="relative h-20 overflow-hidden rounded-[var(--radius-sm)] bg-[var(--brand-surface-alt)]">
+                <div className="relative aspect-square overflow-hidden rounded-[var(--radius-sm)] bg-[var(--brand-surface-alt)]">
                   <Image src={image.publicUrl} alt={locale === "ar" ? image.altTextAr ?? image.altTextEn ?? productName ?? "" : image.altTextEn ?? image.altTextAr ?? productName ?? ""} fill sizes="(max-width: 768px) 25vw, 10vw" unoptimized className="object-contain object-center" />
                 </div>
               </button>

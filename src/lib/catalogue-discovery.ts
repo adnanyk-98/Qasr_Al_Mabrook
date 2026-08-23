@@ -36,10 +36,18 @@ export type DiscoveredProduct = {
   primaryImage: string;
 };
 
+export type DiscoveredBanner = {
+  filename: string;
+  relativePath: string;
+  width?: number;
+  height?: number;
+};
+
 export type DiscoveryReport = {
   source: string;
   categories: string[];
   products: DiscoveredProduct[];
+  banners: DiscoveredBanner[];
   ignoredDirectories: string[];
   unassignedImages: string[];
   ambiguousImages: string[];
@@ -157,7 +165,7 @@ async function listImageFiles(directory: string) {
     .sort((left, right) => left.localeCompare(right, undefined, { numeric: true }));
 }
 
-async function loadManifest(source: string, filesByRelativePath: Set<string>) {
+async function loadManifest(source: string, filesByRelativePath: Set<string>, bannerFiles: Set<string>) {
   const manifestPath = path.join(source, "catalogue-manifest.json");
   try {
     const raw = JSON.parse(await readFile(manifestPath, "utf8")) as unknown;
@@ -175,11 +183,15 @@ async function loadManifest(source: string, filesByRelativePath: Set<string>) {
         const relativePath = path
           .join(product.category, filename)
           .replaceAll("\\", "/");
-        if (!filesByRelativePath.has(relativePath))
+        const bannerRelativePath = path.join("Banner", filename).replaceAll("\\", "/");
+        const existsInCatalog = filesByRelativePath.has(relativePath);
+        const existsInBanner = bannerFiles.has(bannerRelativePath);
+        if (!existsInCatalog && !existsInBanner)
           errors.push(`Missing manifest file: ${relativePath}`);
-        if (assigned.has(relativePath))
-          errors.push(`Duplicate manifest assignment: ${relativePath}`);
-        assigned.add(relativePath);
+        const finalRelativePath = existsInCatalog ? relativePath : bannerRelativePath;
+        if (assigned.has(finalRelativePath))
+          errors.push(`Duplicate manifest assignment: ${finalRelativePath}`);
+        assigned.add(finalRelativePath);
       }
       if (product.primaryImage && !product.images.includes(product.primaryImage)) {
         errors.push(
@@ -189,13 +201,20 @@ async function loadManifest(source: string, filesByRelativePath: Set<string>) {
     }
     const unresolved = new Set<string>();
     for (const relativePath of parsed.data.unresolvedImages) {
-      if (!filesByRelativePath.has(relativePath))
+      const normalizedRelativePath = relativePath.replaceAll("\\", "/");
+      const basename = path.basename(normalizedRelativePath);
+      const bannerMatch = `Banner/${basename}`;
+      const exists =
+        filesByRelativePath.has(normalizedRelativePath) ||
+        bannerFiles.has(normalizedRelativePath) ||
+        bannerFiles.has(bannerMatch);
+      if (!exists)
         errors.push(`Missing unresolved file: ${relativePath}`);
-      if (assigned.has(relativePath))
-        errors.push(`Image is both assigned and unresolved: ${relativePath}`);
-      if (unresolved.has(relativePath))
-        errors.push(`Duplicate unresolved image: ${relativePath}`);
-      unresolved.add(relativePath);
+      if (assigned.has(normalizedRelativePath))
+        errors.push(`Image is both assigned and unresolved: ${normalizedRelativePath}`);
+      if (unresolved.has(normalizedRelativePath))
+        errors.push(`Duplicate unresolved image: ${normalizedRelativePath}`);
+      unresolved.add(normalizedRelativePath);
     }
     return { manifest: parsed.data, errors, assigned, unresolved };
   } catch (error) {
@@ -227,25 +246,47 @@ export async function discoverCatalogue(source: string): Promise<DiscoveryReport
     (directory) => directory.toLowerCase() === "logo",
   );
   const categories = directories.filter(
-    (directory) => !ignoredDirectories.includes(directory),
+    (directory) => !ignoredDirectories.includes(directory) && directory.toLowerCase() !== "banner",
+  );
+  const bannerDirectory = path.join(resolvedSource, "Banner");
+  const bannerFiles = (await stat(bannerDirectory).catch(() => null))?.isDirectory()
+    ? await listImageFiles(bannerDirectory)
+    : [];
+  const banners = await Promise.all(
+    bannerFiles.map(async (filename) => {
+      const dimensions = await readImageDimensions(path.join(bannerDirectory, filename));
+      return {
+        filename,
+        relativePath: `Banner/${filename}`,
+        ...(dimensions ?? {}),
+      } satisfies DiscoveredBanner;
+    }),
   );
   const filesByRelativePath = new Set<string>();
+  const bannerFilesSet = new Set<string>();
   for (const category of categories) {
     for (const filename of await listImageFiles(path.join(resolvedSource, category))) {
       filesByRelativePath.add(`${category}/${filename}`);
     }
   }
+  for (const filename of bannerFiles) {
+    bannerFilesSet.add(`Banner/${filename}`);
+  }
 
-  const manifestResult = await loadManifest(resolvedSource, filesByRelativePath);
+  const manifestResult = await loadManifest(resolvedSource, filesByRelativePath, bannerFilesSet);
   const products: DiscoveredProduct[] = [];
   const unassignedImages: string[] = [];
   const ambiguousImages: string[] = [];
 
   if (manifestResult.manifest) {
     for (const product of manifestResult.manifest.products) {
+      const validImages = product.images.filter((filename) => {
+        const relativePath = path.join(product.category, filename).replaceAll("\\", "/");
+        return filesByRelativePath.has(relativePath);
+      });
       const images = (
         await Promise.all(
-          product.images.map((filename) =>
+          validImages.map((filename) =>
             createImage(resolvedSource, product.category, filename),
           ),
         )
@@ -254,12 +295,17 @@ export async function discoverCatalogue(source: string): Promise<DiscoveryReport
           left.sortOrder - right.sortOrder ||
           left.filename.localeCompare(right.filename),
       );
-      products.push({
-        category: product.category,
-        name: product.name,
-        images,
-        primaryImage: product.primaryImage ?? images[0].filename,
-      });
+      if (images.length > 0) {
+        products.push({
+          category: product.category,
+          name: product.name,
+          images,
+          primaryImage:
+            product.primaryImage && validImages.includes(product.primaryImage)
+              ? product.primaryImage
+              : images[0].filename,
+        });
+      }
     }
     const assigned = manifestResult.assigned ?? new Set<string>();
     const unresolved = manifestResult.unresolved ?? new Set<string>();
@@ -271,6 +317,7 @@ export async function discoverCatalogue(source: string): Promise<DiscoveryReport
       source: resolvedSource,
       categories,
       products,
+      banners,
       ignoredDirectories,
       unassignedImages,
       ambiguousImages,
@@ -314,6 +361,7 @@ export async function discoverCatalogue(source: string): Promise<DiscoveryReport
     source: resolvedSource,
     categories,
     products,
+    banners,
     ignoredDirectories,
     unassignedImages,
     ambiguousImages,

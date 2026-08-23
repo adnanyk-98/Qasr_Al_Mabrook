@@ -21,8 +21,8 @@ export async function Header({ locale = "en", path = "/" }: { locale?: Locale; p
   ];
 
   return (
-    <header className="border-b border-[var(--brand-border)] bg-white/90 backdrop-blur-sm">
-      <Container className="flex items-center justify-between gap-4 py-4">
+    <header className="relative z-40 border-b border-[var(--brand-border)] bg-white/90 backdrop-blur-sm">
+      <Container className="flex items-center justify-between gap-4 py-3 sm:py-4">
         <Link href={localePath(locale, "/")} className="flex shrink-0 items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2">
           <Image
             src={siteConfig.brand.logoColorSvg}
@@ -30,7 +30,7 @@ export async function Header({ locale = "en", path = "/" }: { locale?: Locale; p
             width={404}
             height={362}
             priority
-            className="h-auto w-[112px] sm:w-[144px]"
+            className="h-auto w-[96px] sm:w-[144px]"
           />
         </Link>
 
@@ -52,11 +52,11 @@ export async function Header({ locale = "en", path = "/" }: { locale?: Locale; p
           <Link href={localePath(locale, "/request-quote")} className="hidden sm:inline-flex">
             <Button variant="primary" size="sm">{t("requestQuote")}</Button>
           </Link>
-          <details className="relative md:hidden">
+          <details className="md:hidden">
             <summary className="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-full border border-[var(--brand-border)] text-base text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)]" aria-label={header("openMenu")}>
               <span aria-hidden="true">&#9776;</span>
             </summary>
-            <nav aria-label={header("mainNavigation")} className="absolute end-0 top-12 z-20 min-w-52 space-y-1 rounded-[var(--radius-md)] border border-[var(--brand-border)] bg-white p-2 shadow-[var(--shadow-md)]">
+            <nav aria-label={header("mainNavigation")} className="absolute left-0 right-0 top-full z-50 min-w-52 space-y-1 rounded-b-[var(--radius-md)] border-t border-[var(--brand-border)] bg-white p-2 shadow-[var(--shadow-md)]">
               {navItems.map((item) => (
                 <Link key={item.href} href={item.href} className="block rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium hover:bg-[var(--brand-surface-alt)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)]">
                   {item.label}

@@ -46,7 +46,7 @@
   --color-brand-surface: var(--brand-surface);
   --color-brand-surface-alt: var(--brand-surface-alt);
   --color-brand-border: var(--brand-border);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-jost);
   --font-mono: var(--font-geist-mono);
 }
 
@@ -62,7 +62,7 @@ html[dir="rtl"] {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-jost), Arial, Helvetica, sans-serif;
   font-size: var(--font-size-body);
   line-height: var(--line-height-normal);
   letter-spacing: -0.01em;

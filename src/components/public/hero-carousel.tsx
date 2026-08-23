@@ -34,6 +34,14 @@ export function HeroCarousel({
   const [active, setActive] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
+  const containerWidthRef = useRef<number>(0);
+  const pointerIdRef = useRef<number | null>(null);
+  const startXRef = useRef(0);
+  const startYRef = useRef(0);
+  const dragXRef = useRef(0);
+  const isDraggingRef = useRef(false);
+  const suppressClickRef = useRef(false);
+  const autoplayTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -46,19 +54,31 @@ export function HeroCarousel({
   const goTo = useCallback(
     (index: number) => {
       setActive(Math.max(0, Math.min(index, banners.length - 1)));
+      // reset autoplay timer on manual navigation
+      if (autoplay) {
+        if (autoplayTimerRef.current) window.clearInterval(autoplayTimerRef.current);
+        if (!reducedMotion && banners.length > 1) {
+          autoplayTimerRef.current = window.setInterval(() => setActive((c) => (c + 1) % banners.length), autoplayInterval);
+        }
+      }
     },
-    [banners.length],
+    [autoplay, autoplayInterval, banners.length, reducedMotion],
   );
 
   const prev = useCallback(() => goTo(active - 1), [active, goTo]);
   const next = useCallback(() => goTo(active + 1), [active, goTo]);
 
   useEffect(() => {
+    // centralised autoplay management
     if (!autoplay || reducedMotion || banners.length <= 1) return;
-    const timer = window.setInterval(() => {
+    if (autoplayTimerRef.current) window.clearInterval(autoplayTimerRef.current);
+    autoplayTimerRef.current = window.setInterval(() => {
       setActive((current) => (current + 1) % banners.length);
     }, autoplayInterval);
-    return () => window.clearInterval(timer);
+    return () => {
+      if (autoplayTimerRef.current) window.clearInterval(autoplayTimerRef.current);
+      autoplayTimerRef.current = null;
+    };
   }, [autoplay, autoplayInterval, banners.length, reducedMotion]);
 
   useEffect(() => {
@@ -86,6 +106,138 @@ export function HeroCarousel({
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [banners.length, goTo, next, prev]);
 
+  // measure container width for pixel-based translate during drag
+  useEffect(() => {
+    const setWidth = () => {
+      if (!rootRef.current) return;
+      const el = rootRef.current.querySelector('.relative.w-full.overflow-hidden') as HTMLElement | null;
+      const rect = el ? el.getBoundingClientRect() : rootRef.current.getBoundingClientRect();
+      containerWidthRef.current = Math.max(0, rect.width || 0);
+    };
+    setWidth();
+    window.addEventListener('resize', setWidth);
+    return () => window.removeEventListener('resize', setWidth);
+  }, []);
+
+  // Pointer / touch handlers for swipe gestures
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+
+    const container = root.querySelector('.relative.w-full.overflow-hidden') as HTMLElement | null;
+    const slider = container?.querySelector('.w-full.flex') as HTMLElement | null;
+    if (!container || !slider) return;
+
+    const THRESHOLD = 50; // px
+    const START_MIN = 10; // px before beginning drag
+
+    const onPointerDown = (e: PointerEvent) => {
+      // only left button / touch
+      if ((e as any).button && (e as any).button !== 0) return;
+      pointerIdRef.current = e.pointerId;
+      startXRef.current = e.clientX;
+      startYRef.current = e.clientY;
+      dragXRef.current = 0;
+      isDraggingRef.current = false;
+      suppressClickRef.current = false;
+      (e.target as Element)?.setPointerCapture?.(e.pointerId);
+      window.addEventListener('pointermove', onPointerMove, { passive: false });
+      window.addEventListener('pointerup', onPointerUp);
+    };
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (pointerIdRef.current !== e.pointerId) return;
+      const dx = e.clientX - startXRef.current;
+      const dy = e.clientY - startYRef.current;
+
+      // if not yet dragging, determine whether to start
+      if (!isDraggingRef.current) {
+        if (Math.abs(dx) > START_MIN && Math.abs(dx) > Math.abs(dy)) {
+          isDraggingRef.current = true;
+          // prevent page scroll once we have decided this is a horizontal drag
+          e.preventDefault();
+          if (autoplayTimerRef.current) window.clearInterval(autoplayTimerRef.current);
+        } else if (Math.abs(dy) > START_MIN && Math.abs(dy) > Math.abs(dx)) {
+          // vertical scroll — cancel gesture handling
+          pointerIdRef.current = null;
+          window.removeEventListener('pointermove', onPointerMove);
+          window.removeEventListener('pointerup', onPointerUp);
+          return;
+        } else {
+          return;
+        }
+      }
+
+      // dragging
+      dragXRef.current = dx;
+      suppressClickRef.current = Math.abs(dx) > START_MIN;
+      // apply pixel transform while dragging
+      const width = containerWidthRef.current || container.getBoundingClientRect().width;
+      const base = -active * width;
+      slider.style.transition = 'none';
+      slider.style.transform = `translateX(${base + dragXRef.current}px)`;
+    };
+
+    const onPointerUp = (e: PointerEvent) => {
+      if (pointerIdRef.current !== e.pointerId) return;
+      (e.target as Element)?.releasePointerCapture?.(e.pointerId);
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+
+      if (!isDraggingRef.current) {
+        pointerIdRef.current = null;
+        return;
+      }
+
+      const dx = dragXRef.current;
+      const width = containerWidthRef.current || container.getBoundingClientRect().width;
+      slider.style.transition = '';
+      // decide change
+      if (Math.abs(dx) > THRESHOLD) {
+        if (dx < 0) {
+          setActive((c) => Math.min(c + 1, banners.length - 1));
+        } else {
+          setActive((c) => Math.max(c - 1, 0));
+        }
+      } else {
+        // snap back
+        slider.style.transform = `translateX(${-active * width}px)`;
+      }
+
+      // small delay to allow transition to run then clear dragging state
+      setTimeout(() => {
+        dragXRef.current = 0;
+        isDraggingRef.current = false;
+        pointerIdRef.current = null;
+      }, 50);
+
+      // restart autoplay timer
+      if (autoplay && !reducedMotion && banners.length > 1) {
+        if (autoplayTimerRef.current) window.clearInterval(autoplayTimerRef.current);
+        autoplayTimerRef.current = window.setInterval(() => setActive((c) => (c + 1) % banners.length), autoplayInterval);
+      }
+    };
+
+    container.addEventListener('pointerdown', onPointerDown);
+    return () => {
+      container.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+    };
+  }, [active, autoplay, autoplayInterval, banners.length, reducedMotion]);
+
+  // sync slider transform when active changes (non-dragging)
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const container = root.querySelector('.relative.w-full.overflow-hidden') as HTMLElement | null;
+    const slider = container?.querySelector('.w-full.flex') as HTMLElement | null;
+    if (!container || !slider) return;
+    const width = containerWidthRef.current || container.getBoundingClientRect().width;
+    slider.style.transition = '';
+    slider.style.transform = `translateX(${-active * width}px)`;
+  }, [active]);
+
   if (!banners.length) {
     return null;
   }
@@ -95,7 +247,7 @@ export function HeroCarousel({
       ref={rootRef}
       id={id}
       dir={locale === "ar" ? "rtl" : "ltr"}
-      className="relative isolate overflow-hidden rounded-[var(--radius-2xl)] border border-[var(--brand-border)] bg-[var(--brand-surface-alt)] shadow-[var(--shadow-md)]"
+      className="relative overflow-hidden rounded-[var(--radius-2xl)] border border-[var(--brand-border)] bg-[var(--brand-surface-alt)] shadow-[var(--shadow-md)]"
       tabIndex={0}
       role="region"
       aria-roledescription="carousel"
@@ -111,7 +263,18 @@ export function HeroCarousel({
             <div key={`${id}-${index}`} className="min-w-full w-full shrink-0 relative">
               {(banner.desktopImageUrl || banner.imageUrl) ? (
                 banner.ctaHref ? (
-                  <Link href={banner.ctaHref} aria-label={banner.title ?? banner.imageAlt ?? `Hero banner ${index + 1}`} className="block w-full h-full">
+                  <Link
+                    href={banner.ctaHref}
+                    aria-label={banner.title ?? banner.imageAlt ?? `Hero banner ${index + 1}`}
+                    className="block w-full h-full"
+                    onClick={(e) => {
+                      if (suppressClickRef.current) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        suppressClickRef.current = false;
+                      }
+                    }}
+                  >
                     {/* Responsive picture: mobile source first, desktop as fallback */}
                     <div className="relative w-full aspect-[9/10] md:aspect-[8/3] overflow-hidden rounded-[var(--radius-2xl)]">
                       <picture>
@@ -176,5 +339,7 @@ export function HeroCarousel({
         ))}
       </div>
     </div>
+    // keep slider synced to active when not dragging
+    // update transform in JS to pixel values for smooth transition
   );
 }

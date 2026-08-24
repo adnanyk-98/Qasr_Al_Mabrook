@@ -18,6 +18,7 @@ import {
   updateProduct,
   createProductCategory,
   createProductImage,
+  setProductPrimaryImage,
   createProductTranslation,
   createSpecificationDefinition,
   createSpecificationTranslation,
@@ -25,7 +26,7 @@ import {
   createVariantDefinition,
   createVariantImage,
 } from "@/server/repositories/catalog-admin";
-import { getProductById, updateCategory, getCategoryById } from "@/server/repositories/catalog-admin";
+import { getProductById, updateCategory, getCategoryById, setCategoryImage } from "@/server/repositories/catalog-admin";
 import { requireAdminSession } from "@/server/services/admin-auth";
 import { serverEnv } from "@/config/env";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
@@ -89,13 +90,33 @@ export async function upsertCategoryAction(formData: FormData) {
       status: statusToUse,
       sortOrder: sortOrderSchema.parse(formData.get("sortOrder") ?? 0),
     });
+    // attempt to attach image metadata when provided
+    const providedImageUrl = String(formData.get("imageUrl") ?? "").trim();
+    if (providedImageUrl) {
+      const objectKey = String(formData.get("objectKey") ?? providedImageUrl.split("/").pop() ?? "").trim();
+      const width = Number(formData.get("width") ?? 0);
+      const height = Number(formData.get("height") ?? 0);
+      if (validateImageReference(providedImageUrl, objectKey, width, height)) {
+        await setCategoryImage({ categoryId, objectKey, publicUrl: providedImageUrl, width, height });
+      }
+    }
   } else {
-    await createCategory({
+    const created = await createCategory({
       slug,
       parentId,
       status: parsedStatus,
       sortOrder: sortOrderSchema.parse(formData.get("sortOrder") ?? 0),
     });
+
+    const providedImageUrl = String(formData.get("imageUrl") ?? "").trim();
+    if (providedImageUrl && created?.id) {
+      const objectKey = String(formData.get("objectKey") ?? providedImageUrl.split("/").pop() ?? "").trim();
+      const width = Number(formData.get("width") ?? 0);
+      const height = Number(formData.get("height") ?? 0);
+      if (validateImageReference(providedImageUrl, objectKey, width, height)) {
+        await setCategoryImage({ categoryId: created.id, objectKey, publicUrl: providedImageUrl, width, height });
+      }
+    }
   }
 
   redirect("/admin/categories");
@@ -156,6 +177,7 @@ export async function upsertProductAction(formData: FormData) {
   const slug = slugify(String(formData.get("slug") ?? "")) || slugify(String(formData.get("name") ?? ""));
 
   const productId = String(formData.get("productId") ?? "");
+  let createdOrUpdatedProductId = productId;
   if (productId) {
     // edit existing product without changing ARCHIVED status unintentionally
     const parsedStatus = statusSchema.parse(String(formData.get("status") ?? "DRAFT"));
@@ -174,13 +196,65 @@ export async function upsertProductAction(formData: FormData) {
       status: statusToUse,
       defaultSku: String(formData.get("defaultSku") ?? "") || null,
     });
+    createdOrUpdatedProductId = productId;
   } else {
-    await createProduct({
+    const created = await createProduct({
       slug,
       brandId: String(formData.get("brandId") ?? "") || null,
       status: statusSchema.parse(String(formData.get("status") ?? "DRAFT")),
       defaultSku: String(formData.get("defaultSku") ?? "") || null,
     });
+    createdOrUpdatedProductId = created?.id ?? "";
+  }
+
+  // If client uploaded an image to R2, create a product_images row and mark it primary
+  // Support multiple uploaded images. Client includes repeated fields: imageUrl, objectKey, width, height
+  const imageUrls = formData.getAll("imageUrl").map((v) => String(v ?? "").trim()).filter(Boolean);
+  if (imageUrls.length && createdOrUpdatedProductId) {
+    const objectKeys = formData.getAll("objectKey").map((v) => String(v ?? "").trim());
+    const widths = formData.getAll("width").map((v) => Number(v ?? 0));
+    const heights = formData.getAll("height").map((v) => Number(v ?? 0));
+    const primaryObjectKey = String(formData.get("primaryObjectKey") ?? "").trim();
+    const imageIds = formData.getAll("imageId").map((v) => String(v ?? "").trim());
+
+    let primaryImageId: string | null = null;
+
+    for (let i = 0; i < imageUrls.length; i++) {
+      const providedImageUrl = imageUrls[i];
+      const objectKey = objectKeys[i] ?? providedImageUrl.split("/").pop() ?? "";
+      const width = Number.isFinite(widths[i]) ? widths[i] : 0;
+      const height = Number.isFinite(heights[i]) ? heights[i] : 0;
+      const imageId = imageIds[i] ?? "";
+      if (!validateImageReference(providedImageUrl, objectKey, width, height)) continue;
+
+      if (imageId) {
+        // existing image: do not create a duplicate. If marked primary, remember id to set primary.
+        if (primaryObjectKey ? primaryObjectKey === objectKey : i === 0) {
+          primaryImageId = imageId;
+        }
+        continue;
+      }
+
+      // new image upload: create a new product_images row
+      const img = await createProductImage({
+        productId: createdOrUpdatedProductId,
+        objectKey,
+        publicUrl: providedImageUrl,
+        width: Number.isInteger(width) ? width : undefined,
+        height: Number.isInteger(height) ? height : undefined,
+        isPrimary: primaryObjectKey ? primaryObjectKey === objectKey : i === 0,
+      });
+
+      if (img?.id && (primaryObjectKey ? primaryObjectKey === objectKey : i === 0)) {
+        primaryImageId = img.id;
+      }
+    }
+
+    if (primaryImageId) {
+      // set product primaryImageId and ensure product_images flags reflect this primary
+      await setProductPrimaryImage(createdOrUpdatedProductId, primaryImageId);
+      await (await import('@/server/repositories/catalog-admin')).setProductImagePrimary(createdOrUpdatedProductId, primaryImageId);
+    }
   }
 
   redirect("/admin/products");

@@ -160,6 +160,21 @@ export async function updateCategory(input: { id: string; slug?: string; parentI
   return rows[0] ?? null;
 }
 
+export async function setCategoryImage(input: { categoryId: string; objectKey: string; publicUrl: string; width?: number | null; height?: number | null }) {
+  const rows = await db
+    .update(categories)
+    .set({
+      imageObjectKey: input.objectKey,
+      imagePublicUrl: input.publicUrl,
+      imageWidth: input.width ?? null,
+      imageHeight: input.height ?? null,
+    })
+    .where(eq(categories.id, input.categoryId))
+    .returning();
+
+  return rows[0] ?? null;
+}
+
 export async function getCategoryById(id: string) {
   const rows = await db.select().from(categories).where(eq(categories.id, id)).limit(1);
   return rows[0] ?? null;
@@ -246,6 +261,18 @@ export async function listProductImages() {
   return db.select().from(productImages).orderBy(desc(productImages.createdAt));
 }
 
+export async function setProductPrimaryImage(productId: string, imageId: string) {
+  const rows = await db
+    .update(products)
+    .set({
+      primaryImageId: imageId,
+    })
+    .where(eq(products.id, productId))
+    .returning();
+
+  return rows[0] ?? null;
+}
+
 export async function createProductImage(input: { productId: string; objectKey: string; publicUrl: string; altTextEn?: string | null; altTextAr?: string | null; width?: number | null; height?: number | null; sortOrder?: number; isPrimary?: boolean }) {
   const rows = await db
     .insert(productImages)
@@ -265,8 +292,39 @@ export async function createProductImage(input: { productId: string; objectKey: 
   return rows[0] ?? null;
 }
 
+export async function setProductImagePrimary(productId: string, imageId: string) {
+  // set is_primary = false for all images of this product, then set true for given image
+  await db
+    .update(productImages)
+    .set({ isPrimary: false })
+    .where(eq(productImages.productId, productId as any));
+
+  const rows = await db
+    .update(productImages)
+    .set({ isPrimary: true })
+    .where(eq(productImages.id, imageId))
+    .returning();
+
+  return rows[0] ?? null;
+}
+
 export async function listProductImagesForProduct(productId: string) {
   return db.select().from(productImages).where(eq(productImages.productId, productId)).orderBy(asc(productImages.sortOrder), asc(productImages.createdAt));
+}
+
+export async function getProductImageById(id: string) {
+  const rows = await db.select().from(productImages).where(eq(productImages.id, id)).limit(1);
+  return rows[0] ?? null;
+}
+
+export async function deleteProductImageById(id: string) {
+  const rows = await db.delete(productImages).where(eq(productImages.id, id)).returning();
+  return rows[0] ?? null;
+}
+
+export async function clearProductPrimaryImage(productId: string) {
+  const rows = await db.update(products).set({ primaryImageId: null as any }).where(eq(products.id, productId)).returning();
+  return rows[0] ?? null;
 }
 
 export async function listVariantImages() {

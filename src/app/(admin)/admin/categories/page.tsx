@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Input, Label, Select } from "@/components/ui/form";
 import { listCategories, getCategoryById } from "@/server/repositories/catalog-admin";
+import { CategoryImageField } from "@/components/admin/category-image-field";
 import { upsertCategoryAction } from "@/server/services/admin-catalog";
 import { requireAdminSession } from "@/server/services/admin-auth";
 
@@ -60,6 +61,7 @@ export default async function CategoriesPage({ searchParams }: PageProps) {
                     <option value="ARCHIVED">ARCHIVED</option>
                   </Select>
                 </div>
+                <CategoryImageField currentImageUrl={editingCategory?.imagePublicUrl ?? null} />
                 <Button type="submit" className="w-full">Save category</Button>
               </form>
             </CardBody>

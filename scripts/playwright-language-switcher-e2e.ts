@@ -27,8 +27,8 @@ async function runViewport(viewport: { width: number; height: number } | null, l
   page.on('pageerror', (e) => consoleMessages.push(`pageerror: ${e.message}`));
 
   try {
-    // TEST 1: EN -> AR (start on a stable page)
-    await page.goto(`${base}/en/about-us`, { waitUntil: 'networkidle' });
+    // TEST 1: EN -> AR (start on root)
+    await page.goto(`${base}/`, { waitUntil: 'networkidle' });
     const testIdLocator = page.locator('[data-testid="locale-switcher"]');
 
     async function waitForSwitcherPresence(maxMs = 20000) {

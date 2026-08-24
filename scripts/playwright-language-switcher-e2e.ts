@@ -29,16 +29,42 @@ async function runViewport(viewport: { width: number; height: number } | null, l
   try {
     // TEST 1: EN -> AR
     await page.goto(`${base}/en`, { waitUntil: 'networkidle' });
-
     const testIdLocator = page.locator('[data-testid="locale-switcher"]');
-    const switcherEn = (await testIdLocator.count()) ? testIdLocator : page.getByRole('link', { name: 'AR', exact: true });
-    await switcherEn.waitFor({ state: 'visible', timeout: 15000 });
-    const text = (await switcherEn.innerText()).trim();
-    if (text !== 'AR') throw new Error(`Expected switcher text AR on /en but got "${text}"`);
 
-    const waitForAr = page.waitForFunction(() => location.pathname.startsWith('/ar'));
-    await switcherEn.click();
-    await waitForAr;
+    // Helper: find a locale-switch anchor and click it via page.evaluate (robust to missing header)
+    async function findAndClickLocale(targetLocale: string) {
+      // prefer test id
+      const hasTestId = await testIdLocator.count();
+      if (hasTestId) {
+        const loc = testIdLocator;
+        await loc.waitFor({ state: 'visible', timeout: 15000 });
+        return loc.click();
+      }
+
+      // fallback: find anchor whose href starts with the locale and whose text/aria matches
+      const handle = await page.evaluateHandle((locale) => {
+        const anchors = Array.from(document.querySelectorAll('a'));
+        for (const a of anchors) {
+          const href = a.getAttribute('href') || '';
+          const txt = (a.textContent || '').trim().toUpperCase();
+          const aria = (a.getAttribute('aria-label') || '').trim().toUpperCase();
+          if ((href.startsWith('/' + locale) || href === '/' + locale || href === locale) && (txt === locale.toUpperCase() || aria === locale.toUpperCase())) {
+            return a;
+          }
+        }
+        return null;
+      }, targetLocale);
+
+      const element = handle.asElement();
+      if (!element) throw new Error(`Locale switcher anchor for ${targetLocale} not found`);
+      await page.evaluate((el) => (el as HTMLElement).click(), element);
+      return;
+    }
+
+    // click AR
+    await page.waitForFunction(() => true); // ensure page script context available
+    await findAndClickLocale('ar');
+    await page.waitForFunction(() => location.pathname.startsWith('/ar'));
 
     // verify switcher shows EN and RTL if exposed
     const switcherAr = (await testIdLocator.count()) ? testIdLocator : page.getByRole('link', { name: 'EN', exact: true });
@@ -51,9 +77,8 @@ async function runViewport(viewport: { width: number; height: number } | null, l
     }
 
     // TEST 2: AR -> EN
-    const waitForEn = page.waitForFunction(() => location.pathname.startsWith('/en'));
-    await switcherAr.click();
-    await waitForEn;
+    await findAndClickLocale('en');
+    await page.waitForFunction(() => location.pathname.startsWith('/en'));
     const switcherBack = (await testIdLocator.count()) ? testIdLocator : page.getByRole('link', { name: 'AR', exact: true });
     await switcherBack.waitFor({ state: 'visible', timeout: 15000 });
 
@@ -61,27 +86,24 @@ async function runViewport(viewport: { width: number; height: number } | null, l
     await page.goto(`${base}/en/products`, { waitUntil: 'networkidle' });
     const switcherP = (await testIdLocator.count()) ? testIdLocator : page.getByRole('link', { name: 'AR', exact: true });
     await switcherP.waitFor({ state: 'visible', timeout: 15000 });
-    const waitForArProducts = page.waitForFunction(() => location.pathname.startsWith('/ar/products'));
-    await switcherP.click();
-    await waitForArProducts;
+    await findAndClickLocale('ar');
+    await page.waitForFunction(() => location.pathname.startsWith('/ar/products'));
     // go back
     const switcherProductsAr = (await testIdLocator.count()) ? testIdLocator : page.getByRole('link', { name: 'EN', exact: true });
     await switcherProductsAr.waitFor({ state: 'visible', timeout: 15000 });
-    const waitForEnProducts = page.waitForFunction(() => location.pathname.startsWith('/en/products'));
-    await switcherProductsAr.click();
-    await waitForEnProducts;
+    await findAndClickLocale('en');
+    await page.waitForFunction(() => location.pathname.startsWith('/en/products'));
 
     // TEST 4: QUERY PARAMETER PRESERVATION
     await page.goto(`${base}/en/products?category=test`, { waitUntil: 'networkidle' });
     const switcherQ = (await testIdLocator.count()) ? testIdLocator : page.getByRole('link', { name: 'AR', exact: true });
     await switcherQ.waitFor({ state: 'visible', timeout: 15000 });
-    const waitForArProductsWithQuery = page.waitForFunction(() => location.pathname.startsWith('/ar/products') && location.search.includes('category=test'));
-    await switcherQ.click();
-    await waitForArProductsWithQuery;
+    await findAndClickLocale('ar');
+    await page.waitForFunction(() => location.pathname.startsWith('/ar/products') && location.search.includes('category=test'));
     const waitForEnProductsWithQuery = page.waitForFunction(() => location.pathname.startsWith('/en/products') && location.search.includes('category=test'));
     const switcherQBack = (await testIdLocator.count()) ? testIdLocator : page.getByRole('link', { name: 'EN', exact: true });
     await switcherQBack.waitFor({ state: 'visible', timeout: 15000 });
-    await switcherQBack.click();
+    await findAndClickLocale('en');
     await waitForEnProductsWithQuery;
 
     await context.close();

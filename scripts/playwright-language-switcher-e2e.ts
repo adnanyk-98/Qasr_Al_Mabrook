@@ -31,6 +31,16 @@ async function runViewport(viewport: { width: number; height: number } | null, l
     await page.goto(`${base}/en`, { waitUntil: 'networkidle' });
     const testIdLocator = page.locator('[data-testid="locale-switcher"]');
 
+    async function waitForSwitcherPresence(maxMs = 20000) {
+      const start = Date.now();
+      while (Date.now() - start < maxMs) {
+        const ok = await page.evaluate(() => !!document.querySelector('[data-testid="locale-switcher"]') || Array.from(document.querySelectorAll('a')).some(a => ((a.textContent||'').trim().toUpperCase() === 'AR' || (a.getAttribute('aria-label')||'').toUpperCase() === 'AR')));
+        if (ok) return true;
+        await new Promise((r) => setTimeout(r, 300));
+      }
+      return false;
+    }
+
     // Helper: find a locale-switch anchor and click it via page.evaluate (robust to missing header)
     async function findAndClickLocale(targetLocale: string) {
       // prefer test id
@@ -61,8 +71,9 @@ async function runViewport(viewport: { width: number; height: number } | null, l
       return;
     }
 
-    // click AR
-    await page.waitForFunction(() => true); // ensure page script context available
+    // ensure switcher present then click AR
+    const present = await waitForSwitcherPresence();
+    if (!present) throw new Error('Locale switcher not found on page');
     await findAndClickLocale('ar');
     await page.waitForFunction(() => location.pathname.startsWith('/ar'));
 

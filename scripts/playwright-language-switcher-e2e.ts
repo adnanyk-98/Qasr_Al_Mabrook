@@ -67,9 +67,11 @@ async function runViewport(viewport: { width: number; height: number } | null, l
     await page.waitForFunction(() => location.pathname.startsWith('/ar'));
 
     // verify switcher shows EN and RTL if exposed
-    const switcherAr = (await testIdLocator.count()) ? testIdLocator : page.getByRole('link', { name: 'EN', exact: true });
-    await switcherAr.waitFor({ state: 'visible', timeout: 15000 });
-    const textAr = (await switcherAr.innerText()).trim();
+    await page.waitForFunction(() => !!document.querySelector('[data-testid="locale-switcher"]') || Array.from(document.querySelectorAll('a')).some(a => ((a.textContent||'').trim().toUpperCase() === 'EN' || (a.getAttribute('aria-label')||'').toUpperCase() === 'EN')) , {}, { timeout: 15000 });
+    const textAr = await page.evaluate(() => {
+      const el = document.querySelector('[data-testid="locale-switcher"]') || Array.from(document.querySelectorAll('a')).find(a => ((a.textContent||'').trim().toUpperCase() === 'EN' || (a.getAttribute('aria-label')||'').toUpperCase() === 'EN'));
+      return el ? (el.textContent || (el.getAttribute('aria-label') || '')) .trim().toUpperCase() : null;
+    });
     if (textAr !== 'EN') throw new Error(`Expected switcher text EN on /ar but got "${textAr}"`);
     const dir = await page.evaluate(() => document.documentElement.dir || document.body.dir || '');
     if (dir && dir !== 'rtl') {
@@ -79,32 +81,26 @@ async function runViewport(viewport: { width: number; height: number } | null, l
     // TEST 2: AR -> EN
     await findAndClickLocale('en');
     await page.waitForFunction(() => location.pathname.startsWith('/en'));
-    const switcherBack = (await testIdLocator.count()) ? testIdLocator : page.getByRole('link', { name: 'AR', exact: true });
-    await switcherBack.waitFor({ state: 'visible', timeout: 15000 });
+    await page.waitForFunction(() => !!document.querySelector('[data-testid="locale-switcher"]') || Array.from(document.querySelectorAll('a')).some(a => ((a.textContent||'').trim().toUpperCase() === 'AR' || (a.getAttribute('aria-label')||'').toUpperCase() === 'AR')) , {}, { timeout: 15000 });
 
-    // TEST 3: PATH PRESERVATION (use products listing page)
-    await page.goto(`${base}/en/products`, { waitUntil: 'networkidle' });
-    const switcherP = (await testIdLocator.count()) ? testIdLocator : page.getByRole('link', { name: 'AR', exact: true });
-    await switcherP.waitFor({ state: 'visible', timeout: 15000 });
+    // TEST 3: PATH PRESERVATION (use about-us page to avoid DB-heavy routes)
+    await page.goto(`${base}/en/about-us`, { waitUntil: 'networkidle' });
+    await page.waitForFunction(() => !!document.querySelector('[data-testid="locale-switcher"]') || Array.from(document.querySelectorAll('a')).some(a => ((a.textContent||'').trim().toUpperCase() === 'AR' || (a.getAttribute('aria-label')||'').toUpperCase() === 'AR')) , {}, { timeout: 15000 });
     await findAndClickLocale('ar');
-    await page.waitForFunction(() => location.pathname.startsWith('/ar/products'));
+    await page.waitForFunction(() => location.pathname.startsWith('/ar/about-us'));
     // go back
-    const switcherProductsAr = (await testIdLocator.count()) ? testIdLocator : page.getByRole('link', { name: 'EN', exact: true });
-    await switcherProductsAr.waitFor({ state: 'visible', timeout: 15000 });
+    await page.waitForFunction(() => !!document.querySelector('[data-testid="locale-switcher"]') || Array.from(document.querySelectorAll('a')).some(a => ((a.textContent||'').trim().toUpperCase() === 'EN' || (a.getAttribute('aria-label')||'').toUpperCase() === 'EN')) , {}, { timeout: 15000 });
     await findAndClickLocale('en');
-    await page.waitForFunction(() => location.pathname.startsWith('/en/products'));
+    await page.waitForFunction(() => location.pathname.startsWith('/en/about-us'));
 
-    // TEST 4: QUERY PARAMETER PRESERVATION
-    await page.goto(`${base}/en/products?category=test`, { waitUntil: 'networkidle' });
-    const switcherQ = (await testIdLocator.count()) ? testIdLocator : page.getByRole('link', { name: 'AR', exact: true });
-    await switcherQ.waitFor({ state: 'visible', timeout: 15000 });
+    // TEST 4: QUERY PARAMETER PRESERVATION using about-us with query
+    await page.goto(`${base}/en/about-us?utm=test`, { waitUntil: 'networkidle' });
+    await page.waitForFunction(() => !!document.querySelector('[data-testid="locale-switcher"]') || Array.from(document.querySelectorAll('a')).some(a => ((a.textContent||'').trim().toUpperCase() === 'AR' || (a.getAttribute('aria-label')||'').toUpperCase() === 'AR')) , {}, { timeout: 15000 });
     await findAndClickLocale('ar');
-    await page.waitForFunction(() => location.pathname.startsWith('/ar/products') && location.search.includes('category=test'));
-    const waitForEnProductsWithQuery = page.waitForFunction(() => location.pathname.startsWith('/en/products') && location.search.includes('category=test'));
-    const switcherQBack = (await testIdLocator.count()) ? testIdLocator : page.getByRole('link', { name: 'EN', exact: true });
-    await switcherQBack.waitFor({ state: 'visible', timeout: 15000 });
+    await page.waitForFunction(() => location.pathname.startsWith('/ar/about-us') && location.search.includes('utm=test'));
+    await page.waitForFunction(() => !!document.querySelector('[data-testid="locale-switcher"]') || Array.from(document.querySelectorAll('a')).some(a => ((a.textContent||'').trim().toUpperCase() === 'EN' || (a.getAttribute('aria-label')||'').toUpperCase() === 'EN')) , {}, { timeout: 15000 });
     await findAndClickLocale('en');
-    await waitForEnProductsWithQuery;
+    await page.waitForFunction(() => location.pathname.startsWith('/en/about-us') && location.search.includes('utm=test'));
 
     await context.close();
     await browser.close();

@@ -12,6 +12,7 @@ export async function LocaleSwitcher({ locale, path }: { locale: Locale; path: s
       <Link
         href={localePath(alternate, path)}
         aria-label={alternate.toUpperCase()}
+        data-testid="locale-switcher"
         className="inline-flex items-center rounded-full border border-[var(--brand-border)] bg-[var(--brand-surface)] px-3 py-1 text-xs font-medium text-[var(--foreground)] hover:bg-[var(--brand-surface-alt)]"
       >
         {alternate.toUpperCase()}

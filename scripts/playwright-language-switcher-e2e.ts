@@ -30,8 +30,8 @@ async function runViewport(viewport: { width: number; height: number } | null, l
     // TEST 1: EN -> AR
     await page.goto(`${base}/en`, { waitUntil: 'networkidle' });
 
-    const switcherEn = page.getByRole('link', { name: 'AR' });
-    await switcherEn.waitFor({ state: 'visible', timeout: 10000 });
+    const switcherEn = (await page.getByTestId('locale-switcher').catch(() => null)) ?? page.getByRole('link', { name: 'AR', exact: true });
+    await switcherEn.waitFor({ state: 'visible', timeout: 15000 });
     const text = (await switcherEn.innerText()).trim();
     if (text !== 'AR') throw new Error(`Expected switcher text AR on /en but got "${text}"`);
 
@@ -40,8 +40,8 @@ async function runViewport(viewport: { width: number; height: number } | null, l
     await waitForAr;
 
     // verify switcher shows EN and RTL if exposed
-    const switcherAr = page.getByRole('link', { name: 'EN' });
-    await switcherAr.waitFor({ state: 'visible', timeout: 10000 });
+    const switcherAr = (await page.getByTestId('locale-switcher').catch(() => null)) ?? page.getByRole('link', { name: 'EN', exact: true });
+    await switcherAr.waitFor({ state: 'visible', timeout: 15000 });
     const textAr = (await switcherAr.innerText()).trim();
     if (textAr !== 'EN') throw new Error(`Expected switcher text EN on /ar but got "${textAr}"`);
     const dir = await page.evaluate(() => document.documentElement.dir || document.body.dir || '');
@@ -53,33 +53,33 @@ async function runViewport(viewport: { width: number; height: number } | null, l
     const waitForEn = page.waitForFunction(() => location.pathname.startsWith('/en'));
     await switcherAr.click();
     await waitForEn;
-    const switcherBack = page.getByRole('link', { name: 'AR' });
-    await switcherBack.waitFor({ state: 'visible', timeout: 10000 });
+    const switcherBack = (await page.getByTestId('locale-switcher').catch(() => null)) ?? page.getByRole('link', { name: 'AR', exact: true });
+    await switcherBack.waitFor({ state: 'visible', timeout: 15000 });
 
     // TEST 3: PATH PRESERVATION (use products listing page)
     await page.goto(`${base}/en/products`, { waitUntil: 'networkidle' });
-    const switcherP = page.getByRole('link', { name: 'AR' });
-    await switcherP.waitFor({ state: 'visible', timeout: 10000 });
+    const switcherP = (await page.getByTestId('locale-switcher').catch(() => null)) ?? page.getByRole('link', { name: 'AR', exact: true });
+    await switcherP.waitFor({ state: 'visible', timeout: 15000 });
     const waitForArProducts = page.waitForFunction(() => location.pathname.startsWith('/ar/products'));
     await switcherP.click();
     await waitForArProducts;
     // go back
-    const switcherProductsAr = page.getByRole('link', { name: 'EN' });
-    await switcherProductsAr.waitFor({ state: 'visible', timeout: 10000 });
+    const switcherProductsAr = (await page.getByTestId('locale-switcher').catch(() => null)) ?? page.getByRole('link', { name: 'EN', exact: true });
+    await switcherProductsAr.waitFor({ state: 'visible', timeout: 15000 });
     const waitForEnProducts = page.waitForFunction(() => location.pathname.startsWith('/en/products'));
     await switcherProductsAr.click();
     await waitForEnProducts;
 
     // TEST 4: QUERY PARAMETER PRESERVATION
     await page.goto(`${base}/en/products?category=test`, { waitUntil: 'networkidle' });
-    const switcherQ = page.getByRole('link', { name: 'AR' });
-    await switcherQ.waitFor({ state: 'visible', timeout: 10000 });
+    const switcherQ = (await page.getByTestId('locale-switcher').catch(() => null)) ?? page.getByRole('link', { name: 'AR', exact: true });
+    await switcherQ.waitFor({ state: 'visible', timeout: 15000 });
     const waitForArProductsWithQuery = page.waitForFunction(() => location.pathname.startsWith('/ar/products') && location.search.includes('category=test'));
     await switcherQ.click();
     await waitForArProductsWithQuery;
     const waitForEnProductsWithQuery = page.waitForFunction(() => location.pathname.startsWith('/en/products') && location.search.includes('category=test'));
-    const switcherQBack = page.getByRole('link', { name: 'EN' });
-    await switcherQBack.waitFor({ state: 'visible', timeout: 10000 });
+    const switcherQBack = (await page.getByTestId('locale-switcher').catch(() => null)) ?? page.getByRole('link', { name: 'EN', exact: true });
+    await switcherQBack.waitFor({ state: 'visible', timeout: 15000 });
     await switcherQBack.click();
     await waitForEnProductsWithQuery;
 

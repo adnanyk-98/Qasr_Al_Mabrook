@@ -3,20 +3,27 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Input, Label, Select } from "@/components/ui/form";
-import { listCategories, getCategoryById } from "@/server/repositories/catalog-admin";
+import { listCategoriesPaginated, getCategoryById } from "@/server/repositories/catalog-admin";
+import ClientCategoryList from "@/components/admin/category-list";
+import ClientAdminPagination from "@/components/admin/admin-pagination";
+import AdminPageSizeSelect from "@/components/admin/admin-page-size-select";
 import { CategoryImageField } from "@/components/admin/category-image-field";
 import { upsertCategoryAction } from "@/server/services/admin-catalog";
 import { requireAdminSession } from "@/server/services/admin-auth";
 
 type PageProps = {
-  searchParams: Promise<{ edit?: string }>;
+  searchParams: Promise<{ edit?: string; page?: string; pageSize?: string; search?: string }>;
 };
 
 export default async function CategoriesPage({ searchParams }: PageProps) {
   await requireAdminSession();
-  const categories = await listCategories();
-
   const params = await searchParams;
+  const pageNum = params.page ? Number(params.page) || 1 : 1;
+  const pageSize = [10, 20, 30, 50].includes(Number(params.pageSize)) ? Number(params.pageSize) : 10;
+  const searchQ = typeof params.search === "string" ? params.search : "";
+  const categoriesPaginated = await listCategoriesPaginated({ page: pageNum, pageSize, search: searchQ });
+  const categories = categoriesPaginated.items;
+
   const editId = params.edit ?? "";
   const editingCategory = editId ? await getCategoryById(editId) : null;
 
@@ -71,28 +78,30 @@ export default async function CategoriesPage({ searchParams }: PageProps) {
             <CardHeader>
               <h2 className="text-xl font-semibold text-[var(--foreground)]">Existing categories</h2>
             </CardHeader>
-            <CardBody className="space-y-3">
-                {categories.length === 0 ? (
-                <p className="text-sm text-[var(--text-muted)]">No categories yet.</p>
+            <CardBody className="space-y-3 min-w-0 max-w-full break-words">
+              {categories.length === 0 ? (
+                <p className="text-sm text-[var(--text-muted)]">No categories found.</p>
               ) : (
-                categories.map((category) => (
-                  <div key={category.id} className="rounded-[var(--radius-md)] border border-[var(--brand-border)] p-4">
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
-                        <p className="font-medium text-[var(--foreground)]">{category.slug}</p>
-                        <p className="text-xs uppercase tracking-[0.08em] text-[var(--text-muted)]">{category.status}</p>
-                      </div>
-                      <span className="rounded-full bg-[var(--brand-primary-light)] px-2.5 py-1 text-xs font-medium text-[var(--brand-primary)]">
-                        #{category.sortOrder}
-                      </span>
-                    </div>
-                    <div className="mt-3">
-                      <Link href={`/admin/categories?edit=${category.id}`} className="text-sm text-[var(--brand-primary)]">
-                        Edit
-                      </Link>
+                <>
+                  <div className="flex items-center justify-between gap-4 flex-wrap w-full">
+                    <form method="get" action="/admin/categories" className="flex gap-2 min-w-0 flex-1">
+                      <input name="search" defaultValue={searchQ} placeholder="Search categories..." className="rounded border px-3 py-2 text-sm flex-1 min-w-0" />
+                      <button type="submit" className="rounded bg-[var(--brand-primary)] text-white px-3 py-2 text-sm">Search</button>
+                    </form>
+                    <div className="flex-shrink-0">
+                      <AdminPageSizeSelect value={categoriesPaginated.pageSize} />
                     </div>
                   </div>
-                ))
+
+                  {/* Client category list */}
+                  {/* @ts-ignore */}
+                  <ClientCategoryList initialItems={categories} total={categoriesPaginated.total} page={categoriesPaginated.page} pageSize={categoriesPaginated.pageSize} basePath="/admin/categories" search={searchQ} />
+
+                  <div className="mt-4">
+                    {/* @ts-ignore */}
+                    <ClientAdminPagination total={categoriesPaginated.total} page={categoriesPaginated.page} pageSize={categoriesPaginated.pageSize} basePath="/admin/categories" search={searchQ} />
+                  </div>
+                </>
               )}
             </CardBody>
           </Card>

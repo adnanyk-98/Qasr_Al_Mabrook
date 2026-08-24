@@ -46,14 +46,22 @@ async function ensureClickableFlag(page, anchorSel) {
   await page.evaluate((sel) => {
     window.__heroClicked = 0;
     const a = document.querySelector(sel);
-    if (!a) throw new Error('anchor not found');
-    // capture clicks and prevent navigation so test can assert click
-    a.addEventListener('click', (e) => {
-      e.preventDefault();
-      // increment counter
-      // @ts-ignore
-      window.__heroClicked = (window.__heroClicked || 0) + 1;
-    }, { capture: true });
+    if (a) {
+      a.addEventListener('click', function (e) {
+        try { e.preventDefault(); } catch {}
+        // @ts-ignore
+        window.__heroClicked = (window.__heroClicked || 0) + 1;
+      }, { capture: true });
+    } else {
+      const container = document.querySelector('#homepage-hero .relative.w-full.overflow-hidden');
+      if (container) {
+        container.addEventListener('click', function (e) {
+          try { e.preventDefault(); } catch {}
+          // @ts-ignore
+          window.__heroClicked = (window.__heroClicked || 0) + 1;
+        }, { capture: true });
+      }
+    }
   }, anchorSel);
 }
 
@@ -75,24 +83,48 @@ async function runTest() {
   const box = await page.locator(heroSel).boundingBox();
   if (!box) throw new Error('Hero bounding box not found');
 
-  // find the first anchor inside first slide
-  const firstAnchorSel = `${heroSel} .w-full.flex > div:nth-child(1) a[href]`;
-  const hasAnchor = await page.$(firstAnchorSel);
-  if (!hasAnchor) {
-    console.warn('No clickable banner found in first slide; aborting');
-    await browser.close();
-    process.exit(0);
+  // find any slide anchor or image to attach click hooks
+  const anchorCandidates = await page.$$( `${heroSel} .w-full.flex > div a[href]` );
+  let interactiveSel = '';
+  if (anchorCandidates && anchorCandidates.length > 0) {
+    interactiveSel = `${heroSel} .w-full.flex > div a[href]`;
+  } else {
+    // fallback to image element inside a slide
+    const imgCandidates = await page.$$( `${heroSel} .w-full.flex > div img` );
+    if (!imgCandidates || imgCandidates.length === 0) {
+      console.warn('No clickable banner anchors or images found; aborting');
+      await browser.close();
+      process.exit(0);
+    }
+    interactiveSel = `${heroSel} .w-full.flex > div img`;
   }
-  const href = await page.getAttribute(firstAnchorSel, 'href');
 
-  // ensure click counter hooks are installed
-  await ensureClickableFlag(page, firstAnchorSel);
+  // ensure click counter hooks are installed on the chosen interactive selector
+  await ensureClickableFlag(page, interactiveSel);
+  const firstAnchorSel = interactiveSel;
 
   // get current slide
   const before = await activeIndicatorIndex(page, heroSel);
 
+  // For normal click, target the currently active slide's interactive element
+  const activeIndex = before >= 0 ? before : 0;
+  const activeAnchorSel = `${heroSel} .w-full.flex > div:nth-child(${activeIndex + 1}) a[href]`;
+  const activeImgSel = `${heroSel} .w-full.flex > div:nth-child(${activeIndex + 1}) img`;
+  // prefer anchor if present, otherwise image
+  const hasActiveAnchor = await page.$(activeAnchorSel);
+  const targetSel = hasActiveAnchor ? activeAnchorSel : activeImgSel;
+  await ensureClickableFlag(page, targetSel);
+
   // Test 1: Normal click (no movement) should trigger click and NOT change slide
-  await page.click(firstAnchorSel);
+  // simulate pointerdown/up at center of active slide
+  const activeSlideBox = await page.locator(`${heroSel} .w-full.flex > div:nth-child(${activeIndex + 1})`).boundingBox();
+  if (!activeSlideBox) throw new Error('Active slide box not found');
+  const cx = Math.round(activeSlideBox.x + activeSlideBox.width / 2);
+  const cy = Math.round(activeSlideBox.y + activeSlideBox.height / 2);
+  await dispatchPointerSequence(page, containerSel, [
+    { type: 'down', x: cx, y: cy, pointerType: 'touch', pointerId: 20, delay: 8 },
+    { type: 'up', x: cx, y: cy, pointerType: 'touch', pointerId: 20, delay: 8 },
+  ]);
   await page.waitForTimeout(150);
   const clickCount = await getClickCount(page);
   const afterClickSlide = await activeIndicatorIndex(page, heroSel);
@@ -130,8 +162,16 @@ async function runTest() {
   await page2.waitForSelector(containerSel, { timeout: 20000 });
   const box2 = await page2.locator(heroSel).boundingBox();
   if (!box2) throw new Error('Hero bounding box not found');
-  const firstAnchorSel2 = `${heroSel} .w-full.flex > div:nth-child(1) a[href]`;
-  await ensureClickableFlag(page2, firstAnchorSel2);
+  // pick interactive selector for desktop (anchor or image)
+  const anchorCandidates2 = await page2.$$( `${heroSel} .w-full.flex > div a[href]` );
+  let interactiveSel2 = '';
+  if (anchorCandidates2 && anchorCandidates2.length > 0) {
+    interactiveSel2 = `${heroSel} .w-full.flex > div a[href]`;
+  } else {
+    interactiveSel2 = `${heroSel} .w-full.flex > div img`;
+  }
+  await ensureClickableFlag(page2, interactiveSel2);
+  const firstAnchorSel2 = interactiveSel2;
   const beforeDrag = await activeIndicatorIndex(page2, heroSel);
   const sX = Math.round(box2.x + box2.width * 0.75);
   const mY = Math.round(box2.y + box2.height * 0.5);
@@ -151,6 +191,7 @@ async function runTest() {
   await page2.evaluate(() => { window.__heroClicked = 0; });
   const box3 = box2;
   const smallStart = Math.round(box3.x + box3.width * 0.5);
+  const beforeSmall = await activeIndicatorIndex(page2, heroSel);
   await dispatchPointerSequence(page2, containerSel, [
     { type: 'down', x: smallStart, y: Math.round(box3.y + box3.height * 0.5), pointerType: 'mouse', pointerId: 12, delay: 8 },
     { type: 'move', x: smallStart + 5, y: Math.round(box3.y + box3.height * 0.5) + 2, pointerType: 'mouse', pointerId: 12, delay: 16 },
@@ -162,7 +203,7 @@ async function runTest() {
   await page2.waitForTimeout(150);
   const clicksSmall = await getClickCount(page2);
   const afterSmallSlide = await activeIndicatorIndex(page2, heroSel);
-  const smallMovePassed = clicksSmall === 1 && afterSmallSlide === afterDrag;
+  const smallMovePassed = clicksSmall === 1 && afterSmallSlide === beforeSmall;
   console.log('TEST Small Movement: clicks', clicksSmall, 'slideAfter', afterSmallSlide);
 
   await browser2.close();

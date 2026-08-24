@@ -13,19 +13,26 @@ import { ProductImageField } from "@/components/admin/product-image-field";
 import { requireAdminSession } from "@/server/services/admin-auth";
 import { upsertProductAction, upsertProductCategoryAction } from "@/server/services/admin-catalog";
 import Link from "next/link";
+import ClientProductList from "@/components/admin/product-list";
+import ClientAdminPagination from "@/components/admin/admin-pagination";
+import AdminPageSizeSelect from "@/components/admin/admin-page-size-select";
+import { listProductsPaginated } from "@/server/repositories/catalog-admin";
 
 type PageProps = {
-  searchParams: Promise<{ edit?: string }>;
+  searchParams: Promise<{ edit?: string; page?: string; pageSize?: string; search?: string }>;
 };
 
 export default async function ProductsPage({ searchParams }: PageProps) {
   await requireAdminSession();
 
-  const products = await listProducts();
+  const params = await searchParams;
+  const pageNum = params.page ? Number(params.page) || 1 : 1;
+  const pageSize = [10, 20, 30, 50].includes(Number(params.pageSize)) ? Number(params.pageSize) : 10;
+  const searchQ = typeof params.search === "string" ? params.search : "";
+  const productsPaginated = await listProductsPaginated({ page: pageNum, pageSize, search: searchQ });
+  const products = productsPaginated.items;
   const brands = await listBrands();
   const categories = await listCategories();
-
-  const params = await searchParams;
   const editId = params.edit ?? "";
   const editingProduct = editId ? await getProductById(editId) : null;
   const editingTranslations = editingProduct
@@ -228,37 +235,34 @@ export default async function ProductsPage({ searchParams }: PageProps) {
           <CardHeader>
             <h2 className="text-xl font-semibold text-[var(--foreground)]">Product list</h2>
           </CardHeader>
-          <CardBody className="space-y-3">
+          <CardBody className="space-y-3 min-w-0 max-w-full break-words">
             {products.length === 0 ? (
-              <p className="text-sm text-[var(--text-muted)]">No products yet.</p>
+              <p className="text-sm text-[var(--text-muted)]">No products found.</p>
             ) : (
-              products.map((product) => (
-                <div
-                  key={product.id}
-                  className="rounded-[var(--radius-md)] border border-[var(--brand-border)] p-4"
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <p className="font-medium text-[var(--foreground)]">{product.slug}</p>
-                      <p className="text-xs uppercase tracking-[0.08em] text-[var(--text-muted)]">
-                        {product.defaultSku ?? "No SKU"}
-                      </p>
-                    </div>
-                    <span className="rounded-full bg-[var(--brand-primary-light)] px-2.5 py-1 text-xs font-medium text-[var(--brand-primary)]">
-                      {product.status}
-                    </span>
-                  </div>
-
-                  <div className="mt-3 flex gap-2">
-                    <Link
-                      href={`/admin/products?edit=${product.id}`}
-                      className="text-sm text-[var(--brand-primary)]"
-                    >
-                      Edit
-                    </Link>
+              <>
+                {/* Search and page size controls */}
+                <div className="flex items-center justify-between gap-4 flex-wrap w-full">
+                  <form method="get" action="/admin/products" className="flex gap-2 min-w-0 flex-1">
+                    <input name="search" defaultValue={searchQ} placeholder="Search products..." className="rounded border px-3 py-2 text-sm flex-1 min-w-0" />
+                    <button type="submit" className="rounded bg-[var(--brand-primary)] text-white px-3 py-2 text-sm">Search</button>
+                  </form>
+                  <div className="flex-shrink-0">
+                    <AdminPageSizeSelect value={productsPaginated.pageSize} />
                   </div>
                 </div>
-              ))
+
+                {/* Product list component (responsive) */}
+                {/* @ts-ignore server-to-client */}
+                <div>
+                  {/* Client component will manage delete UX */}
+                  <ClientProductList initialItems={products} total={productsPaginated.total} page={productsPaginated.page} pageSize={productsPaginated.pageSize} basePath="/admin/products" search={searchQ} />
+                </div>
+
+                <div className="mt-4">
+                  {/* Pagination */}
+                  <ClientAdminPagination total={productsPaginated.total} page={productsPaginated.page} pageSize={productsPaginated.pageSize} basePath="/admin/products" search={searchQ} />
+                </div>
+              </>
             )}
           </CardBody>
         </Card>

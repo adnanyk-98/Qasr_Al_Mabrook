@@ -4,18 +4,25 @@ import { HeroImageField } from "@/components/admin/hero-image-field";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Input, Label, Select } from "@/components/ui/form";
-import { getHomepageSectionById, listHomepageSections } from "@/server/repositories/catalog-admin";
+import { getHomepageSectionById, listHomepageSectionsPaginated } from "@/server/repositories/catalog-admin";
+import ClientHomepageList from "@/components/admin/homepage-list";
+import ClientAdminPagination from "@/components/admin/admin-pagination";
+import AdminPageSizeSelect from "@/components/admin/admin-page-size-select";
 import { requireAdminSession } from "@/server/services/admin-auth";
 import { setHomepageSectionStatusAction } from "@/server/services/admin-catalog";
 
 type PageProps = {
-  searchParams: Promise<{ edit?: string; error?: string }>;
+  searchParams: Promise<{ edit?: string; error?: string; page?: string; pageSize?: string; search?: string }>;
 };
 
 export default async function HomepagePage({ searchParams }: PageProps) {
   await requireAdminSession();
   const params = await searchParams;
-  const homepageSections = await listHomepageSections();
+  const pageNum = params.page ? Number(params.page) || 1 : 1;
+  const pageSize = [10, 20, 30, 50].includes(Number(params.pageSize)) ? Number(params.pageSize) : 10;
+  const searchQ = typeof params.search === "string" ? params.search : "";
+  const homepageSectionsPaginated = await listHomepageSectionsPaginated({ page: pageNum, pageSize, search: searchQ });
+  const homepageSections = homepageSectionsPaginated.items;
   const editingSection = params.edit ? await getHomepageSectionById(params.edit) : null;
   const config = (editingSection?.configurationJson ?? {}) as Record<string, string | boolean | undefined>;
   const currentImageUrl = typeof config.imageUrl === "string" && config.imageUrl.trim() ? config.imageUrl : undefined;
@@ -117,40 +124,30 @@ export default async function HomepagePage({ searchParams }: PageProps) {
             <CardHeader>
               <h2 className="text-xl font-semibold text-[var(--foreground)]">Configured sections</h2>
             </CardHeader>
-            <CardBody className="space-y-3">
+            <CardBody className="space-y-3 min-w-0 max-w-full break-words">
               {homepageSections.length === 0 ? (
-                <p className="text-sm text-[var(--text-muted)]">No homepage sections yet.</p>
+                <p className="text-sm text-[var(--text-muted)]">No homepage sections found.</p>
               ) : (
-                homepageSections.map((section) => (
-                  <div key={section.id} className="rounded-[var(--radius-md)] border border-[var(--brand-border)] p-4">
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
-                        <p className="font-medium text-[var(--foreground)]">{section.sectionType}</p>
-                        <p className="text-xs uppercase tracking-[0.08em] text-[var(--text-muted)]">Sort: {section.sortOrder}</p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="rounded-full bg-[var(--brand-primary-light)] px-2.5 py-1 text-xs font-medium text-[var(--brand-primary)]">
-                          {section.status}
-                        </span>
-                        <Link href={`/admin/homepage?edit=${section.id}`} className="text-sm text-[var(--brand-primary)]">
-                          Edit
-                        </Link>
-                      </div>
-                    </div>
-
-                    <form action={setHomepageSectionStatusAction} className="mt-3 flex items-center gap-2">
-                      <input type="hidden" name="sectionId" value={section.id} />
-                      <Select name="status" defaultValue={section.status} className="max-w-[180px]">
-                        <option value="DRAFT">DRAFT</option>
-                        <option value="PUBLISHED">PUBLISHED</option>
-                        <option value="ARCHIVED">ARCHIVED</option>
-                      </Select>
-                      <Button type="submit" variant="secondary" size="sm">
-                        Update
-                      </Button>
+                <>
+                  <div className="flex items-center justify-between gap-4 flex-wrap w-full">
+                      <form method="get" action="/admin/homepage" className="flex gap-2 min-w-0 flex-1">
+                        <input name="search" defaultValue={searchQ} placeholder="Search sections..." className="rounded border px-3 py-2 text-sm flex-1 min-w-0" />
+                      <button type="submit" className="rounded bg-[var(--brand-primary)] text-white px-3 py-2 text-sm">Search</button>
                     </form>
+                    <div className="flex-shrink-0">
+                      <AdminPageSizeSelect value={homepageSectionsPaginated.pageSize} />
+                    </div>
                   </div>
-                ))
+
+                  {/* Client homepage list */}
+                  {/* @ts-ignore */}
+                  <ClientHomepageList initialItems={homepageSections} total={homepageSectionsPaginated.total} page={homepageSectionsPaginated.page} pageSize={homepageSectionsPaginated.pageSize} basePath="/admin/homepage" search={searchQ} />
+
+                  <div className="mt-4">
+                    {/* @ts-ignore */}
+                    <ClientAdminPagination total={homepageSectionsPaginated.total} page={homepageSectionsPaginated.page} pageSize={homepageSectionsPaginated.pageSize} basePath="/admin/homepage" search={searchQ} />
+                  </div>
+                </>
               )}
             </CardBody>
           </Card>

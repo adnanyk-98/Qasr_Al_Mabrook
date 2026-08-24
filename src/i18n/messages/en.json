@@ -46,6 +46,11 @@
     "promotionalSection": "Promotional section",
     "heroAlt": "Catalogue introduction"
   },
+  "loading": {
+    "page": "Preparing the catalogue",
+    "takingLonger": "Taking a little longer than expected.",
+    "retry": "Retry"
+  },
   "categories": {
     "eyebrow": "Categories",
     "title": "Explore categories",

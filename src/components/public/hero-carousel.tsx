@@ -280,7 +280,7 @@ export function HeroCarousel({
       ref={rootRef}
       id={id}
       dir={locale === "ar" ? "rtl" : "ltr"}
-      className="relative overflow-hidden rounded-[var(--radius-2xl)] border border-[var(--brand-border)] bg-[var(--brand-surface-alt)] shadow-[var(--shadow-md)]"
+      className="relative overflow-hidden border border-[var(--brand-border)] bg-[var(--brand-surface-alt)] shadow-[var(--shadow-md)]"
       tabIndex={0}
       role="region"
       aria-roledescription="carousel"
@@ -309,7 +309,7 @@ export function HeroCarousel({
                     }}
                   >
                     {/* Responsive picture: mobile source first, desktop as fallback */}
-                    <div className="relative w-full aspect-[9/10] md:aspect-[8/3] overflow-hidden rounded-[var(--radius-2xl)]">
+                    <div className="relative w-full aspect-[9/10] md:aspect-[8/3] overflow-hidden">
                       <picture>
                         {banner.mobileImageUrl ? <source media="(max-width: 767px)" srcSet={banner.mobileImageUrl} /> : null}
                         <img src={banner.desktopImageUrl ?? banner.imageUrl ?? ''} alt={banner.imageAlt ?? banner.title ?? `Hero banner ${index + 1}`} className="w-full h-full object-contain object-center" />
@@ -318,7 +318,7 @@ export function HeroCarousel({
                   </Link>
                 ) : (
                   <div className="block w-full h-full">
-                    <div className="relative w-full aspect-[9/10] md:aspect-[8/3] overflow-hidden rounded-[var(--radius-2xl)]">
+                    <div className="relative w-full aspect-[9/10] md:aspect-[8/3] overflow-hidden">
                       <picture>
                         {banner.mobileImageUrl ? <source media="(max-width: 767px)" srcSet={banner.mobileImageUrl} /> : null}
                         <img src={banner.desktopImageUrl ?? banner.imageUrl ?? ''} alt={banner.imageAlt ?? banner.title ?? `Hero banner ${index + 1}`} className="w-full h-full object-contain object-center" />

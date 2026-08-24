@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { CatalogueCarousel } from "@/components/public/catalogue-carousel";
-import { CategoryCard } from "@/components/public/category-card";
+import { CategoryMarquee } from "@/components/public/category-marquee";
 import { Container, Section } from "@/components/ui/layout";
 import { ProductCard } from "@/components/public/product-card";
 import { PromotionalBanner } from "@/components/public/promotional-banner";
@@ -35,7 +35,7 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ loc
   return (
     <PublicShell locale={currentLocale} path="/">
       <main>
-        <Section className="bg-[var(--brand-surface)] py-8 sm:py-10 lg:py-12">
+        <Section className="bg-[var(--brand-surface)] !py-0">
           {heroSections.length > 0 ? (
             // Full-bleed hero: render outside the standard centered Container
             <div className="w-full">
@@ -101,43 +101,22 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ loc
           </Section>
         ) : null}
 
-        <Section>
+        <Section className="!pt-8 !pb-8 sm:!pt-10 sm:!pb-12">
           <Container className="space-y-6">
-            <CatalogueCarousel
-              id="homepage-categories-carousel"
-              locale={currentLocale}
-              title={
+            <div className="space-y-6">
+              <div className="flex items-end justify-between gap-4">
                 <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">
-                    {t("categoriesEyebrow")}
-                  </p>
-                  <h2 className="mt-1 text-3xl font-semibold text-[var(--foreground)]">
-                    {t("categoriesTitle")}
-                  </h2>
+                  <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">{t("categoriesEyebrow")}</p>
+                  <h2 className="mt-1 text-3xl font-semibold text-[var(--foreground)]">{t("categoriesTitle")}</h2>
                 </div>
-              }
-              viewAllLink={
-                <Link href={localePath(currentLocale, "/categories")} className="text-sm font-medium text-[var(--brand-primary)] hover:text-[var(--brand-primary-dark)]">
-                  {t("viewAll")}
-                </Link>
-              }
-              prevLabel={currentLocale === "ar" ? "السابق" : "Previous categories"}
-              nextLabel={currentLocale === "ar" ? "التالي" : "Next categories"}
-              itemClassName="min-w-[72%] sm:min-w-[calc(50%-0.625rem)] xl:min-w-[calc(25%-0.75rem)]"
-              items={categories.map((category) => (
-                <CategoryCard
-                  key={category.id}
-                  locale={currentLocale}
-                  slug={category.slug}
-                  name={category.name}
-                  description={category.description}
-                />
-              ))}
-            />
+                <Link href={localePath(currentLocale, "/categories")} className="hidden text-sm font-medium text-[var(--brand-primary)] hover:text-[var(--brand-primary-dark)] sm:block">{t("viewAll")}</Link>
+              </div>
+              <CategoryMarquee locale={currentLocale} categories={categories.map(({ id, slug, name }) => ({ id, slug, name }))} />
+            </div>
           </Container>
         </Section>
 
-        <Section className="pt-0">
+        <Section className="!pt-4 !pb-12 sm:!pt-2 sm:!pb-16">
           <Container className="space-y-6">
             <CatalogueCarousel
               id="homepage-featured-products-carousel"

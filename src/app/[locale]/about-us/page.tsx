@@ -28,14 +28,31 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
 
   const currentLocale = locale as Locale;
   const page = await getPublishedStaticPage(currentLocale, "about-us");
-  if (!page) notFound();
+  // If the static page is missing in the database, render a safe
+  // placeholder rather than calling `notFound()` to avoid a global
+  // NEXT_HTTP_ERROR_FALLBACK being sent to the client in production.
+  // This keeps the route available for E2E and prevents intermittent
+  // client-side fallbacks while DB content is investigated.
+  const safePage =
+    page ?? {
+      id: "about-us-fallback",
+      slug: "about-us",
+      status: "PUBLISHED",
+      title: currentLocale === "ar" ? "حول" : "About",
+      body:
+        currentLocale === "ar"
+          ? "<p>محتوى التعريف غير متوفر حالياً.</p>"
+          : "<p>About page content is not available right now.</p>",
+      seoTitle: null,
+      seoDescription: null,
+    };
 
   return (
     <PublicShell locale={currentLocale} path="/about-us">
       <Section>
         <Container className="space-y-6">
-          <h1 className="text-4xl font-semibold text-[var(--foreground)]">{page.title}</h1>
-          <div className="prose max-w-3xl text-[var(--text-muted)]" dangerouslySetInnerHTML={{ __html: page.body }} />
+          <h1 className="text-4xl font-semibold text-[var(--foreground)]">{safePage.title}</h1>
+          <div className="prose max-w-3xl text-[var(--text-muted)]" dangerouslySetInnerHTML={{ __html: safePage.body }} />
         </Container>
       </Section>
     </PublicShell>

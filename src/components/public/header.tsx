@@ -21,7 +21,7 @@ export async function Header({ locale = "en", path = "/" }: { locale?: Locale; p
   ];
 
   return (
-    <header className="relative z-40 border-b border-[var(--brand-border)] bg-white/90 backdrop-blur-sm">
+    <header className="relative z-40 border-b border-[var(--brand-border)] bg-[var(--brand-header-background)] backdrop-blur-sm">
       <Container className="flex items-center justify-between gap-4 py-3 sm:py-4">
         <Link href={localePath(locale, "/")} className="flex shrink-0 items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2">
           <Image

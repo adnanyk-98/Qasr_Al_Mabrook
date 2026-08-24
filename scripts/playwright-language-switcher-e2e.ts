@@ -14,6 +14,8 @@ async function captureFailure(page, name) {
   await page.screenshot({ path: png, fullPage: true });
   const content = await page.content();
   fs.writeFileSync(html, content);
+  // write a placeholder log (caller may append console messages)
+  fs.writeFileSync(log, `URL: ${page.url()}\n\n`);
   return { png, html, log };
 }
 
@@ -25,11 +27,44 @@ async function runViewport(viewport: { width: number; height: number } | null, l
   const consoleMessages: string[] = [];
   page.on('console', (m) => consoleMessages.push(`${m.type()}: ${m.text()}`));
   page.on('pageerror', (e) => consoleMessages.push(`pageerror: ${e.message}`));
+  const networkEvents: string[] = [];
+  page.on('requestfailed', (req) => networkEvents.push(`requestfailed: ${req.url()} ${req.failure()?.errorText || ''}`));
+  page.on('response', (res) => { if (res.status && res.status() >= 400) networkEvents.push(`response ${res.status()}: ${res.url()}`); });
 
   try {
-    // TEST 1: EN -> AR (start on a stable localized page)
-    await page.goto(`${base}/en/about-us/`, { waitUntil: 'networkidle' });
+    // TEST 1: EN -> AR (probe candidate pages until locale-switcher appears)
+    // prefer the locale root first; avoid pages that sometimes render a NEXT_HTTP_ERROR_FALLBACK
+    const candidates = [
+      `${base}/en`,
+      `${base}/en/about-us`,
+      `${base}/about-us`,
+      `${base}/`,
+    ];
+    let found = false;
     const testIdLocator = page.locator('[data-testid="locale-switcher"]');
+    for (const c of candidates) {
+      try {
+        const resp = await page.goto(c, { waitUntil: 'networkidle' });
+        // if server returned non-200, try next candidate
+        if (resp && resp.status() !== 200) continue;
+        // also ensure the server did not render a Next.js error fallback page
+        const body = await page.content();
+        if (body.includes('NEXT_HTTP_ERROR_FALLBACK') || body.includes('Page not found') || body.includes('next-error')) {
+          continue;
+        }
+      } catch (e) {
+        // ignore navigation errors and try next
+        continue;
+      }
+      if (await waitForSwitcherPresence.call(null, 10000)) {
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      // final attempt: go to canonical en root and wait longer
+      await page.goto(`${base}/en`, { waitUntil: 'networkidle' });
+    }
 
     async function waitForSwitcherPresence(maxMs = 20000) {
       const start = Date.now();
@@ -119,6 +154,22 @@ async function runViewport(viewport: { width: number; height: number } | null, l
     return { success: true, label };
   } catch (err) {
     const files = await captureFailure(page, label.replace(/\s+/g, '-'));
+    // append console messages and error to the log file
+    try {
+      const logText = [
+        `Error: ${err.message}`,
+        `URL: ${page.url()}`,
+        '',
+        'Console messages:',
+        ...consoleMessages,
+        '',
+        'Network events:',
+        ...networkEvents,
+      ].join('\n');
+      fs.appendFileSync(files.log, logText);
+    } catch (e) {
+      // ignore logging errors
+    }
     console.error(`Viewport ${label}: FAIL`, err.message);
     console.error('Saved artifacts:', files);
     await context.close();

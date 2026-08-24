@@ -12,7 +12,7 @@ const variantClasses: Record<PublicImageVariant, string> = {
   "product-card": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]",
   "product-detail-main": "relative mx-auto w-full max-w-[min(100%,500px)] aspect-square overflow-hidden rounded-[var(--radius-xl)] bg-[var(--brand-surface-alt)]",
   "product-detail-thumbnail": "relative mx-auto w-full max-w-[88px] aspect-square overflow-hidden rounded-[var(--radius-sm)] bg-[var(--brand-surface-alt)]",
-  "homepage-hero": "relative aspect-[9/10] md:aspect-[8/3] overflow-hidden rounded-[var(--radius-2xl)] bg-[var(--brand-surface-alt)]",
+  "homepage-hero": "relative aspect-[9/10] md:aspect-[8/3] overflow-hidden bg-[var(--brand-surface-alt)]",
   "homepage-banner": "relative aspect-[3/1] overflow-hidden rounded-[var(--radius-xl)] bg-[var(--brand-surface-alt)]",
   "category-card": "relative mx-auto w-full max-w-[min(100%,220px)] aspect-square overflow-hidden rounded-[var(--radius-lg)] bg-[var(--brand-surface-alt)]",
 };

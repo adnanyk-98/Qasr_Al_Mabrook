@@ -11,6 +11,7 @@
   --brand-surface: #fffaf8;
   --brand-surface-alt: #f5f1ee;
   --brand-border: #e7e1dd;
+  --brand-header-background: rgba(255, 255, 255, 0.9);
   --spacing-1: 0.25rem;
   --spacing-2: 0.5rem;
   --spacing-3: 0.75rem;
@@ -125,6 +126,92 @@ textarea {
 :focus-visible {
   outline: 3px solid var(--brand-primary);
   outline-offset: 2px;
+}
+
+.qam-skeleton {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--brand-surface-alt);
+}
+
+.qam-skeleton::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: linear-gradient(100deg, transparent 20%, rgba(255, 255, 255, 0.55) 50%, transparent 80%);
+  animation: qam-skeleton-shimmer 2.2s ease-in-out infinite;
+}
+
+.qam-loading-progress {
+  animation: qam-loading-progress 1.8s ease-in-out infinite;
+}
+
+@keyframes qam-skeleton-shimmer {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+
+@keyframes qam-loading-progress {
+  0% { transform: translateX(-120%); }
+  50% { transform: translateX(120%); }
+  100% { transform: translateX(320%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qam-skeleton::after,
+  .qam-loading-progress {
+    animation: none;
+  }
+}
+
+.qam-category-track {
+  animation: qam-category-marquee 34s linear infinite;
+  will-change: transform;
+}
+
+.qam-category-viewport:hover .qam-category-track {
+  animation-play-state: paused;
+}
+
+.qam-category-viewport {
+  -webkit-mask-image: linear-gradient(to right, transparent 0, black 7%, black 93%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, black 7%, black 93%, transparent 100%);
+}
+
+[dir="rtl"] .qam-category-viewport {
+  -webkit-mask-image: linear-gradient(to left, transparent 0, black 7%, black 93%, transparent 100%);
+  mask-image: linear-gradient(to left, transparent 0, black 7%, black 93%, transparent 100%);
+}
+
+.qam-category-track[dir="rtl"] {
+  animation-name: qam-category-marquee-rtl;
+}
+
+.qam-category-orb {
+  animation: qam-category-float 5.5s ease-in-out infinite;
+  animation-delay: var(--category-float-delay, 0s);
+}
+
+@keyframes qam-category-marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+@keyframes qam-category-marquee-rtl {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(50%, 0, 0); }
+}
+
+@keyframes qam-category-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qam-category-orb {
+    animation: none;
+  }
 }
 
 @media (max-width: 767px) {

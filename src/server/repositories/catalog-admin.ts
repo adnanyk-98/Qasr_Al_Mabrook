@@ -1,4 +1,5 @@
 import { and, asc, desc, eq, sql } from "drizzle-orm";
+import postgres from 'postgres';
 
 import { db } from "@/db";
 import {
@@ -26,6 +27,33 @@ import {
 
 export async function listCategories() {
   return db.select().from(categories).orderBy(asc(categories.sortOrder), asc(categories.createdAt));
+}
+
+export async function listCategoriesPaginated({ page = 1, pageSize = 10, search = "" }: { page?: number; pageSize?: number; search?: string }) {
+  const offset = Math.max(0, (page - 1) * pageSize);
+
+  const whereClause = search
+    ? sql`(categories.slug ILIKE ${"%" + search + "%"} OR EXISTS (SELECT 1 FROM category_translations ct WHERE ct.category_id = categories.id AND ct.name ILIKE ${"%" + search + "%"}))`
+    : undefined;
+
+  const totalRes = await db.select({ count: sql<number>`count(*)` }).from(categories).where(whereClause as any);
+  const total = Number(totalRes?.[0]?.count ?? 0);
+
+  const items = await db
+    .select()
+    .from(categories)
+    .where(whereClause as any)
+    .orderBy(asc(categories.sortOrder), asc(categories.createdAt))
+    .limit(pageSize)
+    .offset(offset);
+
+  return {
+    items,
+    total,
+    page,
+    pageSize,
+    totalPages: Math.ceil(total / pageSize) || 1,
+  };
 }
 
 export async function createCategory(input: { slug: string; status: "DRAFT" | "PUBLISHED" | "ARCHIVED"; parentId?: string | null; sortOrder?: number }) {
@@ -110,6 +138,34 @@ export async function createAttributeValue(input: { attributeId: string; code: s
 
 export async function listProducts() {
   return db.select().from(products).orderBy(desc(products.createdAt));
+}
+
+export async function listProductsPaginated({ page = 1, pageSize = 10, search = "" }: { page?: number; pageSize?: number; search?: string }) {
+  const offset = Math.max(0, (page - 1) * pageSize);
+
+  // Build a where clause that searches slug, defaultSku, id, or translation name
+  const searchClause = search
+    ? sql`(products.slug ILIKE ${"%" + search + "%"} OR products.default_sku ILIKE ${"%" + search + "%"} OR products.id::text ILIKE ${"%" + search + "%"} OR EXISTS (SELECT 1 FROM product_translations pt WHERE pt.product_id = products.id AND pt.name ILIKE ${"%" + search + "%"}))`
+    : undefined;
+
+  const totalRes = await db.select({ count: sql<number>`count(*)` }).from(products).where(searchClause as any);
+  const total = Number(totalRes?.[0]?.count ?? 0);
+
+  const items = await db
+    .select()
+    .from(products)
+    .where(searchClause as any)
+    .orderBy(desc(products.createdAt))
+    .limit(pageSize)
+    .offset(offset);
+
+  return {
+    items,
+    total,
+    page,
+    pageSize,
+    totalPages: Math.ceil(total / pageSize) || 1,
+  };
 }
 
 export async function getProductById(id: string) {
@@ -352,6 +408,154 @@ export async function createVariantImage(input: { variantCombinationId: string; 
 
 export async function listHomepageSections() {
   return db.select().from(homepageSections).orderBy(asc(homepageSections.sortOrder), desc(homepageSections.createdAt));
+}
+
+export async function listHomepageSectionsPaginated({ page = 1, pageSize = 10, search = "" }: { page?: number; pageSize?: number; search?: string }) {
+  const offset = Math.max(0, (page - 1) * pageSize);
+
+  const whereClause = search
+    ? sql`(homepage_sections.section_type ILIKE ${"%" + search + "%"} OR (homepage_sections.configuration_json->>'title') ILIKE ${"%" + search + "%"})`
+    : undefined;
+
+  const totalRes = await db.select({ count: sql<number>`count(*)` }).from(homepageSections).where(whereClause as any);
+  const total = Number(totalRes?.[0]?.count ?? 0);
+
+  const items = await db
+    .select()
+    .from(homepageSections)
+    .where(whereClause as any)
+    .orderBy(asc(homepageSections.sortOrder), desc(homepageSections.createdAt))
+    .limit(pageSize)
+    .offset(offset);
+
+  return {
+    items,
+    total,
+    page,
+    pageSize,
+    totalPages: Math.ceil(total / pageSize) || 1,
+  };
+}
+
+// Deletion helpers with safety checks
+import { serverEnv } from "@/config/env";
+import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
+
+async function deleteR2ObjectIfConfigured(objectKey?: string | null) {
+  if (!objectKey) return;
+  const r2AccountId = serverEnv.R2_ACCOUNT_ID;
+  const bucket = serverEnv.R2_BUCKET_NAME;
+  if (!r2AccountId || !bucket) return;
+  const endpoint = `https://${r2AccountId}.r2.cloudflarestorage.com`;
+  const s3 = new S3Client({ region: "auto", endpoint, credentials: { accessKeyId: serverEnv.R2_ACCESS_KEY_ID ?? "", secretAccessKey: serverEnv.R2_SECRET_ACCESS_KEY ?? "" } });
+  try {
+    await s3.send(new DeleteObjectCommand({ Bucket: bucket, Key: objectKey }));
+  } catch (e: any) {
+    console.error("R2 delete error", e?.message ?? e);
+  }
+}
+
+export async function deleteProductById(productId: string) {
+  return db.transaction(async (tx) => {
+    const imgs = await tx.select().from(productImages).where(eq(productImages.productId, productId));
+    for (const img of imgs) {
+      await deleteR2ObjectIfConfigured(img.objectKey);
+    }
+
+    // Delete product (DB has cascade FKs for associated records)
+    const rows = await tx.delete(products).where(eq(products.id, productId)).returning();
+    return rows[0] ?? null;
+  });
+}
+
+export async function deleteCategoryById(categoryId: string) {
+  // Prevent deletion if child categories or product relationships exist
+  const child = await db.select().from(categories).where(eq(categories.parentId, categoryId)).limit(1);
+  if (child.length > 0) return { ok: false, reason: "HAS_CHILD" } as const;
+
+  const rel = await db.select().from(productCategories).where(eq(productCategories.categoryId, categoryId)).limit(1);
+  if (rel.length > 0) return { ok: false, reason: "IN_USE" } as const;
+
+  // safe to delete: remove image object if present
+  const cat = await db.select().from(categories).where(eq(categories.id, categoryId)).limit(1);
+  const c = cat[0];
+  if (c?.imageObjectKey) {
+    await deleteR2ObjectIfConfigured(c.imageObjectKey);
+  }
+
+  const rows = await db.delete(categories).where(eq(categories.id, categoryId)).returning();
+  return { ok: true, deleted: rows[0] ?? null } as const;
+}
+
+export async function deleteHomepageSectionById(sectionId: string) {
+  // Deleting a homepage section; do not log connection details or credentials here.
+
+  // Perform deletion inside a transaction and verify within the same tx that the row is removed.
+  const result = await db.transaction(async (tx) => {
+    const rows = await tx.select().from(homepageSections).where(eq(homepageSections.id, sectionId)).limit(1);
+    const section = rows[0];
+    if (!section) return null;
+    const cfg = section.configurationJson as Record<string, unknown> | null;
+    const imageUrl = typeof cfg?.imageUrl === "string" ? cfg.imageUrl : null;
+
+    if (imageUrl) {
+      // Check other sections referencing same imageUrl
+      const refs = await tx.select().from(homepageSections).where(sql`(configuration_json->>'imageUrl') = ${imageUrl} AND id != ${sectionId}`);
+      if (refs.length === 0) {
+        // try to delete R2 object from URL (best-effort; do not fail delete if R2 cleanup errors)
+        try {
+          const objectKey = imageUrl.split("/").pop();
+          if (objectKey) await deleteR2ObjectIfConfigured(objectKey);
+        } catch (e) {
+          // ignore R2 deletion errors here; do not mask DB delete issues
+        }
+      }
+    }
+
+    const deleted = await tx.delete(homepageSections).where(eq(homepageSections.id, sectionId)).returning();
+
+    // Verify within the same transaction that the row no longer exists
+    const chk = await tx.select({ count: sql<number>`count(*)` }).from(homepageSections).where(eq(homepageSections.id, sectionId));
+    const remaining = Number(chk?.[0]?.count ?? 0);
+    // eslint-disable-next-line no-console
+    console.log(`homepage.delete(in-tx): id=${sectionId} deletedCount=${deleted.length} remainingInTx=${remaining}`);
+    if (remaining !== 0) {
+      throw new Error(`homepage.delete: deletion did not remove row within transaction (remaining=${remaining})`);
+    }
+
+    return deleted[0] ?? null;
+  });
+
+  // Post-commit: double-check using a fresh connection to the primary DB (DIRECT_DATABASE_URL) when available
+  try {
+    let postRemaining = 0;
+    const direct = process.env.DIRECT_DATABASE_URL;
+    if (direct) {
+      try {
+        const client = postgres(direct, { ssl: 'require' });
+        const rows = await client`select count(*) as cnt from homepage_sections where id = ${sectionId}`;
+        postRemaining = Number(rows?.[0]?.cnt ?? 0);
+        await client.end();
+      } catch (inner) {
+        // fallback to global db if direct check fails
+        const postChk = await db.select({ count: sql<number>`count(*)` }).from(homepageSections).where(eq(homepageSections.id, sectionId));
+        postRemaining = Number(postChk?.[0]?.count ?? 0);
+      }
+    } else {
+      const postChk = await db.select({ count: sql<number>`count(*)` }).from(homepageSections).where(eq(homepageSections.id, sectionId));
+      postRemaining = Number(postChk?.[0]?.count ?? 0);
+    }
+    // eslint-disable-next-line no-console
+    console.log(`homepage.delete(post-commit): id=${sectionId} remainingAfterCommit=${postRemaining}`);
+    if (postRemaining !== 0) {
+      throw new Error(`homepage.delete: row still present after commit (remaining=${postRemaining})`);
+    }
+  } catch (e) {
+    // If verification fails, surface an error so the API does not return success
+    throw e;
+  }
+
+  return result;
 }
 
 export async function getHomepageSectionById(id: string) {

@@ -9,7 +9,7 @@ export async function Footer({ locale = "en" }: { locale?: Locale }) {
   const common = await getTranslations({ locale, namespace: "common" });
   const t = await getTranslations({ locale, namespace: "footer" });
   return (
-    <footer className="border-t border-[var(--brand-border)] bg-[var(--brand-surface)]">
+    <footer className="border-t border-[var(--brand-border)] bg-[var(--brand-header-background)] backdrop-blur-sm">
       <Container className="grid gap-8 py-12 md:grid-cols-3">
         <div className="space-y-4">
           <div className="text-lg font-semibold text-[var(--foreground)]">{siteConfig.name}</div>

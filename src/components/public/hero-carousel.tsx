@@ -128,8 +128,14 @@ export function HeroCarousel({
     const slider = container?.querySelector('.w-full.flex') as HTMLElement | null;
     if (!container || !slider) return;
 
-    const THRESHOLD = 50; // px
-    const START_MIN = 10; // px before beginning drag
+    const THRESHOLD = 60; // px
+    const START_MIN = 8; // px before beginning drag
+    // Ensure vertical page scrolling remains natural while allowing horizontal swipes
+    // Use pan-y so vertical scrolling is preserved
+    container.style.touchAction = container.style.touchAction || 'pan-y';
+
+    // track the element that has pointer capture so we can release it reliably
+    let capturedElement: HTMLElement | null = null;
 
     const onPointerDown = (e: PointerEvent) => {
       // only left button / touch
@@ -140,9 +146,17 @@ export function HeroCarousel({
       dragXRef.current = 0;
       isDraggingRef.current = false;
       suppressClickRef.current = false;
-      (e.target as Element)?.setPointerCapture?.(e.pointerId);
+      // set pointer capture on the element we attached listener to (container)
+      try {
+        (container as HTMLElement).setPointerCapture?.(e.pointerId);
+        capturedElement = container;
+      } catch {
+        capturedElement = (e.target as HTMLElement) ?? null;
+        try { capturedElement?.setPointerCapture?.(e.pointerId); } catch {}
+      }
       window.addEventListener('pointermove', onPointerMove, { passive: false });
       window.addEventListener('pointerup', onPointerUp);
+      window.addEventListener('pointercancel', onPointerCancel);
     };
 
     const onPointerMove = (e: PointerEvent) => {
@@ -180,9 +194,11 @@ export function HeroCarousel({
 
     const onPointerUp = (e: PointerEvent) => {
       if (pointerIdRef.current !== e.pointerId) return;
-      (e.target as Element)?.releasePointerCapture?.(e.pointerId);
+      try { capturedElement?.releasePointerCapture?.(e.pointerId); } catch {}
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
+
+      window.removeEventListener('pointercancel', onPointerCancel);
 
       if (!isDraggingRef.current) {
         pointerIdRef.current = null;
@@ -209,6 +225,7 @@ export function HeroCarousel({
         dragXRef.current = 0;
         isDraggingRef.current = false;
         pointerIdRef.current = null;
+        capturedElement = null;
       }, 50);
 
       // restart autoplay timer
@@ -216,6 +233,22 @@ export function HeroCarousel({
         if (autoplayTimerRef.current) window.clearInterval(autoplayTimerRef.current);
         autoplayTimerRef.current = window.setInterval(() => setActive((c) => (c + 1) % banners.length), autoplayInterval);
       }
+    };
+
+    const onPointerCancel = (e: PointerEvent) => {
+      if (pointerIdRef.current !== e.pointerId) return;
+      try { capturedElement?.releasePointerCapture?.(e.pointerId); } catch {}
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerCancel);
+      dragXRef.current = 0;
+      isDraggingRef.current = false;
+      pointerIdRef.current = null;
+      capturedElement = null;
+      // snap back
+      const width = containerWidthRef.current || container.getBoundingClientRect().width;
+      slider.style.transition = '';
+      slider.style.transform = `translateX(${-active * width}px)`;
     };
 
     container.addEventListener('pointerdown', onPointerDown);

@@ -1,3 +1,4 @@
+  // The state wait above verifies the visible clone-aware image.
 import { chromium, type Page } from "playwright";
 
 const base = process.env.BASE_URL ?? "http://localhost:3000";
@@ -67,19 +68,18 @@ async function waitForActiveSlide(page: Page, locale: "en" | "ar", index: number
 }
 
 async function waitForFancySuitVisible(page: Page, locale: "en" | "ar") {
-  const imageSelector = '#homepage-hero img[alt="Fancy Suit"]';
   await page.waitForFunction(() => {
     const hero = document.querySelector("#homepage-hero");
     if (!hero) return false;
     const heroBox = hero.getBoundingClientRect();
-    const image = hero.querySelector('img[alt="Fancy Suit"]') as HTMLImageElement | null;
-    if (!image) return false;
-    const slide = image.closest(".min-w-full") as HTMLElement | null;
-    if (!slide) return false;
-    const slideBox = slide.getBoundingClientRect();
-    return image.complete && image.naturalWidth > 0 && image.naturalHeight > 0 && image.getBoundingClientRect().width > 0 && image.getBoundingClientRect().height > 0 && Math.abs(slideBox.left - heroBox.left) <= 1 && Math.abs(slideBox.right - heroBox.right) <= 1;
+    return Array.from(hero.querySelectorAll('img[alt="Fancy Suit"]')).some((image) => {
+      const imageElement = image as HTMLImageElement;
+      const slide = imageElement.closest(".min-w-full") as HTMLElement | null;
+      if (!slide) return false;
+      const slideBox = slide.getBoundingClientRect();
+      return imageElement.complete && imageElement.naturalWidth > 0 && imageElement.naturalHeight > 0 && imageElement.getBoundingClientRect().width > 0 && imageElement.getBoundingClientRect().height > 0 && Math.abs(slideBox.left - heroBox.left) <= 1 && Math.abs(slideBox.right - heroBox.right) <= 1;
+    });
   });
-  await page.locator(imageSelector).waitFor({ state: "visible" });
 }
 
 async function verifyHeroSlideImage(page: Page, locale: "en" | "ar", viewport: { width: number; height: number }, index: number) {
@@ -87,16 +87,18 @@ async function verifyHeroSlideImage(page: Page, locale: "en" | "ar", viewport: {
   await indicator.click();
   await waitForActiveSlide(page, locale, index);
 
-  const image = page.locator('#homepage-hero img[alt="Fancy Suit"]');
-  const result = await image.evaluate((element) => {
-    const imageElement = element as HTMLImageElement;
-    const box = imageElement.getBoundingClientRect();
+  const result = await page.locator('#homepage-hero img[alt="Fancy Suit"]').evaluateAll((elements) => {
+    const imageElement = elements.find((element) => {
+      const box = element.getBoundingClientRect();
+      return box.width > 0 && box.height > 0 && box.right > 0 && box.left < window.innerWidth;
+    }) as HTMLImageElement | undefined;
+    if (!imageElement) return null;
     return {
       currentSrc: imageElement.currentSrc,
       complete: imageElement.complete,
       naturalWidth: imageElement.naturalWidth,
       naturalHeight: imageElement.naturalHeight,
-      visible: box.width > 0 && box.height > 0,
+      visible: true,
       source: imageElement.closest("picture")?.querySelector("source")?.getAttribute("srcset") ?? null,
     };
   });
@@ -226,6 +228,55 @@ async function verifyDesktopHeroInteraction(page: Page, locale: "en" | "ar") {
   if (!noPreview) throw new Error(`${locale}: native drag preview was still observed`);
 }
 
+async function verifyInfiniteLooping(page: Page, locale: "en" | "ar", viewport: { width: number; height: number }) {
+  await page.goto(`${base}/${locale}`, { waitUntil: "networkidle" });
+  await waitForHeroHydrated(page, locale);
+
+  const nextButton = page.locator('#homepage-hero button[aria-label="' + (locale === "ar" ? "الشريحة التالية" : "Next slide") + '"]');
+  const prevButton = page.locator('#homepage-hero button[aria-label="' + (locale === "ar" ? "الشريحة السابقة" : "Previous slide") + '"]');
+
+  // Test NEXT loop: 4 → 1
+  await page.locator(`#homepage-hero button[aria-label="${getSlideAriaLabel(locale, 3)}"]`).click();
+  await waitForActiveSlide(page, locale, 3);
+
+  await nextButton.click();
+  await waitForActiveSlide(page, locale, 0);
+
+  // Test PREVIOUS loop: 1 → 4
+  await page.locator(`#homepage-hero button[aria-label="${getSlideAriaLabel(locale, 0)}"]`).click();
+  await waitForActiveSlide(page, locale, 0);
+
+  await prevButton.click();
+  await waitForActiveSlide(page, locale, 3);
+
+  // Test drag loop forward: 4 → 1
+  await page.locator(`#homepage-hero button[aria-label="${getSlideAriaLabel(locale, 3)}"]`).click();
+  await waitForActiveSlide(page, locale, 3);
+
+  const heroBox = await page.locator('#homepage-hero').boundingBox();
+  if (heroBox) {
+    await page.mouse.move(heroBox.x + heroBox.width * 0.7, heroBox.y + heroBox.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(heroBox.x + heroBox.width * 0.15, heroBox.y + heroBox.height / 2, { steps: 12 });
+    await page.mouse.up();
+    await page.waitForTimeout(600);
+    await waitForActiveSlide(page, locale, 0);
+  }
+
+  // Test drag loop backward: 1 → 4
+  await page.locator(`#homepage-hero button[aria-label="${getSlideAriaLabel(locale, 0)}"]`).click();
+  await waitForActiveSlide(page, locale, 0);
+
+  if (heroBox) {
+    await page.mouse.move(heroBox.x + heroBox.width * 0.3, heroBox.y + heroBox.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(heroBox.x + heroBox.width * 0.85, heroBox.y + heroBox.height / 2, { steps: 12 });
+    await page.mouse.up();
+    await page.waitForTimeout(600);
+    await waitForActiveSlide(page, locale, 3);
+  }
+}
+
 async function main() {
   const browser = await chromium.launch();
   const context = await browser.newContext();
@@ -250,6 +301,8 @@ async function main() {
     await page.setViewportSize(viewport);
     await checkFancySuitHero(page, "en", viewport);
     await checkFancySuitHero(page, "ar", viewport);
+    await verifyInfiniteLooping(page, "en", viewport);
+    await verifyInfiniteLooping(page, "ar", viewport);
     await page.goto(`${base}/en/products`, { waitUntil: "networkidle" });
     await page.waitForSelector('main a[href*="/products/"]');
     const productHref = await page.locator('main a[href*="/products/"]').first().getAttribute("href");

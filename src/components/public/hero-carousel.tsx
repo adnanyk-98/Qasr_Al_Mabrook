@@ -32,9 +32,10 @@ export function HeroCarousel({
   autoplay?: boolean;
   autoplayInterval?: number;
 }) {
-  const [active, setActive] = useState(0);
+  const [active, setActive] = useState(1); // Start at 1 (first real slide in infinite track)
   const [reducedMotion, setReducedMotion] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
+  const isRepositioningRef = useRef(false); // Prevent state resets during silent repositioning
   const preventNativeDrag = (event: React.DragEvent<HTMLElement>) => {
     event.preventDefault();
     event.stopPropagation();
@@ -49,10 +50,28 @@ export function HeroCarousel({
   const suppressClickRef = useRef(false);
   const autoplayTimerRef = useRef<number | null>(null);
   const direction = locale === "ar" ? 1 : -1;
+  
   const bannerSignature = useMemo(
     () => banners.map((banner) => [banner.desktopImageUrl, banner.mobileImageUrl, banner.imageUrl, banner.title, banner.subtitle, banner.ctaLabel, banner.ctaHref].join("\u0001")).join("\u0002"),
     [banners],
   );
+
+  // Create infinite track with cloned slides: [clone last, ...real slides, clone first]
+  const infiniteTrack = useMemo(() => {
+    if (!banners.length) return [];
+    return [
+      banners[banners.length - 1], // clone of last slide
+      ...banners,
+      banners[0], // clone of first slide
+    ];
+  }, [banners]);
+
+  // Map internal index to real slide index for indicators
+  const getRealSlideIndex = useCallback((internalIndex: number) => {
+    if (banners.length === 0) return 0;
+    const realIndex = ((internalIndex - 1) % banners.length + banners.length) % banners.length;
+    return realIndex;
+  }, [banners.length]);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -64,12 +83,14 @@ export function HeroCarousel({
 
   const goTo = useCallback(
     (index: number) => {
-      setActive(Math.max(0, Math.min(index, banners.length - 1)));
+      setActive(index);
       // reset autoplay timer on manual navigation
       if (autoplay) {
         if (autoplayTimerRef.current) window.clearInterval(autoplayTimerRef.current);
         if (!reducedMotion && banners.length > 1) {
-          autoplayTimerRef.current = window.setInterval(() => setActive((c) => (c + 1) % banners.length), autoplayInterval);
+          autoplayTimerRef.current = window.setInterval(() => {
+            setActive((c) => c + 1);
+          }, autoplayInterval);
         }
       }
     },
@@ -80,25 +101,52 @@ export function HeroCarousel({
   const next = useCallback(() => goTo(active + 1), [active, goTo]);
 
   useEffect(() => {
-    setActive(0);
+    setActive(1); // Reset to first real slide
     dragXRef.current = 0;
     isDraggingRef.current = false;
     hasDraggedRef.current = false;
     suppressClickRef.current = false;
+    isRepositioningRef.current = false;
   }, [locale, bannerSignature]);
 
   useEffect(() => {
-    // centralised autoplay management
+    // centralised autoplay management with infinite looping
     if (!autoplay || reducedMotion || banners.length <= 1) return;
     if (autoplayTimerRef.current) window.clearInterval(autoplayTimerRef.current);
     autoplayTimerRef.current = window.setInterval(() => {
-      setActive((current) => (current + 1) % banners.length);
+      setActive((current) => current + 1);
     }, autoplayInterval);
     return () => {
       if (autoplayTimerRef.current) window.clearInterval(autoplayTimerRef.current);
       autoplayTimerRef.current = null;
     };
   }, [autoplay, autoplayInterval, banners.length, reducedMotion]);
+
+  // Handle infinite loop repositioning
+  // Handle infinite loop repositioning when transition completes
+  useEffect(() => {
+    if (!rootRef.current || banners.length === 0) return;
+    const container = rootRef.current.querySelector('.relative.w-full.overflow-hidden') as HTMLElement | null;
+    const slider = container?.querySelector('.w-full.flex') as HTMLElement | null;
+    if (!container || !slider) return;
+    const handleTransitionEnd = () => {
+      if (active === 0) {
+        isRepositioningRef.current = true;
+        slider.style.transition = 'none';
+        slider.style.transform = `translateX(${direction * banners.length * 100}%)`;
+        setActive(banners.length);
+        requestAnimationFrame(() => { isRepositioningRef.current = false; });
+      } else if (active === infiniteTrack.length - 1) {
+        isRepositioningRef.current = true;
+        slider.style.transition = 'none';
+        slider.style.transform = `translateX(${direction * 100}%)`;
+        setActive(1);
+        requestAnimationFrame(() => { isRepositioningRef.current = false; });
+      }
+    };
+    slider.addEventListener('transitionend', handleTransitionEnd);
+    return () => slider.removeEventListener('transitionend', handleTransitionEnd);
+  }, [active, banners.length, direction, infiniteTrack.length]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -111,16 +159,9 @@ export function HeroCarousel({
         event.preventDefault();
         prev();
       }
-      if (event.key === "Home") {
-        event.preventDefault();
-        goTo(0);
-      }
-      if (event.key === "End") {
-        event.preventDefault();
-        goTo(banners.length - 1);
-      }
+      if (event.key === "Home") { event.preventDefault(); goTo(1); }
+      if (event.key === "End") { event.preventDefault(); goTo(banners.length); }
     };
-
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [banners.length, goTo, next, prev]);
@@ -142,7 +183,6 @@ export function HeroCarousel({
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
-
     const container = root.querySelector('.relative.w-full.overflow-hidden') as HTMLElement | null;
     const slider = container?.querySelector('.w-full.flex') as HTMLElement | null;
     if (!container || !slider) return;
@@ -150,7 +190,6 @@ export function HeroCarousel({
     const THRESHOLD = 60; // px
     const START_MIN = 8; // px before beginning drag
     // Ensure vertical page scrolling remains natural while allowing horizontal swipes
-    // Use pan-y so vertical scrolling is preserved
     container.style.touchAction = container.style.touchAction || 'pan-y';
 
     // track the element that has pointer capture so we can release it reliably
@@ -242,12 +281,12 @@ export function HeroCarousel({
       const dx = dragXRef.current;
       const width = containerWidthRef.current || container.getBoundingClientRect().width;
       slider.style.transition = '';
-      // decide change
+      // decide change with infinite looping
       if (Math.abs(dx) > THRESHOLD) {
         if (dx < 0) {
-          setActive((c) => Math.min(c + 1, banners.length - 1));
+          setActive((c) => c + 1);
         } else {
-          setActive((c) => Math.max(c - 1, 0));
+          setActive((c) => c - 1);
         }
       } else {
         // snap back
@@ -263,10 +302,10 @@ export function HeroCarousel({
         hasDraggedRef.current = false;
       }, 50);
 
-      // restart autoplay timer
+      // restart autoplay timer with infinite looping
       if (autoplay && !reducedMotion && banners.length > 1) {
         if (autoplayTimerRef.current) window.clearInterval(autoplayTimerRef.current);
-        autoplayTimerRef.current = window.setInterval(() => setActive((c) => (c + 1) % banners.length), autoplayInterval);
+        autoplayTimerRef.current = window.setInterval(() => setActive((c) => c + 1), autoplayInterval);
       }
     };
 
@@ -308,17 +347,27 @@ export function HeroCarousel({
   }, [active, autoplay, autoplayInterval, banners.length, direction, reducedMotion]);
 
   // sync slider transform when active changes (non-dragging)
+
+  // sync slider transform when active changes (non-dragging)
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
     const container = root.querySelector('.relative.w-full.overflow-hidden') as HTMLElement | null;
     const slider = container?.querySelector('.w-full.flex') as HTMLElement | null;
     if (!container || !slider) return;
+    
     const width = containerWidthRef.current || container.getBoundingClientRect().width;
-    slider.style.transition = '';
-    slider.style.transform = `translateX(${direction * active * width}px)`;
+    
+    if (isRepositioningRef.current) {
+      // During repositioning, ensure transition is disabled
+      slider.style.transition = 'none';
+      slider.style.transform = `translateX(${direction * active * width}px)`;
+    } else {
+      // After repositioning, re-enable the transition from CSS class
+      slider.style.transition = '';
+      slider.style.transform = `translateX(${direction * active * width}px)`;
+    }
   }, [active, direction]);
-
   if (!banners.length) {
     return null;
   }
@@ -340,59 +389,66 @@ export function HeroCarousel({
           className="w-full flex transition-transform duration-500 ease-out"
           style={{ transform: `translateX(${direction * active * 100}%)` }}
         >
-          {banners.map((banner, index) => (
-            <div key={`${id}-${index}`} className="min-w-full w-full shrink-0 relative">
-              {(banner.desktopImageUrl || banner.imageUrl) ? (
-                banner.ctaHref ? (
-                  <Link
-                    href={localizedHref(locale, banner.ctaHref)}
-                    aria-label={banner.title ?? banner.imageAlt ?? `Hero banner ${index + 1}`}
-                    className="block w-full h-full"
-                    draggable={false}
-                    onDragStart={preventNativeDrag}
-                    onDragStartCapture={preventNativeDrag}
-                    onClick={(e) => {
-                      if (suppressClickRef.current || hasDraggedRef.current) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        suppressClickRef.current = false;
-                        hasDraggedRef.current = false;
-                      }
-                    }}
-                  >
-                    {/* Responsive picture: mobile source first, desktop as fallback */}
-                    <div className="relative w-full aspect-[9/10] md:aspect-[8/3] overflow-hidden">
-                      <picture>
-                        {banner.mobileImageUrl ? <source media="(max-width: 767px)" srcSet={banner.mobileImageUrl} /> : null}
-                        <img
-                          src={banner.desktopImageUrl ?? banner.imageUrl ?? ''}
-                          alt={banner.imageAlt ?? banner.title ?? `Hero banner ${index + 1}`}
-                          draggable={false}
-                          onDragStart={(event) => event.preventDefault()}
-                          className="w-full h-full object-contain object-center"
-                        />
-                      </picture>
+          {infiniteTrack.map((banner, index) => {
+            const isClone = index === 0 || index === infiniteTrack.length - 1;
+            return (
+              <div 
+                key={`${id}-${index}`} 
+                className="min-w-full w-full shrink-0 relative"
+                aria-hidden={isClone ? "true" : undefined}
+              >
+                {(banner.desktopImageUrl || banner.imageUrl) ? (
+                  banner.ctaHref ? (
+                    <Link
+                      href={localizedHref(locale, banner.ctaHref)}
+                      aria-label={banner.title ?? banner.imageAlt ?? `Hero banner ${getRealSlideIndex(index) + 1}`}
+                      className="block w-full h-full"
+                      draggable={false}
+                      onDragStart={preventNativeDrag}
+                      onDragStartCapture={preventNativeDrag}
+                      onClick={(e) => {
+                        if (suppressClickRef.current || hasDraggedRef.current) {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          suppressClickRef.current = false;
+                          hasDraggedRef.current = false;
+                        }
+                      }}
+                    >
+                      {/* Responsive picture: mobile source first, desktop as fallback */}
+                      <div className="relative w-full aspect-[9/10] md:aspect-[8/3] overflow-hidden">
+                        <picture>
+                          {banner.mobileImageUrl ? <source media="(max-width: 767px)" srcSet={banner.mobileImageUrl} /> : null}
+                          <img
+                            src={banner.desktopImageUrl ?? banner.imageUrl ?? ''}
+                            alt={banner.imageAlt ?? banner.title ?? `Hero banner ${getRealSlideIndex(index) + 1}`}
+                            draggable={false}
+                            onDragStart={(event) => event.preventDefault()}
+                            className="w-full h-full object-contain object-center"
+                          />
+                        </picture>
+                      </div>
+                    </Link>
+                  ) : (
+                    <div className="block w-full h-full">
+                      <div className="relative w-full aspect-[9/10] md:aspect-[8/3] overflow-hidden">
+                        <picture>
+                          {banner.mobileImageUrl ? <source media="(max-width: 767px)" srcSet={banner.mobileImageUrl} /> : null}
+                          <img
+                            src={banner.desktopImageUrl ?? banner.imageUrl ?? ''}
+                            alt={banner.imageAlt ?? banner.title ?? `Hero banner ${getRealSlideIndex(index) + 1}`}
+                            draggable={false}
+                            onDragStart={(event) => event.preventDefault()}
+                            className="w-full h-full object-contain object-center"
+                          />
+                        </picture>
+                      </div>
                     </div>
-                  </Link>
-                ) : (
-                  <div className="block w-full h-full">
-                    <div className="relative w-full aspect-[9/10] md:aspect-[8/3] overflow-hidden">
-                      <picture>
-                        {banner.mobileImageUrl ? <source media="(max-width: 767px)" srcSet={banner.mobileImageUrl} /> : null}
-                        <img
-                          src={banner.desktopImageUrl ?? banner.imageUrl ?? ''}
-                          alt={banner.imageAlt ?? banner.title ?? `Hero banner ${index + 1}`}
-                          draggable={false}
-                          onDragStart={(event) => event.preventDefault()}
-                          className="w-full h-full object-contain object-center"
-                        />
-                      </picture>
-                    </div>
-                  </div>
-                )
-              ) : null}
-            </div>
-          ))}
+                  )
+                ) : null}
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -403,8 +459,7 @@ export function HeroCarousel({
           size="sm"
           aria-label={locale === "ar" ? "الشريحة السابقة" : "Previous slide"}
           onClick={prev}
-          disabled={active === 0}
-          className="h-10 w-10 rounded-full border-white/60 bg-white/15 text-white backdrop-blur-sm hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-40"
+          className="h-10 w-10 rounded-full border-white/60 bg-white/15 text-white backdrop-blur-sm hover:bg-white/20"
         >
           {locale === "ar" ? "‹" : "‹"}
         </Button>
@@ -417,8 +472,7 @@ export function HeroCarousel({
           size="sm"
           aria-label={locale === "ar" ? "الشريحة التالية" : "Next slide"}
           onClick={next}
-          disabled={active === banners.length - 1}
-          className="h-10 w-10 rounded-full border-white/60 bg-white/15 text-white backdrop-blur-sm hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-40"
+          className="h-10 w-10 rounded-full border-white/60 bg-white/15 text-white backdrop-blur-sm hover:bg-white/20"
         >
           {locale === "ar" ? "›" : "›"}
         </Button>
@@ -430,13 +484,11 @@ export function HeroCarousel({
             key={`${id}-dot-${index}`}
             type="button"
             aria-label={locale === "ar" ? `الانتقال إلى الشريحة ${index + 1}` : `Go to slide ${index + 1}`}
-            onClick={() => goTo(index)}
-            className={`h-2.5 rounded-full transition-[width,background-color] ${index === active ? "w-9 bg-white" : "w-2.5 bg-white/50 hover:bg-white/80"}`}
+            onClick={() => goTo(index + 1)} // +1 because internal track starts at 1
+            className={`h-2.5 rounded-full transition-[width,background-color] ${getRealSlideIndex(active) === index ? "w-9 bg-white" : "w-2.5 bg-white/50 hover:bg-white/80"}`}
           />
         ))}
       </div>
     </div>
-    // keep slider synced to active when not dragging
-    // update transform in JS to pixel values for smooth transition
   );
 }

@@ -40,6 +40,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           lastModified: new Date(),
           changeFrequency: "weekly",
           priority: 0.9,
+        },
+        {
+          url: `${baseUrl}${localePath(locale, "/store-locator")}`,
+          lastModified: new Date(),
+          changeFrequency: "monthly",
+          priority: 0.8,
         }
       );
     }

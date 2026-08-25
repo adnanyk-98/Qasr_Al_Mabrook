@@ -2,9 +2,11 @@
   "common": {
     "home": "الرئيسية",
     "catalogue": "الكتالوج",
+    "products": "المنتجات",
     "categories": "الفئات",
     "search": "بحث",
     "contact": "تواصل معنا",
+    "storeLocator": "موقع المتجر",
     "requestQuote": "طلب عرض سعر",
     "backToCatalogue": "العودة إلى الكتالوج",
     "viewDetails": "عرض التفاصيل",
@@ -23,13 +25,33 @@
     "openMenu": "فتح قائمة التنقل",
     "logoAlt": "شعار قصر المبارك"
   },
+  "storeLocator": {
+    "eyebrow": "موقع المتجر",
+    "title": "اكتشف متجرنا",
+    "description": "ألقِ نظرة على تجربة قصر المبارك واكتشف المكان الذي يقف خلف كتالوج منتجاتنا.",
+    "galleryLabel": "معرض متجر قصر المبارك",
+    "imageAlt": "منظر داخلي لمتجر قصر المبارك",
+    "close": "إغلاق الصورة",
+    "previous": "صورة المتجر السابقة",
+    "next": "صورة المتجر التالية",
+    "visitUs": "زورنا",
+    "callUs": "اتصل بنا",
+    "address": "العنوان",
+    "phone": "الهاتف",
+    "viewOnMaps": "عرض الموقع على خرائط Google",
+    "mapsAriaLabel": "عرض موقع قصر المبارك على خرائط Google"
+  },
   "footer": {
     "description": "كتالوج ومنصة تواصل متقدمة لاكتشاف المنتجات باللغتين الإنجليزية والعربية.",
     "explore": "استكشف",
     "contact": "تواصل معنا",
     "salesEnquiries": "استفسارات المبيعات",
     "languageSupport": "دعم بالإنجليزية والعربية",
-    "responsiveDiscovery": "اكتشاف متجاوب للمنتجات"
+    "responsiveDiscovery": "اكتشاف متجاوب للمنتجات",
+    "address": "العنوان",
+    "phone": "الهاتف",
+    "viewOnMaps": "عرض الموقع على خرائط Google",
+    "mapsAriaLabel": "عرض موقع قصر المبارك على خرائط Google"
   },
   "home": {
     "eyebrow": "تجربة كتالوج متقدمة",
@@ -45,6 +67,14 @@
     "featuredCollection": "مجموعة مختارة",
     "promotionalSection": "قسم ترويجي",
     "heroAlt": "مقدمة الكتالوج"
+  },
+  "highlights": {
+    "eyebrow": "ما يميزنا",
+    "title": "كتالوج مبني على الثقة",
+    "experience": "سنوات من الخبرة",
+    "products": "مجموعة المنتجات",
+    "clients": "عميل سعيد",
+    "retention": "الاحتفاظ بالعملاء"
   },
   "loading": {
     "page": "جارٍ تجهيز الكتالوج",

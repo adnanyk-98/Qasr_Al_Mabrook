@@ -44,7 +44,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
 
   return (
     <div>
-      <NextIntlClientProvider locale={currentLocale} messages={messages[currentLocale]}>
+      <NextIntlClientProvider key={currentLocale} locale={currentLocale} messages={messages[currentLocale]}>
         {children}
       </NextIntlClientProvider>
     </div>

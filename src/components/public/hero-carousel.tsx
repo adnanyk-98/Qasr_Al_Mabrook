@@ -42,6 +42,8 @@ export function HeroCarousel({
   const isDraggingRef = useRef(false);
   const suppressClickRef = useRef(false);
   const autoplayTimerRef = useRef<number | null>(null);
+  const direction = locale === "ar" ? 1 : -1;
+  const bannerSignature = banners.map((banner) => [banner.desktopImageUrl, banner.mobileImageUrl, banner.imageUrl, banner.title, banner.subtitle, banner.ctaLabel, banner.ctaHref].join("\u0001")).join("\u0002");
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -67,6 +69,13 @@ export function HeroCarousel({
 
   const prev = useCallback(() => goTo(active - 1), [active, goTo]);
   const next = useCallback(() => goTo(active + 1), [active, goTo]);
+
+  useEffect(() => {
+    setActive(0);
+    dragXRef.current = 0;
+    isDraggingRef.current = false;
+    suppressClickRef.current = false;
+  }, [locale, bannerSignature]);
 
   useEffect(() => {
     // centralised autoplay management
@@ -187,7 +196,7 @@ export function HeroCarousel({
       suppressClickRef.current = Math.abs(dx) > START_MIN;
       // apply pixel transform while dragging
       const width = containerWidthRef.current || container.getBoundingClientRect().width;
-      const base = -active * width;
+      const base = direction * active * width;
       slider.style.transition = 'none';
       slider.style.transform = `translateX(${base + dragXRef.current}px)`;
     };
@@ -217,7 +226,7 @@ export function HeroCarousel({
         }
       } else {
         // snap back
-        slider.style.transform = `translateX(${-active * width}px)`;
+        slider.style.transform = `translateX(${direction * active * width}px)`;
       }
 
       // small delay to allow transition to run then clear dragging state
@@ -248,7 +257,7 @@ export function HeroCarousel({
       // snap back
       const width = containerWidthRef.current || container.getBoundingClientRect().width;
       slider.style.transition = '';
-      slider.style.transform = `translateX(${-active * width}px)`;
+      slider.style.transform = `translateX(${direction * active * width}px)`;
     };
 
     container.addEventListener('pointerdown', onPointerDown);
@@ -257,7 +266,7 @@ export function HeroCarousel({
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
     };
-  }, [active, autoplay, autoplayInterval, banners.length, reducedMotion]);
+  }, [active, autoplay, autoplayInterval, banners.length, direction, reducedMotion]);
 
   // sync slider transform when active changes (non-dragging)
   useEffect(() => {
@@ -268,8 +277,8 @@ export function HeroCarousel({
     if (!container || !slider) return;
     const width = containerWidthRef.current || container.getBoundingClientRect().width;
     slider.style.transition = '';
-    slider.style.transform = `translateX(${-active * width}px)`;
-  }, [active]);
+    slider.style.transform = `translateX(${direction * active * width}px)`;
+  }, [active, direction]);
 
   if (!banners.length) {
     return null;
@@ -290,7 +299,7 @@ export function HeroCarousel({
       <div className="relative w-full overflow-hidden">
         <div
           className="w-full flex transition-transform duration-500 ease-out"
-          style={{ transform: `translateX(-${active * 100}%)` }}
+          style={{ transform: `translateX(${direction * active * 100}%)` }}
         >
           {banners.map((banner, index) => (
             <div key={`${id}-${index}`} className="min-w-full w-full shrink-0 relative">

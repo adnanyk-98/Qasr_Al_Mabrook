@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { Jost, Geist_Mono } from "next/font/google";
 import { siteConfig } from "@/config/site";
+import { DocumentLocaleSync } from "@/components/i18n/document-locale-sync";
+import { resolvePageDirection } from "@/lib/homepage-content";
 import "./globals.css";
 
 const jost = Jost({
@@ -27,14 +29,17 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const requestHeaders = await headers();
   const locale = requestHeaders.get("x-qam-locale") === "ar" ? "ar" : "en";
+  const dir = resolvePageDirection(locale);
 
   return (
     <html
       lang={locale}
-      dir={locale === "ar" ? "rtl" : "ltr"}
+      dir={dir}
+      data-scroll-behavior="smooth"
       className={`${jost.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
+        <DocumentLocaleSync />
         {children}
       </body>
     </html>

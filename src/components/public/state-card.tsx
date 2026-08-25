@@ -10,7 +10,7 @@ export function EmptyState({ title, description }: { title: string; description?
 export function LoadingState({ label }: { label?: string }) {
   return (
     <div className="rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-white p-8 text-center text-sm text-[var(--text-muted)] shadow-[var(--shadow-sm)]">
-      {label ?? "Loading..."}
+      {label ?? "Preparing content..."}
     </div>
   );
 }

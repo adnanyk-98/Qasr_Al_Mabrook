@@ -170,6 +170,15 @@ textarea {
   will-change: transform;
 }
 
+.qam-highlight-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.qam-highlight-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
 .qam-category-viewport:hover .qam-category-track {
   animation-play-state: paused;
 }

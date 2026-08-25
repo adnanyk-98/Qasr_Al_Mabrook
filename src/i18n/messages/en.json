@@ -2,9 +2,11 @@
   "common": {
     "home": "Home",
     "catalogue": "Catalogue",
+    "products": "Products",
     "categories": "Categories",
     "search": "Search",
     "contact": "Contact",
+    "storeLocator": "Store Locator",
     "requestQuote": "Request Quote",
     "backToCatalogue": "Back to catalogue",
     "viewDetails": "View details",
@@ -23,13 +25,33 @@
     "openMenu": "Open navigation menu",
     "logoAlt": "Qasr Al Mabrook logo"
   },
+  "storeLocator": {
+    "eyebrow": "Store locator",
+    "title": "Explore our store",
+    "description": "Step inside the Qasr Al Mabrook experience and discover the setting behind our product catalogue.",
+    "galleryLabel": "Qasr Al Mabrook store gallery",
+    "imageAlt": "Interior view of the Qasr Al Mabrook store",
+    "close": "Close image",
+    "previous": "Previous store image",
+    "next": "Next store image",
+    "visitUs": "Visit us",
+    "callUs": "Call us",
+    "address": "Address",
+    "phone": "Phone",
+    "viewOnMaps": "View on Google Maps",
+    "mapsAriaLabel": "View Qasr Al Mabrook location on Google Maps"
+  },
   "footer": {
     "description": "Premium catalogue and enquiry platform for product discovery across English and Arabic experiences.",
     "explore": "Explore",
     "contact": "Contact",
     "salesEnquiries": "Sales enquiries",
     "languageSupport": "English / Arabic support",
-    "responsiveDiscovery": "Responsive product discovery"
+    "responsiveDiscovery": "Responsive product discovery",
+    "address": "Address",
+    "phone": "Phone",
+    "viewOnMaps": "View on Google Maps",
+    "mapsAriaLabel": "View Qasr Al Mabrook location on Google Maps"
   },
   "home": {
     "eyebrow": "Premium catalogue experience",
@@ -45,6 +67,14 @@
     "featuredCollection": "Featured collection",
     "promotionalSection": "Promotional section",
     "heroAlt": "Catalogue introduction"
+  },
+  "highlights": {
+    "eyebrow": "Our difference",
+    "title": "A catalogue built on trust",
+    "experience": "Years of Experience",
+    "products": "Range of Products",
+    "clients": "Happy Clients",
+    "retention": "Customer Retention"
   },
   "loading": {
     "page": "Preparing the catalogue",

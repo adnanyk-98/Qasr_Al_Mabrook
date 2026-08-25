@@ -10,6 +10,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",
+    "e2e:locale-switch": "tsx scripts/playwright-locale-switch-e2e.ts",
     "readiness:check": "tsx scripts/check-production-readiness.ts",
     "db:migration:check": "drizzle-kit check",
     "db:migration:apply": "tsx scripts/apply-migrations.ts",

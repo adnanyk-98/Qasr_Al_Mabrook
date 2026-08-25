@@ -14,10 +14,8 @@ export async function Header({ locale = "en", path = "/" }: { locale?: Locale; p
   const header = await getTranslations({ locale, namespace: "header" });
   const navItems = [
     { label: t("home"), href: localePath(locale, "/") },
-    { label: t("catalogue"), href: localePath(locale, "/products") },
-    { label: t("categories"), href: localePath(locale, "/categories") },
-    { label: t("search"), href: localePath(locale, "/search") },
-    { label: t("contact"), href: localePath(locale, "/contact-us") },
+    { label: t("products"), href: localePath(locale, "/products") },
+    { label: t("storeLocator"), href: localePath(locale, "/store-locator") },
   ];
 
   return (
@@ -34,12 +32,12 @@ export async function Header({ locale = "en", path = "/" }: { locale?: Locale; p
           />
         </Link>
 
-        <nav aria-label={header("mainNavigation")} className="hidden items-center gap-6 md:flex">
+        <nav aria-label={header("mainNavigation")} className="hidden items-center gap-9 md:flex">
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="text-sm font-medium text-[var(--foreground)] transition-colors hover:text-[var(--brand-primary)]"
+              className="text-lg font-medium text-[var(--foreground)] transition-colors hover:text-[var(--brand-primary)]"
             >
               {item.label}
             </Link>

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 
+import { buildLoopedCategorySequence } from "@/lib/homepage-content";
 import { localePath } from "@/lib/locales";
 
 type CategoryMarqueeItem = {
@@ -51,8 +52,8 @@ export function CategoryMarquee({ locale, categories }: { locale: "en" | "ar"; c
 
   if (!categories.length) return null;
 
-  const copies = Math.max(2, Math.ceil(8 / categories.length));
-  const loopItems = Array.from({ length: copies * 2 }, (_, copy) => categories.map((category) => ({ category, copy })) ).flat();
+  const copies = Math.max(2, Math.ceil(12 / Math.max(categories.length, 1)));
+  const loopItems = Array.from({ length: copies }, (_, copy) => categories.map((category) => ({ category, copy }))).flat();
 
   function handlePointerDown(event: React.PointerEvent<HTMLDivElement>) {
     const track = trackRef.current;

@@ -4,6 +4,11 @@ export const siteConfig = {
   name: "Qasr Al Mabrook",
   domain: "qasralmabrook.com",
   url: clientEnv.NEXT_PUBLIC_SITE_URL,
+  contact: {
+    address: "Al Ghuwair - Hay Al Gharb - Sharjah - United Arab Emirates",
+    phone: "+971503093800",
+    mapsUrl: "https://maps.app.goo.gl/AGAHaCeodMY7gPAY9",
+  },
   defaultLocale: "en" as const,
   locales: ["en", "ar"] as const,
   brand: {

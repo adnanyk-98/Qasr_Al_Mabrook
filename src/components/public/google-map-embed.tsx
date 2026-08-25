@@ -8,7 +8,7 @@ export function GoogleMapEmbed({ locale, variant = "store", className = "" }: { 
       <iframe
         title={title}
         src="https://www.google.com/maps?q=qasr+al+mabrook&z=14&t=m&hl=en&output=embed"
-        className={`block w-full border-0 ${variant === "footer" ? "h-[220px]" : "h-[280px] md:h-[300px] lg:h-[350px]"}`}
+        className={`block w-full border-0 ${variant === "footer" ? "h-[220px]" : "h-full"}`}
         loading="lazy"
         referrerPolicy="no-referrer-when-downgrade"
       />

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { HeroCarousel } from "@/components/public/hero-carousel";
 import { StoreGallery } from "@/components/public/store-gallery";
 import { Container, Section } from "@/components/ui/layout";
 import { listPublishedHomepageSections } from "@/server/repositories/public-catalog";
@@ -31,17 +30,29 @@ export default async function StoreLocatorPage({ params }: { params: Promise<{ l
   const currentLocale = locale as Locale;
   const t = await getTranslations({ locale: currentLocale, namespace: "storeLocator" });
   const sections = await listPublishedHomepageSections();
-  const heroSection = sections.find((section) => section.sectionType.toUpperCase() === "HERO");
-  const hero = heroSection ? [{
-    desktopImageUrl: readLocalizedConfigString(heroSection.configurationJson, "desktopImageUrl", currentLocale) ?? readLocalizedConfigString(heroSection.configurationJson, "imageUrl", currentLocale) ?? null,
-    mobileImageUrl: readLocalizedConfigString(heroSection.configurationJson, "mobileImageUrl", currentLocale) ?? null,
-    imageAlt: readLocalizedConfigString(heroSection.configurationJson, "imageAlt", currentLocale) ?? t("title"),
-  }] : [];
+  const heroSections = sections.filter((section) => section.sectionType.toUpperCase() === "HERO");
+  const superMarketSection = heroSections.find((section) => {
+    const ctaHref = readLocalizedConfigString(section.configurationJson, "ctaHref", currentLocale);
+    const title = readLocalizedConfigString(section.configurationJson, "title", currentLocale);
+    return ctaHref?.replace(/\/$/, "").endsWith("/store-locator") || title?.toLowerCase() === "super market";
+  }) ?? heroSections[0];
+  const superMarketImage = superMarketSection ? {
+    desktop: readLocalizedConfigString(superMarketSection.configurationJson, "desktopImageUrl", currentLocale) ?? readLocalizedConfigString(superMarketSection.configurationJson, "imageUrl", currentLocale) ?? null,
+    mobile: readLocalizedConfigString(superMarketSection.configurationJson, "mobileImageUrl", currentLocale) ?? null,
+    alt: readLocalizedConfigString(superMarketSection.configurationJson, "imageAlt", currentLocale) ?? t("title"),
+  } : null;
   const photos = storePhotos.map((photo) => ({ ...photo, alt: t("imageAlt") }));
 
   return (
     <PublicShell locale={currentLocale} path="/store-locator">
-      {hero.length ? <HeroCarousel id="store-locator-hero" locale={currentLocale} autoplay={false} banners={hero} /> : null}
+      {superMarketImage?.desktop ? (
+        <div className="w-full">
+          <picture>
+            {superMarketImage.mobile ? <source media="(max-width: 1024px)" srcSet={superMarketImage.mobile} /> : null}
+            <img src={superMarketImage.desktop} alt={superMarketImage.alt} className="block h-auto w-full" draggable={false} />
+          </picture>
+        </div>
+      ) : null}
       <Section>
         <Container className="space-y-10">
           <div className="max-w-2xl space-y-4">
@@ -50,10 +61,10 @@ export default async function StoreLocatorPage({ params }: { params: Promise<{ l
             <p className="max-w-xl text-base leading-7 text-[var(--text-muted)]">{t("description")}</p>
           </div>
 
-          <div className="grid gap-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(400px,1.1fr)] lg:items-stretch">
-          <address className="not-italic overflow-hidden rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 shadow-[var(--shadow-sm)] sm:p-6">
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 lg:content-center">
-              <div className="flex min-h-[180px] items-start gap-3 rounded-[var(--radius-md)] border border-[var(--brand-border)] bg-white p-4 sm:min-h-[190px]">
+          <div className="rounded-[var(--radius-xl)] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4 shadow-[var(--shadow-sm)] sm:p-5 lg:p-7">
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(400px,1.1fr)] lg:items-stretch lg:gap-6">
+          <div className="flex flex-col gap-6 lg:justify-center">
+              <address className="not-italic flex items-start gap-3 rounded-[var(--radius-md)] border border-[var(--brand-border)] bg-white p-5 shadow-[var(--shadow-sm)]">
                 <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--brand-primary-light)] text-[var(--brand-primary)]">
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-5 w-5">
                     <path d="M12 21s6-5.2 6-11a6 6 0 1 0-12 0c0 5.8 6 11 6 11Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -67,9 +78,9 @@ export default async function StoreLocatorPage({ params }: { params: Promise<{ l
                     {siteConfig.contact.address}
                   </a>
                 </div>
-              </div>
+              </address>
 
-              <div className="flex min-h-[180px] items-start gap-3 rounded-[var(--radius-md)] border border-[var(--brand-border)] bg-white p-4 sm:min-h-[190px] lg:border-l lg:border-[var(--brand-border)] lg:bg-transparent lg:pl-6">
+              <div className="flex items-start gap-3 rounded-[var(--radius-md)] border border-[var(--brand-border)] bg-white p-5 shadow-[var(--shadow-sm)] lg:border-l lg:border-[var(--brand-border)] lg:pl-6">
                 <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--brand-primary-light)] text-[var(--brand-primary)]">
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-5 w-5">
                     <path d="M5 4.75A2.75 2.75 0 0 1 7.75 2h.5A2.75 2.75 0 0 1 11 4.75V5a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-.25Zm-2.5 2.5A2.5 2.5 0 0 1 5 4.75v.25a3.5 3.5 0 0 0 3.5 3.5h2A3.5 3.5 0 0 0 14 5v-.25A2.5 2.5 0 0 1 16.5 7.25v10.5A2.5 2.5 0 0 1 14 20.25h-4A2.5 2.5 0 0 1 7.5 17.75V7.25Zm7 7.75h5.25a2.75 2.75 0 0 1 2.75 2.75v.5a.75.75 0 0 1-.75.75H19.5a2.5 2.5 0 0 1-2.5-2.5v-1.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -84,9 +95,11 @@ export default async function StoreLocatorPage({ params }: { params: Promise<{ l
                 </div>
               </div>
 
-            </div>
-          </address>
-          <GoogleMapEmbed locale={currentLocale} variant="store" />
+          </div>
+          <div className="h-[280px] sm:h-[320px] lg:h-[400px]">
+            <GoogleMapEmbed locale={currentLocale} variant="store" className="h-full" />
+          </div>
+          </div>
           </div>
 
           <section aria-labelledby="store-gallery-title" className="space-y-6 pt-4">

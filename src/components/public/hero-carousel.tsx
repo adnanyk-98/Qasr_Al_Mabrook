@@ -452,32 +452,6 @@ export function HeroCarousel({
         </div>
       </div>
 
-      <div className="absolute left-3 top-1/2 z-30 -translate-y-1/2 sm:left-5 lg:left-7">
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          aria-label={locale === "ar" ? "الشريحة السابقة" : "Previous slide"}
-          onClick={prev}
-          className="h-10 w-10 rounded-full border-white/60 bg-white/15 text-white backdrop-blur-sm hover:bg-white/20"
-        >
-          {locale === "ar" ? "‹" : "‹"}
-        </Button>
-      </div>
-
-      <div className="absolute right-3 top-1/2 z-30 -translate-y-1/2 sm:right-5 lg:right-7">
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          aria-label={locale === "ar" ? "الشريحة التالية" : "Next slide"}
-          onClick={next}
-          className="h-10 w-10 rounded-full border-white/60 bg-white/15 text-white backdrop-blur-sm hover:bg-white/20"
-        >
-          {locale === "ar" ? "›" : "›"}
-        </Button>
-      </div>
-
       <div className="absolute inset-x-0 bottom-4 z-30 flex items-center justify-center gap-2 sm:bottom-5">
         {banners.map((banner, index) => (
           <button

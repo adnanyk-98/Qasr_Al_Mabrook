@@ -232,24 +232,7 @@ async function verifyInfiniteLooping(page: Page, locale: "en" | "ar", viewport: 
   await page.goto(`${base}/${locale}`, { waitUntil: "networkidle" });
   await waitForHeroHydrated(page, locale);
 
-  const nextButton = page.locator('#homepage-hero button[aria-label="' + (locale === "ar" ? "الشريحة التالية" : "Next slide") + '"]');
-  const prevButton = page.locator('#homepage-hero button[aria-label="' + (locale === "ar" ? "الشريحة السابقة" : "Previous slide") + '"]');
-
-  // Test NEXT loop: 4 → 1
-  await page.locator(`#homepage-hero button[aria-label="${getSlideAriaLabel(locale, 3)}"]`).click();
-  await waitForActiveSlide(page, locale, 3);
-
-  await nextButton.click();
-  await waitForActiveSlide(page, locale, 0);
-
-  // Test PREVIOUS loop: 1 → 4
-  await page.locator(`#homepage-hero button[aria-label="${getSlideAriaLabel(locale, 0)}"]`).click();
-  await waitForActiveSlide(page, locale, 0);
-
-  await prevButton.click();
-  await waitForActiveSlide(page, locale, 3);
-
-  // Test drag loop forward: 4 → 1
+  // Test NEXT loop: 4 → 1 via drag
   await page.locator(`#homepage-hero button[aria-label="${getSlideAriaLabel(locale, 3)}"]`).click();
   await waitForActiveSlide(page, locale, 3);
 
@@ -263,7 +246,7 @@ async function verifyInfiniteLooping(page: Page, locale: "en" | "ar", viewport: 
     await waitForActiveSlide(page, locale, 0);
   }
 
-  // Test drag loop backward: 1 → 4
+  // Test PREVIOUS loop: 1 → 4 via drag
   await page.locator(`#homepage-hero button[aria-label="${getSlideAriaLabel(locale, 0)}"]`).click();
   await waitForActiveSlide(page, locale, 0);
 

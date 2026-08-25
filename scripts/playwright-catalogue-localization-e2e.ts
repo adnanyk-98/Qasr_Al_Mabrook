@@ -1,6 +1,6 @@
 import { chromium, type Page } from "playwright";
 
-const base = process.env.BASE_URL ?? "http://127.0.0.1:3000";
+const base = process.env.BASE_URL ?? "http://localhost:3000";
 const viewports = [
   { width: 1920, height: 1080 },
   { width: 1440, height: 900 },
@@ -38,41 +38,66 @@ async function checkPage(page: Page, locale: "en" | "ar", route: string) {
   return result;
 }
 
-async function checkFancySuitHero(page: Page, locale: "en" | "ar", viewport: { width: number; height: number }) {
-  await page.goto(`${base}/${locale}`, { waitUntil: "networkidle" });
-  const indicators = page.locator("#homepage-hero button[aria-label^='Go to slide'], #homepage-hero button[aria-label^='الانتقال إلى الشريحة']");
-  if (await indicators.count() !== 4) throw new Error(`${locale} ${viewport.width}x${viewport.height}: expected exactly four hero slides`);
+function getSlideAriaLabel(locale: "en" | "ar", index: number) {
+  return locale === "ar" ? `الانتقال إلى الشريحة ${index + 1}` : `Go to slide ${index + 1}`;
+}
 
-  await page.waitForFunction(() => {
-    const firstIndicator = document.querySelector("#homepage-hero button.w-9");
-    return Boolean(firstIndicator);
-  });
-  await indicators.nth(3).click();
-  await page.waitForFunction(() => {
+async function waitForHeroHydrated(page: Page, locale: "en" | "ar") {
+  await page.waitForFunction(({ locale: targetLocale }) => {
+    const hero = document.querySelector("#homepage-hero");
+    if (!hero) return false;
+    const indicators = Array.from(hero.querySelectorAll("button[aria-label^='Go to slide'], button[aria-label^='الانتقال إلى الشريحة']"));
+    if (indicators.length !== 4) return false;
+    const slideImages = Array.from(hero.querySelectorAll("img"));
+    return slideImages.length > 0 && indicators.every((item) => item instanceof HTMLElement);
+  }, { locale });
+}
+
+async function waitForActiveSlide(page: Page, locale: "en" | "ar", index: number) {
+  const targetLabel = getSlideAriaLabel(locale, index);
+  await page.waitForFunction(({ targetLabel: label }) => {
     const indicators = Array.from(document.querySelectorAll("#homepage-hero button[aria-label^='Go to slide'], #homepage-hero button[aria-label^='الانتقال إلى الشريحة']"));
-    return indicators[3]?.className.includes("w-9") ?? false;
-  }, undefined, { timeout: 5000, polling: 50 });
-  const fancyImage = page.locator('#homepage-hero img[alt="Fancy Suit"]');
+    const active = indicators.find((indicator) => {
+      const aria = indicator.getAttribute("aria-label") ?? "";
+      const classes = (indicator as HTMLElement).className.toString().split(/\s+/);
+      return aria === label && classes.includes("w-9");
+    });
+    return Boolean(active);
+  }, { targetLabel });
+}
+
+async function waitForFancySuitVisible(page: Page, locale: "en" | "ar") {
+  const imageSelector = '#homepage-hero img[alt="Fancy Suit"]';
   await page.waitForFunction(() => {
     const hero = document.querySelector("#homepage-hero");
     if (!hero) return false;
     const heroBox = hero.getBoundingClientRect();
     const image = hero.querySelector('img[alt="Fancy Suit"]') as HTMLImageElement | null;
-    const slide = image?.closest(".min-w-full");
+    if (!image) return false;
+    const slide = image.closest(".min-w-full") as HTMLElement | null;
     if (!slide) return false;
     const slideBox = slide.getBoundingClientRect();
-    return Math.abs(slideBox.left - heroBox.left) <= 1 && Math.abs(slideBox.right - heroBox.right) <= 1;
-  }, undefined, { timeout: 5000, polling: 50 });
-  await fancyImage.waitFor({ state: "visible" });
-  const result = await fancyImage.evaluate((element) => {
-    const image = element as HTMLImageElement;
+    return image.complete && image.naturalWidth > 0 && image.naturalHeight > 0 && image.getBoundingClientRect().width > 0 && image.getBoundingClientRect().height > 0 && Math.abs(slideBox.left - heroBox.left) <= 1 && Math.abs(slideBox.right - heroBox.right) <= 1;
+  });
+  await page.locator(imageSelector).waitFor({ state: "visible" });
+}
+
+async function verifyHeroSlideImage(page: Page, locale: "en" | "ar", viewport: { width: number; height: number }, index: number) {
+  const indicator = page.locator(`#homepage-hero button[aria-label="${getSlideAriaLabel(locale, index)}"]`);
+  await indicator.click();
+  await waitForActiveSlide(page, locale, index);
+
+  const image = page.locator('#homepage-hero img[alt="Fancy Suit"]');
+  const result = await image.evaluate((element) => {
+    const imageElement = element as HTMLImageElement;
+    const box = imageElement.getBoundingClientRect();
     return {
-    currentSrc: image.currentSrc,
-    complete: image.complete,
-    naturalWidth: image.naturalWidth,
-    naturalHeight: image.naturalHeight,
-    visible: image.getBoundingClientRect().width > 0 && image.getBoundingClientRect().height > 0,
-    source: image.closest("picture")?.querySelector("source")?.getAttribute("srcset") ?? null,
+      currentSrc: imageElement.currentSrc,
+      complete: imageElement.complete,
+      naturalWidth: imageElement.naturalWidth,
+      naturalHeight: imageElement.naturalHeight,
+      visible: box.width > 0 && box.height > 0,
+      source: imageElement.closest("picture")?.querySelector("source")?.getAttribute("srcset") ?? null,
     };
   });
 
@@ -80,10 +105,24 @@ async function checkFancySuitHero(page: Page, locale: "en" | "ar", viewport: { w
   if (!result || !result.currentSrc.includes(expectedName) || !result.complete || result.naturalWidth <= 0 || result.naturalHeight <= 0 || !result.visible) {
     throw new Error(`${locale} ${viewport.width}x${viewport.height}: Fancy Suit source mismatch ${JSON.stringify(result)}`);
   }
+}
+
+async function checkFancySuitHero(page: Page, locale: "en" | "ar", viewport: { width: number; height: number }) {
+  await page.goto(`${base}/${locale}`, { waitUntil: "networkidle" });
+  const indicators = page.locator("#homepage-hero button[aria-label^='Go to slide'], #homepage-hero button[aria-label^='الانتقال إلى الشريحة']");
+  if (await indicators.count() !== 4) throw new Error(`${locale} ${viewport.width}x${viewport.height}: expected exactly four hero slides`);
+
+  await waitForHeroHydrated(page, locale);
+  const targetIndex = 3;
+  await indicators.nth(targetIndex).click();
+  await waitForActiveSlide(page, locale, targetIndex);
+  await waitForFancySuitVisible(page, locale);
+
+  await verifyHeroSlideImage(page, locale, viewport, targetIndex);
 
   for (let index = 0; index < 4; index += 1) {
     await indicators.nth(index).click();
-    await page.waitForTimeout(700);
+    await waitForActiveSlide(page, locale, index);
     const slide = await page.locator("#homepage-hero").evaluate((hero) => {
       const heroBox = hero.getBoundingClientRect();
       const image = Array.from(hero.querySelectorAll("img")).find((candidate) => {
@@ -96,6 +135,95 @@ async function checkFancySuitHero(page: Page, locale: "en" | "ar", viewport: { w
       throw new Error(`${locale} ${viewport.width}x${viewport.height}: hero slide ${index + 1} is not loaded and visible ${JSON.stringify(slide)}`);
     }
   }
+}
+
+async function verifyDesktopHeroInteraction(page: Page, locale: "en" | "ar") {
+  await page.goto(`${base}/${locale}`, { waitUntil: "networkidle" });
+  await waitForHeroHydrated(page, locale);
+
+  const firstSlideLink = page.locator('#homepage-hero a[aria-label="Super Market"]');
+  const firstSlideBox = await firstSlideLink.boundingBox();
+  if (!firstSlideBox) throw new Error(`${locale}: could not measure first hero link`);
+
+  const centerX = firstSlideBox.x + firstSlideBox.width / 2;
+  const centerY = firstSlideBox.y + firstSlideBox.height / 2;
+
+  await page.mouse.move(centerX, centerY);
+  await page.mouse.down();
+  await page.mouse.up();
+  await page.waitForURL(new RegExp(`${locale}/store-locator`), { timeout: 5000 });
+
+  await page.goto(`${base}/${locale}`, { waitUntil: "networkidle" });
+  await waitForHeroHydrated(page, locale);
+
+  const heroLink = page.locator('#homepage-hero a[aria-label="Super Market"]');
+  const linkBox = await heroLink.boundingBox();
+  if (!linkBox) throw new Error(`${locale}: could not measure super market hero link`);
+
+  await page.mouse.move(linkBox.x + 20, linkBox.y + linkBox.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(linkBox.x + 40, linkBox.y + linkBox.height / 2, { steps: 12 });
+  await page.mouse.up();
+  await page.waitForURL(new RegExp(`${locale}/store-locator`), { timeout: 5000 });
+
+  await page.goto(`${base}/${locale}`, { waitUntil: "networkidle" });
+  await waitForHeroHydrated(page, locale);
+
+  const heroRegion = page.locator('#homepage-hero');
+  const heroBox = await heroRegion.boundingBox();
+  if (!heroBox) throw new Error(`${locale}: could not measure hero region`);
+
+  const dragStartX = heroBox.x + heroBox.width * 0.65;
+  const dragStartY = heroBox.y + heroBox.height / 2;
+  const dragEndX = heroBox.x + heroBox.width * 0.15;
+
+  await page.mouse.move(dragStartX, dragStartY);
+  await page.mouse.down();
+  await page.mouse.move(dragEndX, dragStartY, { steps: 14 });
+  await page.mouse.up();
+
+  await page.waitForFunction(({ locale: targetLocale }) => {
+    const indicators = Array.from(document.querySelectorAll("#homepage-hero button[aria-label^='Go to slide'], #homepage-hero button[aria-label^='الانتقال إلى الشريحة']"));
+    const active = indicators.find((indicator) => {
+      const classes = (indicator as HTMLElement).className.toString().split(/\s+/);
+      return classes.includes("w-9");
+    });
+    if (!active) return false;
+    const aria = active.getAttribute("aria-label") ?? "";
+    return aria.includes(targetLocale === "ar" ? "الشريحة 2" : "slide 2") || aria.includes(targetLocale === "ar" ? "الشريحة 1" : "slide 1");
+  }, { locale });
+
+  const urlAfterDrag = page.url();
+  if (urlAfterDrag.includes("/store-locator")) {
+    throw new Error(`${locale}: drag on hero changed URL unexpectedly`);
+  }
+
+  await page.goto(`${base}/${locale}`, { waitUntil: "networkidle" });
+  await waitForHeroHydrated(page, locale);
+
+  const dragStartXBack = heroBox.x + heroBox.width * 0.35;
+  const dragEndXBack = heroBox.x + heroBox.width * 0.85;
+  await page.mouse.move(dragStartXBack, heroBox.y + heroBox.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(dragEndXBack, heroBox.y + heroBox.height / 2, { steps: 14 });
+  await page.mouse.up();
+
+  await page.waitForFunction(({ locale: targetLocale }) => {
+    const indicators = Array.from(document.querySelectorAll("#homepage-hero button[aria-label^='Go to slide'], #homepage-hero button[aria-label^='الانتقال إلى الشريحة']"));
+    const active = indicators.find((indicator) => {
+      const classes = (indicator as HTMLElement).className.toString().split(/\s+/);
+      return classes.includes("w-9");
+    });
+    if (!active) return false;
+    const aria = active.getAttribute("aria-label") ?? "";
+    return aria.includes(targetLocale === "ar" ? "الشريحة 1" : "slide 1") || aria.includes(targetLocale === "ar" ? "الشريحة 2" : "slide 2");
+  }, { locale });
+
+  const noPreview = await page.evaluate(() => {
+    const hero = document.querySelector("#homepage-hero");
+    return !hero || !hero.querySelector("a[draggable='true']") && !document.body.innerText.includes("about:blank");
+  });
+  if (!noPreview) throw new Error(`${locale}: native drag preview was still observed`);
 }
 
 async function main() {

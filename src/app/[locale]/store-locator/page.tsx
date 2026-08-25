@@ -52,8 +52,8 @@ export default async function StoreLocatorPage({ params }: { params: Promise<{ l
 
           <div className="grid gap-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(400px,1.1fr)] lg:items-stretch">
           <address className="not-italic overflow-hidden rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 shadow-[var(--shadow-sm)] sm:p-6">
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-1 lg:content-center">
-              <div className="flex items-start gap-3 rounded-[var(--radius-md)] border border-[var(--brand-border)] bg-white/60 p-4 md:min-h-[150px]">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 lg:content-center">
+              <div className="flex min-h-[180px] items-start gap-3 rounded-[var(--radius-md)] border border-[var(--brand-border)] bg-white p-4 sm:min-h-[190px]">
                 <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--brand-primary-light)] text-[var(--brand-primary)]">
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-5 w-5">
                     <path d="M12 21s6-5.2 6-11a6 6 0 1 0-12 0c0 5.8 6 11 6 11Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -63,11 +63,13 @@ export default async function StoreLocatorPage({ params }: { params: Promise<{ l
                 <div className="min-w-0">
                   <span className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">{t("visitUs")}</span>
                   <span className="mt-2 block text-base font-semibold text-[var(--foreground)]">{t("address")}</span>
-                  <span className="mt-1 block max-w-[22rem] leading-6 text-sm text-[var(--text-muted)]">{siteConfig.contact.address}</span>
+                  <a href={siteConfig.contact.mapsUrl} target="_blank" rel="noopener noreferrer" aria-label={t("mapsAriaLabel")} className="mt-1 block max-w-[11rem] cursor-pointer leading-6 text-sm text-[var(--text-muted)] transition-colors hover:text-[var(--brand-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2">
+                    {siteConfig.contact.address}
+                  </a>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 rounded-[var(--radius-md)] border border-[var(--brand-border)] bg-white/60 p-4 md:min-h-[150px] md:border-l md:border-[var(--brand-border)] md:bg-transparent md:pl-6">
+              <div className="flex min-h-[180px] items-start gap-3 rounded-[var(--radius-md)] border border-[var(--brand-border)] bg-white p-4 sm:min-h-[190px] lg:border-l lg:border-[var(--brand-border)] lg:bg-transparent lg:pl-6">
                 <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--brand-primary-light)] text-[var(--brand-primary)]">
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-5 w-5">
                     <path d="M5 4.75A2.75 2.75 0 0 1 7.75 2h.5A2.75 2.75 0 0 1 11 4.75V5a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-.25Zm-2.5 2.5A2.5 2.5 0 0 1 5 4.75v.25a3.5 3.5 0 0 0 3.5 3.5h2A3.5 3.5 0 0 0 14 5v-.25A2.5 2.5 0 0 1 16.5 7.25v10.5A2.5 2.5 0 0 1 14 20.25h-4A2.5 2.5 0 0 1 7.5 17.75V7.25Zm7 7.75h5.25a2.75 2.75 0 0 1 2.75 2.75v.5a.75.75 0 0 1-.75.75H19.5a2.5 2.5 0 0 1-2.5-2.5v-1.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -87,7 +89,14 @@ export default async function StoreLocatorPage({ params }: { params: Promise<{ l
           <GoogleMapEmbed locale={currentLocale} variant="store" />
           </div>
 
-          <StoreGallery photos={photos} label={t("galleryLabel")} closeLabel={t("close")} previousLabel={t("previous")} nextLabel={t("next")} />
+          <section aria-labelledby="store-gallery-title" className="space-y-6 pt-4">
+            <div className="max-w-3xl space-y-3">
+              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">{t("galleryEyebrow")}</p>
+              <h2 id="store-gallery-title" className="text-3xl font-semibold text-[var(--foreground)] sm:text-4xl">{t("galleryTitle")}</h2>
+              <p className="max-w-2xl text-base leading-7 text-[var(--text-muted)]">{t("galleryDescription")}</p>
+            </div>
+            <StoreGallery photos={photos} label={t("galleryLabel")} closeLabel={t("close")} previousLabel={t("previous")} nextLabel={t("next")} />
+          </section>
         </Container>
       </Section>
     </PublicShell>

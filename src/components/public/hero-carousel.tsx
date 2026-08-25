@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -35,16 +35,24 @@ export function HeroCarousel({
   const [active, setActive] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
+  const preventNativeDrag = (event: React.DragEvent<HTMLElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+  };
   const containerWidthRef = useRef<number>(0);
   const pointerIdRef = useRef<number | null>(null);
   const startXRef = useRef(0);
   const startYRef = useRef(0);
   const dragXRef = useRef(0);
   const isDraggingRef = useRef(false);
+  const hasDraggedRef = useRef(false);
   const suppressClickRef = useRef(false);
   const autoplayTimerRef = useRef<number | null>(null);
   const direction = locale === "ar" ? 1 : -1;
-  const bannerSignature = banners.map((banner) => [banner.desktopImageUrl, banner.mobileImageUrl, banner.imageUrl, banner.title, banner.subtitle, banner.ctaLabel, banner.ctaHref].join("\u0001")).join("\u0002");
+  const bannerSignature = useMemo(
+    () => banners.map((banner) => [banner.desktopImageUrl, banner.mobileImageUrl, banner.imageUrl, banner.title, banner.subtitle, banner.ctaLabel, banner.ctaHref].join("\u0001")).join("\u0002"),
+    [banners],
+  );
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -75,6 +83,7 @@ export function HeroCarousel({
     setActive(0);
     dragXRef.current = 0;
     isDraggingRef.current = false;
+    hasDraggedRef.current = false;
     suppressClickRef.current = false;
   }, [locale, bannerSignature]);
 
@@ -155,6 +164,7 @@ export function HeroCarousel({
       startYRef.current = e.clientY;
       dragXRef.current = 0;
       isDraggingRef.current = false;
+      hasDraggedRef.current = false;
       suppressClickRef.current = false;
       window.addEventListener('pointermove', onPointerMove, { passive: false });
       window.addEventListener('pointerup', onPointerUp);
@@ -170,6 +180,7 @@ export function HeroCarousel({
       if (!isDraggingRef.current) {
         if (Math.abs(dx) > THRESHOLD && Math.abs(dx) > Math.abs(dy)) {
           isDraggingRef.current = true;
+          hasDraggedRef.current = true;
           try {
             container.setPointerCapture(e.pointerId);
             capturedElement = container;
@@ -206,11 +217,12 @@ export function HeroCarousel({
       try { capturedElement?.releasePointerCapture?.(e.pointerId); } catch {}
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
-
       window.removeEventListener('pointercancel', onPointerCancel);
 
       if (!isDraggingRef.current) {
         pointerIdRef.current = null;
+        hasDraggedRef.current = false;
+        suppressClickRef.current = false;
         return;
       }
 
@@ -235,6 +247,7 @@ export function HeroCarousel({
         isDraggingRef.current = false;
         pointerIdRef.current = null;
         capturedElement = null;
+        hasDraggedRef.current = false;
       }, 50);
 
       // restart autoplay timer
@@ -254,6 +267,8 @@ export function HeroCarousel({
       isDraggingRef.current = false;
       pointerIdRef.current = null;
       capturedElement = null;
+      hasDraggedRef.current = false;
+      suppressClickRef.current = false;
       // snap back
       const width = containerWidthRef.current || container.getBoundingClientRect().width;
       slider.style.transition = '';
@@ -309,11 +324,15 @@ export function HeroCarousel({
                     href={localizedHref(locale, banner.ctaHref)}
                     aria-label={banner.title ?? banner.imageAlt ?? `Hero banner ${index + 1}`}
                     className="block w-full h-full"
+                    draggable={false}
+                    onDragStart={preventNativeDrag}
+                    onDragStartCapture={preventNativeDrag}
                     onClick={(e) => {
-                      if (suppressClickRef.current) {
+                      if (suppressClickRef.current || hasDraggedRef.current) {
                         e.preventDefault();
                         e.stopPropagation();
                         suppressClickRef.current = false;
+                        hasDraggedRef.current = false;
                       }
                     }}
                   >
@@ -321,7 +340,13 @@ export function HeroCarousel({
                     <div className="relative w-full aspect-[9/10] md:aspect-[8/3] overflow-hidden">
                       <picture>
                         {banner.mobileImageUrl ? <source media="(max-width: 767px)" srcSet={banner.mobileImageUrl} /> : null}
-                        <img src={banner.desktopImageUrl ?? banner.imageUrl ?? ''} alt={banner.imageAlt ?? banner.title ?? `Hero banner ${index + 1}`} className="w-full h-full object-contain object-center" />
+                        <img
+                          src={banner.desktopImageUrl ?? banner.imageUrl ?? ''}
+                          alt={banner.imageAlt ?? banner.title ?? `Hero banner ${index + 1}`}
+                          draggable={false}
+                          onDragStart={(event) => event.preventDefault()}
+                          className="w-full h-full object-contain object-center"
+                        />
                       </picture>
                     </div>
                   </Link>
@@ -330,7 +355,13 @@ export function HeroCarousel({
                     <div className="relative w-full aspect-[9/10] md:aspect-[8/3] overflow-hidden">
                       <picture>
                         {banner.mobileImageUrl ? <source media="(max-width: 767px)" srcSet={banner.mobileImageUrl} /> : null}
-                        <img src={banner.desktopImageUrl ?? banner.imageUrl ?? ''} alt={banner.imageAlt ?? banner.title ?? `Hero banner ${index + 1}`} className="w-full h-full object-contain object-center" />
+                        <img
+                          src={banner.desktopImageUrl ?? banner.imageUrl ?? ''}
+                          alt={banner.imageAlt ?? banner.title ?? `Hero banner ${index + 1}`}
+                          draggable={false}
+                          onDragStart={(event) => event.preventDefault()}
+                          className="w-full h-full object-contain object-center"
+                        />
                       </picture>
                     </div>
                   </div>

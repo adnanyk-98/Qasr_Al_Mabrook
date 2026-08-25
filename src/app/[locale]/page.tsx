@@ -114,7 +114,7 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ loc
               {[
                 { value: "15+", label: highlights("experience"), mark: "experience" },
                 { value: "1000+", label: highlights("products"), mark: "products" },
-                { value: "90+", label: highlights("clients"), mark: "clients" },
+                { value: "90K+", label: highlights("clients"), mark: "clients" },
                 { value: "95%", label: highlights("retention"), mark: "retention" },
               ].map((highlight) => (
                 <article key={highlight.mark} className="qam-highlight-card flex flex-col items-center rounded-[var(--radius-md)] border border-[var(--brand-border)] bg-white px-3 py-4 text-center shadow-[var(--shadow-sm)] sm:px-5 sm:py-5">

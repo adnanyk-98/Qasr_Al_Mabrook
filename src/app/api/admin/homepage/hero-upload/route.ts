@@ -24,6 +24,7 @@ export async function POST(request: Request) {
 
   const formData = await request.formData();
   const file = formData.get("imageFile");
+  const role = String(formData.get("role") ?? "desktop") === "mobile" ? "mobile" : "desktop";
 
   if (!file || typeof file !== "object" || !("arrayBuffer" in file) || !(file as any).name) {
     return NextResponse.json({ success: false, error: "No file provided" }, { status: 400 });
@@ -40,12 +41,8 @@ export async function POST(request: Request) {
   const buffer = Buffer.from(await file.arrayBuffer());
   const dims = await readOriginalProductImageMetadata(buffer);
 
-  // Validate exact 1920x1080 requirement
-  if (dims.width !== 1920 || dims.height !== 1080) {
-    return NextResponse.json({ success: false, error: `Image must be exactly 1920×1080, got ${dims.width}×${dims.height}` }, { status: 400 });
-  }
-
   const validation = validateHeroImageUpload({
+    role,
     mimeType: (file as any).type,
     size: (file as any).size,
     width: dims.width ?? undefined,
@@ -66,7 +63,7 @@ export async function POST(request: Request) {
     },
   });
 
-  const safeSlug = slugify("hero");
+  const safeSlug = slugify(role === "mobile" ? "hero-mobile" : "hero-desktop");
   const originalName = (file as any).name || "hero";
   const safeFilename = originalName.trim().replace(/\s+/g, "-").replace(/[^a-zA-Z0-9.\-_]/g, "");
   const key = `hero/${safeSlug}/${safeFilename}`;

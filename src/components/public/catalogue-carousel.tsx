@@ -180,13 +180,13 @@ export function CatalogueCarousel({
           onKeyDown={handleKeyDown}
           className="overflow-x-auto pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         >
-          <div className="flex gap-4 md:gap-5 lg:gap-6">
+          <div className="flex w-full items-stretch gap-4 md:gap-5 lg:gap-6">
             {items.map((item, index) => (
               <div
                 key={index}
                 data-carousel-card
                 className={[
-                  "shrink-0 snap-start",
+                  "flex shrink-0 snap-start",
                   itemClassName ?? "min-w-[85%] sm:min-w-[calc(50%-0.625rem)] xl:min-w-[calc(33.333%-1rem)]",
                 ].join(" ")}
               >

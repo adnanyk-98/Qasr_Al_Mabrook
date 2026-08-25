@@ -20,6 +20,15 @@ export function localePath(locale: Locale, path: string) {
   return `/${locale}${normalized}`;
 }
 
+export function localizedHref(locale: Locale, href: string) {
+  if (!href.startsWith("/")) {
+    return href;
+  }
+
+  const normalized = href.replace(/^\/(?:en|ar)(?=\/|$)/, "") || "/";
+  return localePath(locale, normalized);
+}
+
 export function getAlternateLocale(currentLocale: Locale) {
   return currentLocale === "en" ? "ar" : "en";
 }

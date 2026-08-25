@@ -94,11 +94,6 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ loc
                       {t("browse")}
                     </Button>
                   </Link>
-                  <Link href={localePath(currentLocale, "/categories")}>
-                    <Button variant="outline" size="lg">
-                      {t("explore")}
-                    </Button>
-                  </Link>
                 </div>
               </div>
             )}
@@ -152,7 +147,6 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ loc
                   <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">{t("categoriesEyebrow")}</p>
                   <h2 className="mt-1 text-3xl font-semibold text-[var(--foreground)]">{t("categoriesTitle")}</h2>
                 </div>
-                <Link href={localePath(currentLocale, "/categories")} className="hidden text-sm font-medium text-[var(--brand-primary)] hover:text-[var(--brand-primary-dark)] sm:block">{t("viewAll")}</Link>
               </div>
               <CategoryMarquee locale={currentLocale} categories={categories.map(({ id, slug, name }) => ({ id, slug, name }))} />
             </div>
@@ -181,12 +175,13 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ loc
               }
               prevLabel={currentLocale === "ar" ? "السابق" : "Previous products"}
               nextLabel={currentLocale === "ar" ? "التالي" : "Next products"}
-              itemClassName="min-w-[84%] sm:min-w-[calc(50%-0.625rem)] xl:min-w-[calc(33.333%-1rem)]"
+              itemClassName="w-[84%] sm:w-[calc((100%_-_1.25rem)_/_2)] xl:w-[calc((100%_-_3rem)_/_3)]"
               items={featuredProducts.map((product) => (
                 <ProductCard
                   key={product.id}
                   locale={currentLocale}
                   product={product}
+                  compact
                 />
               ))}
             />

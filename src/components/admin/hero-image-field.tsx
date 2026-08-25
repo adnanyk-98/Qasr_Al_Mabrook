@@ -5,12 +5,15 @@ import { useState } from "react";
 import { Label } from "@/components/ui/form";
 
 type HeroImageFieldProps = {
+  fieldName: "desktopImageUrl" | "mobileImageUrl";
+  uploadRole: "desktop" | "mobile";
+  label: string;
   currentImageUrl?: string;
   currentAlt?: string;
 };
 
-export function HeroImageField({ currentImageUrl, currentAlt }: HeroImageFieldProps) {
-  const [selectedFileName, setSelectedFileName] = useState(currentImageUrl ? "Existing hero image" : "No file selected");
+export function HeroImageField({ fieldName, uploadRole, label, currentImageUrl, currentAlt }: HeroImageFieldProps) {
+  const [selectedFileName, setSelectedFileName] = useState(currentImageUrl ? decodeURIComponent(currentImageUrl.split("/").pop() ?? "Existing hero image") : "No file selected");
   const [dimensions, setDimensions] = useState("—");
   const [status, setStatus] = useState(currentImageUrl ? "Existing image retained" : "No file selected");
   const [previewUrl, setPreviewUrl] = useState(currentImageUrl ?? "");
@@ -40,9 +43,9 @@ export function HeroImageField({ currentImageUrl, currentAlt }: HeroImageFieldPr
       img.onload = () => {
         const nextDimensions = `${img.width} × ${img.height}`;
         setDimensions(nextDimensions);
-        const ratio = img.width / img.height;
-        const isValid = Math.abs(ratio - 16 / 9) <= 0.02;
-        setStatus(isValid ? "✓ Valid hero banner" : "Hero banner must be 16:9 (for example 1920 × 1080).");
+        const expected = uploadRole === "mobile" ? "1080 × 1200" : "1920 × 720";
+        const isValid = `${img.width} × ${img.height}` === expected;
+        setStatus(isValid ? "✓ Valid hero banner" : `${label} must be exactly ${expected}.`);
       };
       img.src = dataUrl;
     };
@@ -65,6 +68,7 @@ export function HeroImageField({ currentImageUrl, currentAlt }: HeroImageFieldPr
     try {
       const fd = new FormData();
       fd.append("imageFile", selectedFile, selectedFile.name);
+      fd.append("role", uploadRole);
 
       const res = await fetch("/api/admin/homepage/hero-upload", {
         method: "POST",
@@ -80,7 +84,7 @@ export function HeroImageField({ currentImageUrl, currentAlt }: HeroImageFieldPr
       setUploadedUrl(body.publicUrl ?? "");
       setPreviewUrl(body.publicUrl ?? previewUrl);
       setSelectedFileName(selectedFile.name);
-      setStatus("✓ Uploaded hero banner");
+      setStatus(`✓ Uploaded ${label.toLowerCase()}`);
     } catch (err: any) {
       setUploadError(String(err?.message ?? err));
       setStatus("Upload failed");
@@ -91,9 +95,9 @@ export function HeroImageField({ currentImageUrl, currentAlt }: HeroImageFieldPr
 
   return (
     <div>
-      <Label htmlFor="imageFile">Hero image</Label>
+      <Label htmlFor={`${fieldName}-file`}>{label}</Label>
       <input
-        id="imageFile"
+        id={`${fieldName}-file`}
         type="file"
         accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
         className="block w-full text-sm"
@@ -101,7 +105,7 @@ export function HeroImageField({ currentImageUrl, currentAlt }: HeroImageFieldPr
       />
 
       {/* Hidden field used by the main Save form - contains only the R2 URL when uploaded */}
-      <input type="hidden" name="imageUrl" value={uploadedUrl} />
+      <input type="hidden" name={fieldName} value={uploadedUrl} />
 
       <div className="mt-3 rounded-[var(--radius-md)] border border-[var(--brand-border)] bg-[var(--brand-surface-alt)] p-3">
         <p className="text-xs font-medium uppercase tracking-[0.08em] text-[var(--text-muted)]">Selected file</p>
@@ -120,7 +124,9 @@ export function HeroImageField({ currentImageUrl, currentAlt }: HeroImageFieldPr
           </div>
         </div>
         {previewUrl ? (
-          <img src={previewUrl} alt={currentAlt ?? "Hero banner preview"} className="mt-3 h-28 w-full rounded object-cover" />
+          <div className="mt-3 w-full overflow-hidden rounded" style={{ aspectRatio: uploadRole === "mobile" ? "1080 / 1200" : "1920 / 720" }}>
+            <img src={previewUrl} alt={currentAlt ?? "Hero banner preview"} className="h-full w-full object-contain" onLoad={(event) => setDimensions(`${event.currentTarget.naturalWidth} × ${event.currentTarget.naturalHeight}`)} />
+          </div>
         ) : null}
         <div className="mt-3 flex items-center gap-2">
           <button type="button" onClick={uploadHero} disabled={uploading} className="rounded bg-[var(--brand-primary)] px-3 py-1 text-white">

@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { localePath, type Locale } from "@/lib/locales";
+import { localizedHref, type Locale } from "@/lib/locales";
 import { PublicImageSlot } from "@/components/public/public-image-slot";
 import { getTranslations } from "next-intl/server";
 
@@ -32,7 +32,7 @@ export async function PromotionalBanner({
         <h2 className="text-2xl font-semibold text-[var(--foreground)]">{title}</h2>
         {subtitle ? <p className="max-w-2xl text-sm leading-6 text-[var(--text-muted)]">{subtitle}</p> : null}
         {ctaLabel && ctaHref ? (
-          <Link href={ctaHref.startsWith("/") ? localePath(locale, ctaHref) : ctaHref} className="inline-flex text-sm font-medium text-[var(--brand-primary)] hover:text-[var(--brand-primary-dark)]">
+          <Link href={localizedHref(locale, ctaHref)} className="inline-flex text-sm font-medium text-[var(--brand-primary)] hover:text-[var(--brand-primary-dark)]">
             {ctaLabel}
           </Link>
         ) : null}

@@ -44,6 +44,7 @@ export default async function CategoriesPage({ searchParams }: PageProps) {
             </CardHeader>
             <CardBody>
               <form action={upsertCategoryAction} className="space-y-4">
+                {editingCategory ? <input type="hidden" name="categoryId" value={editingCategory.id} /> : null}
                 <div>
                   <Label htmlFor="name">Name</Label>
                   <Input id="name" name="name" placeholder="Seasonal essentials" required defaultValue={editingCategory?.slug ?? ""} />

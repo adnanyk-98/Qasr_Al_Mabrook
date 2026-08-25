@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
+import { FeaturedProductCard } from "@/components/public/featured-product-card";
 import { PublicImageSlot } from "@/components/public/public-image-slot";
 import { localePath } from "@/lib/locales";
 import { getTranslations } from "next-intl/server";
@@ -19,10 +20,23 @@ export type PublicProductCardProps = {
   imageUrl?: string | null;
   categoryName?: string | null;
   showCategory?: boolean;
+  compact?: boolean;
 };
 
-export async function ProductCard({ locale, product, imageUrl, categoryName, showCategory = false }: PublicProductCardProps) {
+export async function ProductCard({ locale, product, imageUrl, categoryName, showCategory = false, compact = false }: PublicProductCardProps) {
   const t = await getTranslations({ locale, namespace: "common" });
+
+  if (compact) {
+    return (
+      <FeaturedProductCard
+        locale={locale}
+        product={{ ...product, primaryImageUrl: imageUrl ?? product.primaryImageUrl }}
+        viewDetailsLabel={t("viewDetails")}
+        requestQuoteLabel={t("requestQuote")}
+      />
+    );
+  }
+
   const href = `/${locale}/products/${product.slug}`;
   const resolvedImageUrl = imageUrl ?? product.primaryImageUrl ?? null;
 
@@ -37,7 +51,7 @@ export async function ProductCard({ locale, product, imageUrl, categoryName, sho
         />
       </div>
 
-      <div className="flex flex-1 flex-col justify-between space-y-4 p-5 pt-4">
+      <div className="flex min-h-0 flex-1 flex-col space-y-4 p-5 pt-4">
         {showCategory && categoryName ? (
           <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--brand-primary)]">{categoryName}</p>
         ) : null}
@@ -45,11 +59,11 @@ export async function ProductCard({ locale, product, imageUrl, categoryName, sho
         <div className="space-y-2">
           <h3 className="text-xl font-semibold text-[var(--foreground)]">{product.name}</h3>
           {product.shortDescription ? (
-            <p className="line-clamp-3 text-sm leading-6 text-[var(--text-muted)]">{product.shortDescription}</p>
+            <p className="text-sm leading-6 text-[var(--text-muted)]">{product.shortDescription}</p>
           ) : null}
         </div>
 
-        <div className="flex items-center justify-between gap-3 pt-2">
+        <div className="mt-auto flex items-center justify-between gap-3 pt-2">
           <Link href={href} className="text-sm font-medium text-[var(--brand-primary)] hover:text-[var(--brand-primary-dark)]">
             {t("viewDetails")}
           </Link>

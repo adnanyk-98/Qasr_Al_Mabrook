@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { PublicImageSlot } from "@/components/public/public-image-slot";
+import { localizedHref } from "@/lib/locales";
 
 export function HeroCarousel({
   id,
@@ -155,14 +156,6 @@ export function HeroCarousel({
       dragXRef.current = 0;
       isDraggingRef.current = false;
       suppressClickRef.current = false;
-      // set pointer capture on the element we attached listener to (container)
-      try {
-        (container as HTMLElement).setPointerCapture?.(e.pointerId);
-        capturedElement = container;
-      } catch {
-        capturedElement = (e.target as HTMLElement) ?? null;
-        try { capturedElement?.setPointerCapture?.(e.pointerId); } catch {}
-      }
       window.addEventListener('pointermove', onPointerMove, { passive: false });
       window.addEventListener('pointerup', onPointerUp);
       window.addEventListener('pointercancel', onPointerCancel);
@@ -175,8 +168,15 @@ export function HeroCarousel({
 
       // if not yet dragging, determine whether to start
       if (!isDraggingRef.current) {
-        if (Math.abs(dx) > START_MIN && Math.abs(dx) > Math.abs(dy)) {
+        if (Math.abs(dx) > THRESHOLD && Math.abs(dx) > Math.abs(dy)) {
           isDraggingRef.current = true;
+          try {
+            container.setPointerCapture(e.pointerId);
+            capturedElement = container;
+          } catch {
+            capturedElement = (e.target as HTMLElement) ?? null;
+            try { capturedElement?.setPointerCapture?.(e.pointerId); } catch {}
+          }
           // prevent page scroll once we have decided this is a horizontal drag
           e.preventDefault();
           if (autoplayTimerRef.current) window.clearInterval(autoplayTimerRef.current);
@@ -193,7 +193,7 @@ export function HeroCarousel({
 
       // dragging
       dragXRef.current = dx;
-      suppressClickRef.current = Math.abs(dx) > START_MIN;
+      suppressClickRef.current = Math.abs(dx) > THRESHOLD;
       // apply pixel transform while dragging
       const width = containerWidthRef.current || container.getBoundingClientRect().width;
       const base = direction * active * width;
@@ -306,7 +306,7 @@ export function HeroCarousel({
               {(banner.desktopImageUrl || banner.imageUrl) ? (
                 banner.ctaHref ? (
                   <Link
-                    href={banner.ctaHref}
+                    href={localizedHref(locale, banner.ctaHref)}
                     aria-label={banner.title ?? banner.imageAlt ?? `Hero banner ${index + 1}`}
                     className="block w-full h-full"
                     onClick={(e) => {

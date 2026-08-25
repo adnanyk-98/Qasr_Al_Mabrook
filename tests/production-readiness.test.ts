@@ -186,21 +186,32 @@ test("reconciles the catalogue image total without counting unresolved files", (
   assert.equal(plan.skippedUnresolvedImages.length, 1);
 });
 
-test("accepts valid hero banner dimensions and rejects invalid 16:9 uploads", () => {
+test("accepts production desktop and mobile hero dimensions", () => {
   const valid = validateHeroImageUpload({
     mimeType: "image/jpeg",
     size: 2_000_000,
-    width: 1600,
-    height: 900,
+    role: "desktop",
+    width: 1920,
+    height: 720,
   });
   assert.equal(valid.ok, true);
+
+  const mobile = validateHeroImageUpload({
+    mimeType: "image/jpeg",
+    size: 2_000_000,
+    role: "mobile",
+    width: 1080,
+    height: 1200,
+  });
+  assert.equal(mobile.ok, true);
 
   const invalid = validateHeroImageUpload({
     mimeType: "image/jpeg",
     size: 2_000_000,
+    role: "desktop",
     width: 1200,
     height: 900,
   });
   assert.equal(invalid.ok, false);
-  assert.match(invalid.error ?? "", /16:9/);
+  assert.match(invalid.error ?? "", /1920 × 720/);
 });

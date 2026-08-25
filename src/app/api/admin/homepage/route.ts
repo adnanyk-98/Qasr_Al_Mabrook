@@ -30,18 +30,21 @@ export async function POST(request: Request) {
   const status = String(formData.get("status") ?? "DRAFT");
   const sortOrder = String(formData.get("sortOrder") ?? "0");
 
-  let existingImageUrl = "";
+  let existingDesktopImageUrl = "";
+  let existingMobileImageUrl = "";
   if (sectionId) {
     const current = await getHomepageSectionById(sectionId);
     const currentConfig = (current?.configurationJson ?? {}) as Record<string, unknown>;
-    existingImageUrl = typeof currentConfig.imageUrl === "string" ? currentConfig.imageUrl : "";
+    existingDesktopImageUrl = typeof currentConfig.desktopImageUrl === "string" ? currentConfig.desktopImageUrl : typeof currentConfig.imageUrl === "string" ? currentConfig.imageUrl : "";
+    existingMobileImageUrl = typeof currentConfig.mobileImageUrl === "string" ? currentConfig.mobileImageUrl : "";
   }
 
   const configurationJson: Record<string, unknown> = {
     title: String(formData.get("title") ?? ""),
     subtitle: String(formData.get("subtitle") ?? ""),
     description: String(formData.get("description") ?? ""),
-    imageUrl: existingImageUrl,
+    desktopImageUrl: existingDesktopImageUrl,
+    mobileImageUrl: existingMobileImageUrl,
     imageAlt: String(formData.get("imageAlt") ?? ""),
     ctaLabel: String(formData.get("ctaLabel") ?? ""),
     ctaHref: String(formData.get("ctaHref") ?? ""),
@@ -50,10 +53,10 @@ export async function POST(request: Request) {
 
   // The file binary MUST NOT be accepted via this route anymore.
   // Binary uploads are handled by the dedicated hero-upload route.
-  const providedImageUrl = String(formData.get("imageUrl") ?? "").trim();
-  if (providedImageUrl) {
-    configurationJson.imageUrl = providedImageUrl;
-  }
+  const providedDesktopImageUrl = String(formData.get("desktopImageUrl") ?? "").trim();
+  const providedMobileImageUrl = String(formData.get("mobileImageUrl") ?? "").trim();
+  if (providedDesktopImageUrl) configurationJson.desktopImageUrl = providedDesktopImageUrl;
+  if (providedMobileImageUrl) configurationJson.mobileImageUrl = providedMobileImageUrl;
 
   if (sectionId) {
     await updateHomepageSection({

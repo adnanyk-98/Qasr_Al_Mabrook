@@ -25,7 +25,8 @@ export default async function HomepagePage({ searchParams }: PageProps) {
   const homepageSections = homepageSectionsPaginated.items;
   const editingSection = params.edit ? await getHomepageSectionById(params.edit) : null;
   const config = (editingSection?.configurationJson ?? {}) as Record<string, string | boolean | undefined>;
-  const currentImageUrl = typeof config.imageUrl === "string" && config.imageUrl.trim() ? config.imageUrl : undefined;
+  const currentDesktopImageUrl = typeof config.desktopImageUrl === "string" && config.desktopImageUrl.trim() ? config.desktopImageUrl : typeof config.imageUrl === "string" && config.imageUrl.trim() ? config.imageUrl : undefined;
+  const currentMobileImageUrl = typeof config.mobileImageUrl === "string" && config.mobileImageUrl.trim() ? config.mobileImageUrl : undefined;
   const formError = params.error ? decodeURIComponent(params.error) : null;
 
   return (
@@ -88,7 +89,10 @@ export default async function HomepagePage({ searchParams }: PageProps) {
                   <Input id="description" name="description" placeholder="Supporting copy" defaultValue={String(config.description ?? "")} />
                 </div>
 
-                <HeroImageField currentImageUrl={currentImageUrl} currentAlt={String(config.imageAlt ?? "Hero banner preview")} />
+                <div className="grid gap-4">
+                  <HeroImageField fieldName="desktopImageUrl" uploadRole="desktop" label="Desktop Hero Image" currentImageUrl={currentDesktopImageUrl} currentAlt={String(config.imageAlt ?? "Desktop hero banner preview")} />
+                  <HeroImageField fieldName="mobileImageUrl" uploadRole="mobile" label="Mobile Hero Image" currentImageUrl={currentMobileImageUrl} currentAlt={String(config.imageAlt ?? "Mobile hero banner preview")} />
+                </div>
 
                 <div>
                   <Label htmlFor="imageAlt">Image alt text</Label>
@@ -102,7 +106,8 @@ export default async function HomepagePage({ searchParams }: PageProps) {
 
                 <div>
                   <Label htmlFor="ctaHref">CTA link</Label>
-                  <Input id="ctaHref" name="ctaHref" placeholder="/en/products" defaultValue={String(config.ctaHref ?? "")} />
+                  <Input id="ctaHref" name="ctaHref" placeholder="/store-locator" defaultValue={String(config.ctaHref ?? "")} />
+                  <p className="mt-1 text-xs text-[var(--text-muted)]">For internal pages, enter the path without the locale, e.g. /store-locator.</p>
                 </div>
 
                 <div>

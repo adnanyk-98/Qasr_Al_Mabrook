@@ -9,7 +9,7 @@ import { SearchForm } from "@/components/public/search-form";
 import { localePath, type Locale } from "@/lib/locales";
 import { getTranslations } from "next-intl/server";
 
-export async function Header({ locale = "en", path = "/" }: { locale?: Locale; path?: string }) {
+export async function Header({ locale = "en", path = "/", showLocaleSwitcher = true }: { locale?: Locale; path?: string; showLocaleSwitcher?: boolean }) {
   const t = await getTranslations({ locale, namespace: "common" });
   const header = await getTranslations({ locale, namespace: "header" });
   const navItems = [
@@ -46,7 +46,7 @@ export async function Header({ locale = "en", path = "/" }: { locale?: Locale; p
 
         <div className="flex items-center gap-3">
           <div className="hidden lg:block"><SearchForm locale={locale} defaultValue={path.includes("search") ? undefined : undefined} /></div>
-          <LocaleSwitcher locale={locale} path={path} />
+          {showLocaleSwitcher ? <LocaleSwitcher locale={locale} path={path} /> : null}
           <Link href={localePath(locale, "/request-quote")} className="hidden sm:inline-flex">
             <Button variant="primary" size="sm">{t("requestQuote")}</Button>
           </Link>

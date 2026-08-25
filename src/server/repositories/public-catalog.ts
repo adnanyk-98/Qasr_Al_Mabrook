@@ -519,15 +519,24 @@ export async function listProductAttributeSelections(productId: string, locale: 
     .leftJoin(attributeValueTranslations, and(eq(attributeValueTranslations.attributeValueId, attributeValues.id), eq(attributeValueTranslations.locale, locale)))
     .where(eq(productAttributeValues.productId, productId));
 
+  const attributeIds = rows.map((row) => row.attributeId).filter(Boolean);
+  const valueIds = rows.map((row) => row.valueId).filter(Boolean) as string[];
+  const fallbackAttributes = attributeIds.length
+    ? await db.select().from(attributeTranslations).where(and(inArray(attributeTranslations.attributeId, attributeIds), eq(attributeTranslations.locale, "en")))
+    : [];
+  const fallbackValues = valueIds.length
+    ? await db.select().from(attributeValueTranslations).where(and(inArray(attributeValueTranslations.attributeValueId, valueIds), eq(attributeValueTranslations.locale, "en")))
+    : [];
+
   return rows
     .filter((row) => row.attributeId && row.valueId)
     .map((row) => ({
       attributeId: row.attributeId,
       valueId: row.valueId,
       attributeCode: row.attributeCode,
-      attributeName: row.attributeName ?? row.attributeCode,
+      attributeName: row.attributeName ?? fallbackAttributes.find((translation) => translation.attributeId === row.attributeId)?.name ?? row.attributeCode,
       valueCode: row.valueCode,
-      label: row.valueLabel ?? row.valueCode,
+      label: row.valueLabel ?? fallbackValues.find((translation) => translation.attributeValueId === row.valueId)?.label ?? row.valueCode,
     }));
 }
 

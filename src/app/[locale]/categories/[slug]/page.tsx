@@ -58,11 +58,6 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
             </div>
             <h1 className="text-4xl font-semibold text-[var(--foreground)]">{category.name}</h1>
             {category.description ? <p className="max-w-3xl text-base leading-7 text-[var(--text-muted)]">{category.description}</p> : null}
-            <div className="flex items-center gap-3 text-sm text-[var(--text-muted)]">
-              <Link href={localePath(currentLocale, "/categories")} className="text-[var(--brand-primary)] hover:text-[var(--brand-primary-dark)]">
-                {t("allCategories")}
-              </Link>
-            </div>
           </div>
 
           {products.length === 0 ? (

@@ -1,4 +1,5 @@
 export type HeroImageValidationInput = {
+  role?: "desktop" | "mobile";
   mimeType?: string | null;
   size?: number | null;
   width?: number | null;
@@ -34,11 +35,9 @@ export function validateHeroImageUpload(input: HeroImageValidationInput): HeroIm
     return { ok: false, error: "Hero banner file is too large. Please upload an image under 8MB." };
   }
 
-  const ratio = width / height;
-  const expectedRatio = 16 / 9;
-  const tolerance = 0.02;
-  if (Math.abs(ratio - expectedRatio) > tolerance) {
-    return { ok: false, error: "Hero banner must be 16:9 (for example 1920 × 1080)." };
+  const expected = input.role === "mobile" ? { width: 1080, height: 1200 } : { width: 1920, height: 720 };
+  if (width !== expected.width || height !== expected.height) {
+    return { ok: false, error: `${input.role === "mobile" ? "Mobile" : "Desktop"} hero banner must be exactly ${expected.width} × ${expected.height}.` };
   }
 
   return { ok: true, width, height, mimeType };

@@ -14,6 +14,7 @@ import {
   getProductBySlug,
   listProductCategoriesForProduct,
   listProductImagesForPublic,
+  listProductSpecifications,
   listProductVariantGroups,
   listRelatedProducts,
   listVariantCombinationValuesForProduct,
@@ -63,17 +64,19 @@ export default async function ProductDetailPage({ params, searchParams }: { para
 
   if (!product) notFound();
 
-  const [images, categories, variants, variantValues, contactSettings] = await Promise.all([
+  const [images, categories, variants, variantValues, specifications, contactSettings] = await Promise.all([
     listProductImagesForPublic(product.id),
     listProductCategoriesForProduct(product.id, currentLocale),
     listVariantCombinationsForProduct(product.id),
     listVariantCombinationValuesForProduct(product.id, currentLocale),
+    listProductSpecifications(product.id, currentLocale),
     getPublicContactSettings(),
   ]);
   const relatedProducts = await listRelatedProducts(currentLocale, product.id, categories.map(({ category }) => category.id));
 
   const productCategoryNames = categories.map(({ category, translation }) => ({
     id: category.id,
+    slug: category.slug,
     name: translation?.name ?? category.slug,
   }));
   const variantGroups = await listProductVariantGroups(product.id, currentLocale);
@@ -114,7 +117,7 @@ export default async function ProductDetailPage({ params, searchParams }: { para
               <>
                 <span>/</span>
                 {productCategoryNames.map((category) => (
-                  <Link key={category.id} href={localePath(currentLocale, `/categories/${category.name.toLowerCase().replace(/\s+/g, "-")}`)} className="text-[var(--brand-primary)] hover:text-[var(--brand-primary-dark)]">
+                  <Link key={category.id} href={localePath(currentLocale, `/categories/${category.slug}`)} className="text-[var(--brand-primary)] hover:text-[var(--brand-primary-dark)]">
                     {category.name}
                   </Link>
                 ))}
@@ -149,7 +152,9 @@ export default async function ProductDetailPage({ params, searchParams }: { para
                 <h1 className="mt-2 text-4xl font-semibold text-[var(--foreground)]">{product.name}</h1>
               </div>
 
-              <p className="text-base leading-7 text-[var(--text-muted)]">{product.shortDescription ?? product.description ?? t("noSummary")}</p>
+              {product.shortDescription || product.description ? (
+                <p className="text-base leading-7 text-[var(--text-muted)]">{product.shortDescription ?? product.description}</p>
+              ) : null}
 
               {attributeSelectionsByGroup.length > 0 ? (
                 <div className="space-y-4 rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-white p-5 shadow-[var(--shadow-sm)]">
@@ -177,35 +182,49 @@ export default async function ProductDetailPage({ params, searchParams }: { para
                 {common("backToCatalogue")}
               </Link>
 
-              <div className="rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-[var(--brand-surface-alt)] p-5 text-sm leading-6 text-[var(--text-muted)]">
-                {product.description ? <div dangerouslySetInnerHTML={{ __html: product.description }} /> : t("noDescription")}
-              </div>
+              {product.description ? (
+                <div className="rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-[var(--brand-surface-alt)] p-5 text-sm leading-6 text-[var(--text-muted)]">
+                  <div dangerouslySetInnerHTML={{ __html: product.description }} />
+                </div>
+              ) : null}
             </div>
           </div>
 
           <div className="grid gap-8 xl:grid-cols-[0.95fr_1.05fr]">
+            {(Boolean(selectedVariant?.sku ?? product.defaultSku) || productCategoryNames.length > 0 || specifications.length > 0) ? (
             <section className="rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-white p-6 shadow-[var(--shadow-sm)]">
               <h2 className="text-2xl font-semibold text-[var(--foreground)]">{t("specifications")}</h2>
               <div className="mt-5 space-y-3">
-                <div className="flex items-center justify-between border-b border-[var(--brand-border)] py-2 text-sm">
-                  <span className="font-medium text-[var(--foreground)]">{common("sku")}</span>
-                  <span className="text-[var(--text-muted)]">{selectedVariant?.sku ?? product.defaultSku ?? "—"}</span>
-                </div>
+                {selectedVariant?.sku ?? product.defaultSku ? (
+                  <div className="flex items-center justify-between border-b border-[var(--brand-border)] py-2 text-sm">
+                    <span className="font-medium text-[var(--foreground)]">{common("sku")}</span>
+                    <span className="text-[var(--text-muted)]">{selectedVariant?.sku ?? product.defaultSku}</span>
+                  </div>
+                ) : null}
                 {productCategoryNames.length > 0 ? (
                   <div className="flex items-center justify-between border-b border-[var(--brand-border)] py-2 text-sm">
                     <span className="font-medium text-[var(--foreground)]">{common("category")}</span>
                     <span className="text-[var(--text-muted)]">{productCategoryNames.map((category) => category.name).join(", ")}</span>
                   </div>
                 ) : null}
+                {specifications.map((specification) => (
+                  <div key={specification.id} className="flex items-center justify-between border-b border-[var(--brand-border)] py-2 text-sm">
+                    <span className="font-medium text-[var(--foreground)]">{specification.name}</span>
+                    <span className="text-[var(--text-muted)]">{specification.value}</span>
+                  </div>
+                ))}
               </div>
             </section>
+            ) : null}
 
+            {product.description ? (
             <section className="rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-white p-6 shadow-[var(--shadow-sm)]">
               <h2 className="text-2xl font-semibold text-[var(--foreground)]">{t("details")}</h2>
               <div className="mt-5 space-y-4 text-sm leading-7 text-[var(--text-muted)]">
-                <p>{product.description ?? product.shortDescription ?? t("noDescription")}</p>
+                <div dangerouslySetInnerHTML={{ __html: product.description }} />
               </div>
             </section>
+            ) : null}
           </div>
 
           {relatedProducts.length > 0 ? (

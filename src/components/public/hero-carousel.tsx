@@ -223,6 +223,19 @@ export function HeroCarousel({
         pointerIdRef.current = null;
         hasDraggedRef.current = false;
         suppressClickRef.current = false;
+        // Manually trigger click on active link only for very small movements (< 10px)
+        const dx = dragXRef.current;
+        if (Math.abs(dx) < 10) {
+          setTimeout(() => {
+            const slides = container?.querySelectorAll('.min-w-full') as NodeListOf<HTMLElement>;
+            if (slides && slides[active]) {
+              const link = slides[active].querySelector('a[href]') as HTMLAnchorElement;
+              if (link) {
+                link.click();
+              }
+            }
+          }, 0);
+        }
         return;
       }
 
@@ -275,9 +288,20 @@ export function HeroCarousel({
       slider.style.transform = `translateX(${direction * active * width}px)`;
     };
 
+    const onContainerClick = (e: MouseEvent) => {
+      // If this click happened after a drag, prevent it; otherwise allow it to bubble to the link
+      if (hasDraggedRef.current) {
+        e.preventDefault();
+        e.stopPropagation();
+        hasDraggedRef.current = false;
+      }
+    };
+
     container.addEventListener('pointerdown', onPointerDown);
+    container.addEventListener('click', onContainerClick, true);
     return () => {
       container.removeEventListener('pointerdown', onPointerDown);
+      container.removeEventListener('click', onContainerClick, true);
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
     };

@@ -11,6 +11,7 @@ import { readLocalizedConfigString } from "@/lib/homepage-content";
 import { getTranslations } from "next-intl/server";
 import { PublicShell } from "@/components/public/public-shell";
 import { siteConfig } from "@/config/site";
+import { GoogleMapEmbed } from "@/components/public/google-map-embed";
 
 const storePhotos = Array.from({ length: 8 }, (_, index) => ({
   src: `/store-locator/In-Store-Images-${String(index + 1).padStart(2, "0")}.jpg`,
@@ -49,8 +50,9 @@ export default async function StoreLocatorPage({ params }: { params: Promise<{ l
             <p className="max-w-xl text-base leading-7 text-[var(--text-muted)]">{t("description")}</p>
           </div>
 
+          <div className="grid gap-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(400px,1.1fr)] lg:items-stretch">
           <address className="not-italic overflow-hidden rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 shadow-[var(--shadow-sm)] sm:p-6">
-            <div className="grid gap-5 md:grid-cols-[1.45fr_1fr_auto] md:items-center">
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-1 lg:content-center">
               <div className="flex items-start gap-3 rounded-[var(--radius-md)] border border-[var(--brand-border)] bg-white/60 p-4 md:min-h-[150px]">
                 <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--brand-primary-light)] text-[var(--brand-primary)]">
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-5 w-5">
@@ -61,7 +63,7 @@ export default async function StoreLocatorPage({ params }: { params: Promise<{ l
                 <div className="min-w-0">
                   <span className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">{t("visitUs")}</span>
                   <span className="mt-2 block text-base font-semibold text-[var(--foreground)]">{t("address")}</span>
-                  <span className="mt-1 block max-w-[32rem] leading-6 text-sm text-[var(--text-muted)]">{siteConfig.contact.address}</span>
+                  <span className="mt-1 block max-w-[22rem] leading-6 text-sm text-[var(--text-muted)]">{siteConfig.contact.address}</span>
                 </div>
               </div>
 
@@ -80,17 +82,10 @@ export default async function StoreLocatorPage({ params }: { params: Promise<{ l
                 </div>
               </div>
 
-              <div className="flex items-center justify-start md:justify-end">
-                <a href={siteConfig.contact.mapsUrl} target="_blank" rel="noopener noreferrer" aria-label={t("mapsAriaLabel")} className="inline-flex w-full items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--brand-primary)] bg-[var(--brand-primary)] px-4 py-3 text-sm font-semibold text-white shadow-[var(--shadow-sm)] transition-colors hover:bg-[var(--brand-primary-dark)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2 md:w-auto">
-                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-4 w-4">
-                    <path d="M12 21s6-5.2 6-11a6 6 0 1 0-12 0c0 5.8 6 11 6 11Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                    <circle cx="12" cy="9.5" r="2.5" stroke="currentColor" strokeWidth="1.8" />
-                  </svg>
-                  <span>{t("viewOnMaps")}</span>
-                </a>
-              </div>
             </div>
           </address>
+          <GoogleMapEmbed locale={currentLocale} variant="store" />
+          </div>
 
           <StoreGallery photos={photos} label={t("galleryLabel")} closeLabel={t("close")} previousLabel={t("previous")} nextLabel={t("next")} />
         </Container>

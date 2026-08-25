@@ -13,7 +13,7 @@ export async function Footer({ locale = "en" }: { locale?: Locale }) {
 
   return (
     <footer className="border-t border-[var(--brand-border)] bg-[var(--brand-header-background)] backdrop-blur-sm">
-      <Container className="grid gap-8 py-12 md:grid-cols-3">
+      <Container className="grid gap-8 py-12 md:grid-cols-[1fr_0.8fr_1.15fr]">
         <div className="space-y-4">
           <div className="flex flex-col items-start gap-3">
             <Image
@@ -51,15 +51,6 @@ export async function Footer({ locale = "en" }: { locale?: Locale }) {
             <li>
               <span className="block font-medium text-[var(--foreground)]">{t("phone")}</span>
               <a href={`tel:${siteConfig.contact.phone}`} className="hover:text-[var(--brand-primary)]">{siteConfig.contact.phone}</a>
-            </li>
-            <li>
-              <a href={siteConfig.contact.mapsUrl} target="_blank" rel="noopener noreferrer" aria-label={t("mapsAriaLabel")} className="inline-flex items-center gap-2 hover:text-[var(--brand-primary)]">
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-4 w-4">
-                  <path d="M12 21s6-5.2 6-11a6 6 0 1 0-12 0c0 5.8 6 11 6 11Z" stroke="currentColor" strokeWidth="1.7" />
-                  <circle cx="12" cy="10" r="2" stroke="currentColor" strokeWidth="1.7" />
-                </svg>
-                {t("viewOnMaps")}
-              </a>
             </li>
           </ul>
         </div>

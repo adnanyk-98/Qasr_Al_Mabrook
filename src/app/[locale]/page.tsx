@@ -10,6 +10,7 @@ import { PromotionalBanner } from "@/components/public/promotional-banner";
 import { PublicImageSlot } from "@/components/public/public-image-slot";
 import { HeroCarousel } from "@/components/public/hero-carousel";
 import { PublicShell } from "@/components/public/public-shell";
+import { TestimonialsSection } from "@/components/public/testimonials-section";
 import { listPublishedCategories, listPublishedHomepageSections, listPublishedProducts } from "@/server/repositories/public-catalog";
 import { localePath, locales, type Locale } from "@/lib/locales";
 import { readLocalizedConfigString } from "@/lib/homepage-content";
@@ -187,6 +188,7 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ loc
             />
           </Container>
         </Section>
+        <TestimonialsSection locale={currentLocale} />
       </main>
     </PublicShell>
   );

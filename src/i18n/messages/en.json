@@ -76,6 +76,26 @@
     "clients": "Happy Clients",
     "retention": "Customer Retention"
   },
+  "testimonials": {
+    "eyebrow": "",
+    "title": "What Our Clients Say",
+    "sampleNote": "",
+    "retail": {
+      "quote": "Finding practical products for our shop is much easier when the range is clearly organized. The team helps us identify the right category when we need something specific.",
+      "name": "Ahmed Al Mansoori",
+      "role": "Retail Store Owner"
+    },
+    "tailoring": {
+      "quote": "The clothing selection gives our tailoring work a useful starting point. It is helpful to browse several options before deciding what fits a particular project.",
+      "name": "Mariam Al Nuaimi",
+      "role": "Tailoring Business Owner"
+    },
+    "procurement": {
+      "quote": "For local business purchasing, I appreciate being able to review the catalogue and ask about a product without unnecessary guesswork.",
+      "name": "Khalid Al Haddad",
+      "role": "Procurement Coordinator"
+    }
+  },
   "loading": {
     "page": "Preparing the catalogue",
     "takingLonger": "Taking a little longer than expected.",

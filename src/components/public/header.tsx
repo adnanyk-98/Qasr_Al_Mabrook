@@ -8,6 +8,7 @@ import { LocaleSwitcher } from "@/components/public/locale-switcher";
 import { SearchForm } from "@/components/public/search-form";
 import { localePath, type Locale } from "@/lib/locales";
 import { getTranslations } from "next-intl/server";
+import { TrackedLink } from "@/components/analytics/tracked-link";
 
 export async function Header({ locale = "en", path = "/", showLocaleSwitcher = true }: { locale?: Locale; path?: string; showLocaleSwitcher?: boolean }) {
   const t = await getTranslations({ locale, namespace: "common" });
@@ -47,9 +48,9 @@ export async function Header({ locale = "en", path = "/", showLocaleSwitcher = t
         <div className="flex items-center gap-3">
           <div className="hidden lg:block"><SearchForm locale={locale} defaultValue={path.includes("search") ? undefined : undefined} /></div>
           {showLocaleSwitcher ? <LocaleSwitcher locale={locale} path={path} /> : null}
-          <Link href={localePath(locale, "/request-quote")} className="hidden sm:inline-flex">
+          <TrackedLink event="product_request_quote" params={{ locale, source: "header" }} href={localePath(locale, "/request-quote")} className="hidden sm:inline-flex">
             <Button variant="primary" size="sm">{t("requestQuote")}</Button>
-          </Link>
+          </TrackedLink>
           <details className="md:hidden">
             <summary className="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-full border border-[var(--brand-border)] text-base text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)]" aria-label={header("openMenu")}>
               <span aria-hidden="true">&#9776;</span>

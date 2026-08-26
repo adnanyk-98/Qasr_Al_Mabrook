@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { TrackedLink } from "@/components/analytics/tracked-link";
 
 import { Button } from "@/components/ui/button";
 import { PublicImageSlot } from "@/components/public/public-image-slot";
@@ -15,6 +15,7 @@ export function FeaturedProductCard({
 }: {
   locale: "en" | "ar";
   product: {
+    id: string;
     slug: string;
     name: string;
     shortDescription?: string | null;
@@ -86,14 +87,13 @@ export function FeaturedProductCard({
               <span className="sr-only">More product information is available.</span>
             ) : null}
           </div>
-
           <div className="flex h-10 shrink-0 items-center justify-between gap-3 pt-2">
-            <Link href={`/${locale}/products/${product.slug}`} className="min-w-0 text-sm font-medium text-[var(--brand-primary)] hover:text-[var(--brand-primary-dark)]">
+            <TrackedLink event="featured_product_click" params={{ product_id: product.id, product_name: product.name, product_slug: product.slug, locale, source: "featured-products" }} href={`/${locale}/products/${product.slug}`} className="min-w-0 text-sm font-medium text-[var(--brand-primary)] hover:text-[var(--brand-primary-dark)]">
               {viewDetailsLabel}
-            </Link>
-            <Link href={localePath(locale, `/request-quote?source=PRODUCT&product=${encodeURIComponent(product.slug)}`)}>
+            </TrackedLink>
+            <TrackedLink event="product_request_quote" params={{ product_id: product.id, product_name: product.name, product_slug: product.slug, locale, source: "featured-products" }} href={localePath(locale, `/request-quote?source=PRODUCT&product=${encodeURIComponent(product.slug)}`)}>
               <Button type="button" variant="primary" size="sm">{requestQuoteLabel}</Button>
-            </Link>
+            </TrackedLink>
           </div>
         </div>
       </article>

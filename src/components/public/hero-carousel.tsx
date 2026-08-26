@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { PublicImageSlot } from "@/components/public/public-image-slot";
 import { localizedHref } from "@/lib/locales";
+import { trackEvent } from "@/lib/analytics";
 
 export function HeroCarousel({
   id,
@@ -407,11 +408,14 @@ export function HeroCarousel({
                       onDragStart={preventNativeDrag}
                       onDragStartCapture={preventNativeDrag}
                       onClick={(e) => {
+                        const destination = banner.ctaHref ?? "";
                         if (suppressClickRef.current || hasDraggedRef.current) {
                           e.preventDefault();
                           e.stopPropagation();
                           suppressClickRef.current = false;
                           hasDraggedRef.current = false;
+                        } else {
+                          trackEvent("hero_click", { locale, source: id, destination: localizedHref(locale, destination) });
                         }
                       }}
                     >

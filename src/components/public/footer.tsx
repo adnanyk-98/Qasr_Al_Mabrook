@@ -5,6 +5,7 @@ import { siteConfig } from "@/config/site";
 import { Container } from "@/components/ui/layout";
 import { localePath, type Locale } from "@/lib/locales";
 import { getTranslations } from "next-intl/server";
+import { TrackedLink } from "@/components/analytics/tracked-link";
 
 export async function Footer({ locale = "en" }: { locale?: Locale }) {
   const common = await getTranslations({ locale, namespace: "common" });
@@ -50,7 +51,7 @@ export async function Footer({ locale = "en" }: { locale?: Locale }) {
             </li>
             <li>
               <span className="block font-medium text-[var(--foreground)]">{t("phone")}</span>
-              <a href={`tel:${siteConfig.contact.phone}`} className="hover:text-[var(--brand-primary)]">{siteConfig.contact.phone}</a>
+              <TrackedLink event="phone_click" params={{ locale, source: "footer" }} href={`tel:${siteConfig.contact.phone}`} className="hover:text-[var(--brand-primary)]">{siteConfig.contact.phone}</TrackedLink>
             </li>
           </ul>
         </div>

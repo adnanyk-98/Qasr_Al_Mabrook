@@ -9,6 +9,7 @@ import { getCategoryBySlug, listCategoryProducts } from "@/server/repositories/p
 import { localePath, locales, type Locale } from "@/lib/locales";
 import { createBreadcrumbStructuredData, createCategoryMetadata } from "@/lib/seo";
 import { getTranslations } from "next-intl/server";
+import { AnalyticsTracker } from "@/components/analytics/analytics-tracker";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }): Promise<Metadata> {
   const { locale, slug } = await params;
@@ -54,6 +55,7 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
     <PublicShell locale={currentLocale} path={`/categories/${slug}`}>
       <Section>
         <Container className="space-y-8">
+          <AnalyticsTracker event="category_view" params={{ category_id: category.id, category_name: category.name, locale: currentLocale }} />
           <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{

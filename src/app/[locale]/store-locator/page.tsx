@@ -11,6 +11,8 @@ import { getTranslations } from "next-intl/server";
 import { PublicShell } from "@/components/public/public-shell";
 import { siteConfig } from "@/config/site";
 import { GoogleMapEmbed } from "@/components/public/google-map-embed";
+import { AnalyticsTracker } from "@/components/analytics/analytics-tracker";
+import { TrackedLink } from "@/components/analytics/tracked-link";
 
 const storePhotos = Array.from({ length: 8 }, (_, index) => ({
   src: `/store-locator/In-Store-Images-${String(index + 1).padStart(2, "0")}.jpg`,
@@ -45,6 +47,7 @@ export default async function StoreLocatorPage({ params }: { params: Promise<{ l
 
   return (
     <PublicShell locale={currentLocale} path="/store-locator">
+      <AnalyticsTracker event="store_locator_view" params={{ locale: currentLocale, source: "/store-locator" }} />
       {superMarketImage?.desktop ? (
         <div className="w-full">
           <picture>
@@ -74,9 +77,9 @@ export default async function StoreLocatorPage({ params }: { params: Promise<{ l
                 <div className="min-w-0">
                   <span className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">{t("visitUs")}</span>
                   <span className="mt-2 block text-base font-semibold text-[var(--foreground)]">{t("address")}</span>
-                  <a href={siteConfig.contact.mapsUrl} target="_blank" rel="noopener noreferrer" aria-label={t("mapsAriaLabel")} className="mt-1 block max-w-[11rem] cursor-pointer leading-6 text-sm text-[var(--text-muted)] transition-colors hover:text-[var(--brand-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2">
+                  <TrackedLink event="map_click" params={{ locale: currentLocale, source: "/store-locator" }} href={siteConfig.contact.mapsUrl} target="_blank" rel="noopener noreferrer" aria-label={t("mapsAriaLabel")} className="mt-1 block max-w-[11rem] cursor-pointer leading-6 text-sm text-[var(--text-muted)] transition-colors hover:text-[var(--brand-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2">
                     {siteConfig.contact.address}
-                  </a>
+                  </TrackedLink>
                 </div>
               </address>
 
@@ -89,9 +92,9 @@ export default async function StoreLocatorPage({ params }: { params: Promise<{ l
                 <div className="min-w-0">
                   <span className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">{t("callUs")}</span>
                   <span className="mt-2 block text-base font-semibold text-[var(--foreground)]">{t("phone")}</span>
-                  <a href={`tel:${siteConfig.contact.phone}`} className="mt-1 block text-sm text-[var(--text-muted)] transition-colors hover:text-[var(--brand-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2">
+                  <TrackedLink event="phone_click" params={{ locale: currentLocale, source: "/store-locator" }} href={`tel:${siteConfig.contact.phone}`} className="mt-1 block text-sm text-[var(--text-muted)] transition-colors hover:text-[var(--brand-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2">
                     {siteConfig.contact.phone}
-                  </a>
+                  </TrackedLink>
                 </div>
               </div>
 

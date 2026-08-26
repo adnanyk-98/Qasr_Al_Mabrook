@@ -1,11 +1,11 @@
-import Link from "next/link";
-
 import { localePath, type Locale } from "@/lib/locales";
 import { PublicImageSlot } from "@/components/public/public-image-slot";
 import { getTranslations } from "next-intl/server";
+import { TrackedLink } from "@/components/analytics/tracked-link";
 
 export async function CategoryCard({
   locale,
+  categoryId,
   slug,
   name,
   description,
@@ -13,6 +13,7 @@ export async function CategoryCard({
   imageAlt,
 }: {
   locale: Locale;
+  categoryId?: string;
   slug: string;
   name: string;
   description?: string | null;
@@ -21,7 +22,7 @@ export async function CategoryCard({
 }) {
   const t = await getTranslations({ locale, namespace: "common" });
   return (
-    <Link href={localePath(locale, `/categories/${slug}`)} className="group flex h-full flex-col rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-white p-3 shadow-[var(--shadow-sm)] transition-colors hover:border-[var(--brand-primary)]">
+    <TrackedLink event="category_view" params={{ category_id: categoryId, category_name: name, locale, source: "category-card" }} href={localePath(locale, `/categories/${slug}`)} className="group flex h-full flex-col rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-white p-3 shadow-[var(--shadow-sm)] transition-colors hover:border-[var(--brand-primary)]">
       <div className="px-1 pb-0 pt-1">
         <PublicImageSlot
           src={imageUrl}
@@ -36,6 +37,6 @@ export async function CategoryCard({
         <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">{name}</h2>
         {description ? <p className="mt-3 text-sm leading-6 text-[var(--text-muted)]">{description}</p> : null}
       </div>
-    </Link>
+    </TrackedLink>
   );
 }

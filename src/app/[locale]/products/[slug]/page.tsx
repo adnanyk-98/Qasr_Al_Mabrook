@@ -22,6 +22,7 @@ import {
 } from "@/server/repositories/public-catalog";
 import { localePath, locales, type Locale } from "@/lib/locales";
 import { createBreadcrumbStructuredData, createProductMetadata, createProductStructuredData, buildCanonical } from "@/lib/seo";
+import { AnalyticsTracker } from "@/components/analytics/analytics-tracker";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }): Promise<Metadata> {
   const { locale, slug } = await params;
@@ -94,6 +95,7 @@ export default async function ProductDetailPage({ params, searchParams }: { para
     <PublicShell locale={currentLocale} path={`/products/${slug}${query.variant ? `?variant=${encodeURIComponent(query.variant)}` : ""}`}>
       <Section>
         <Container className="space-y-10">
+          <AnalyticsTracker event="product_view" params={{ product_id: product.id, product_name: product.name, product_slug: product.slug, sku: selectedVariant?.sku ?? product.defaultSku, category: productCategoryNames.map((category) => category.name).join(", "), locale: currentLocale }} />
           {/* JSON-LD Structured Data for Product */}
           <script
             type="application/ld+json"

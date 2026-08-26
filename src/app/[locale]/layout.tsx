@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { locales, type Locale } from "@/lib/locales";
 import { createOrganizationStructuredData, createPublicPageMetadata, createWebSiteStructuredData } from "@/lib/seo";
 import { NextIntlClientProvider } from "next-intl";
+import { GoogleAnalytics } from "@/components/analytics/google-analytics";
 
 import arMessages from "@/i18n/messages/ar.json";
 import enMessages from "@/i18n/messages/en.json";
@@ -45,6 +46,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
   return (
     <div>
       <NextIntlClientProvider key={currentLocale} locale={currentLocale} messages={messages[currentLocale]}>
+        <GoogleAnalytics />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: createOrganizationStructuredData() }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: createWebSiteStructuredData() }} />
         {children}

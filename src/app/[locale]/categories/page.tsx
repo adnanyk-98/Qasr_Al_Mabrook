@@ -49,7 +49,7 @@ export default async function CategoriesPage({ params }: { params: Promise<{ loc
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-              {categories.map((category) => <CategoryCard key={category.id} locale={currentLocale} slug={category.slug} name={category.name} description={category.description} imageUrl={category.imagePublicUrl} />)}
+              {categories.map((category) => <CategoryCard key={category.id} locale={currentLocale} categoryId={category.id} slug={category.slug} name={category.name} description={category.description} imageUrl={category.imagePublicUrl} />)}
           </div>
         </Container>
       </Section>

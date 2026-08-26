@@ -21,7 +21,7 @@ import {
   listVariantCombinationsForProduct,
 } from "@/server/repositories/public-catalog";
 import { localePath, locales, type Locale } from "@/lib/locales";
-import { createProductMetadata, createProductStructuredData, buildCanonical } from "@/lib/seo";
+import { createBreadcrumbStructuredData, createProductMetadata, createProductStructuredData, buildCanonical } from "@/lib/seo";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }): Promise<Metadata> {
   const { locale, slug } = await params;
@@ -107,6 +107,16 @@ export default async function ProductDetailPage({ params, searchParams }: { para
                 brand: product.brandName,
                 url: buildCanonical(currentLocale, `/products/${slug}`),
               }),
+            }}
+          />
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: createBreadcrumbStructuredData(currentLocale, [
+                { name: t("products"), path: "/products" },
+                ...productCategoryNames.map((category) => ({ name: category.name, path: `/categories/${category.slug}` })),
+                { name: product.name, path: `/products/${slug}` },
+              ]),
             }}
           />
           <div className="flex flex-wrap items-center gap-2 text-sm text-[var(--text-muted)]">

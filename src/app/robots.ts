@@ -20,6 +20,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [
           "/admin", // Admin interface
           "/api", // API routes
+          "/search", // Search results are utility pages, not landing pages
         ],
       },
     ],

@@ -7,7 +7,7 @@ import { ProductCard } from "@/components/public/product-card";
 import { PublicShell } from "@/components/public/public-shell";
 import { getCategoryBySlug, listCategoryProducts } from "@/server/repositories/public-catalog";
 import { localePath, locales, type Locale } from "@/lib/locales";
-import { createCategoryMetadata } from "@/lib/seo";
+import { createBreadcrumbStructuredData, createCategoryMetadata } from "@/lib/seo";
 import { getTranslations } from "next-intl/server";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }): Promise<Metadata> {
@@ -27,6 +27,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     seoTitle: category.seoTitle,
     seoDescription: category.seoDescription,
     description: category.description,
+    ogImage: category.imagePublicUrl,
+    ogImageAlt: category.name,
     hasAlternate: Boolean(alternateCategory),
   });
 }
@@ -52,6 +54,15 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
     <PublicShell locale={currentLocale} path={`/categories/${slug}`}>
       <Section>
         <Container className="space-y-8">
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: createBreadcrumbStructuredData(currentLocale, [
+                { name: t("title"), path: "/categories" },
+                { name: category.name, path: `/categories/${slug}` },
+              ]),
+            }}
+          />
           <div className="space-y-3">
             <div className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">
               {t("detailEyebrow")}

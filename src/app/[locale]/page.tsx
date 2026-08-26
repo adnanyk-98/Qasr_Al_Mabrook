@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 
 import { Button } from "@/components/ui/button";
 import { CatalogueCarousel } from "@/components/public/catalogue-carousel";
@@ -16,6 +17,21 @@ import { listPublishedCategories, listPublishedHomepageSections, listPublishedPr
 import { localePath, locales, type Locale } from "@/lib/locales";
 import { readLocalizedConfigString } from "@/lib/homepage-content";
 import { getTranslations } from "next-intl/server";
+
+import enMessages from "@/i18n/messages/en.json";
+import arMessages from "@/i18n/messages/ar.json";
+
+const metadataMessages = { en: enMessages, ar: arMessages } as const;
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  if (!locales.includes(locale as Locale)) return {};
+
+  const currentLocale = locale as Locale;
+  return {
+    title: { absolute: metadataMessages[currentLocale].metadata.siteTitle },
+  };
+}
 
 function HighlightIcon({ type }: { type: "experience" | "products" | "clients" | "retention" }) {
   const common = { viewBox: "0 0 48 48", fill: "none", "aria-hidden": true, className: "h-[42px] w-[42px] text-[var(--brand-primary)]" } as const;

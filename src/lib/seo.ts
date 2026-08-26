@@ -39,6 +39,7 @@ export function buildAlternates(locale: Locale, path: string, hasAlternate = tru
     languages: {
       [locale]: buildCanonical(locale, path),
       [alternateLocale]: buildCanonical(alternateLocale, path),
+      "x-default": buildCanonical("en", path),
     },
   };
 }
@@ -82,6 +83,12 @@ export function createPublicPageMetadata(options: CreateMetadataOptions): Metada
   const canonical = buildCanonical(locale, path);
 
   // Build metadata object
+  const openGraphImage = {
+    url: ogImage || `${getBaseUrl()}${siteConfig.brand.logoColorPng}`,
+    alt: ogImageAlt || finalTitle,
+    ...(ogImage ? { width: ogImageWidth, height: ogImageHeight } : {}),
+  };
+
   const metadata: Metadata = {
     title: finalTitle,
     description: finalDescription,
@@ -96,23 +103,15 @@ export function createPublicPageMetadata(options: CreateMetadataOptions): Metada
       siteName: siteConfig.name,
       locale: locale === "ar" ? "ar_SA" : "en_US",
       type: "website",
+      images: [openGraphImage],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: finalTitle,
+      description: finalDescription,
+      images: [ogImage || `${getBaseUrl()}${siteConfig.brand.logoColorPng}`],
     },
   };
-
-  // Add OG image if provided
-  if (ogImage) {
-    metadata.openGraph = {
-      ...metadata.openGraph,
-      images: [
-        {
-          url: ogImage,
-          width: ogImageWidth,
-          height: ogImageHeight,
-          alt: ogImageAlt || finalTitle,
-        },
-      ],
-    };
-  }
 
   return metadata;
 }
@@ -231,6 +230,16 @@ export function createOrganizationStructuredData(): string {
   return JSON.stringify(schema);
 }
 
+export function createWebSiteStructuredData(): string {
+  return JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: siteConfig.name,
+    url: getBaseUrl(),
+    inLanguage: ["en", "ar"],
+  });
+}
+
 /**
  * Create JSON-LD structured data for BreadcrumbList
  */
@@ -241,7 +250,7 @@ export interface BreadcrumbItem {
 
 export function createBreadcrumbStructuredData(locale: Locale, items: BreadcrumbItem[]): string {
   const breadcrumbs = [
-    { name: "Home", path: "/" },
+    { name: locale === "ar" ? "الرئيسية" : "Home", path: "/" },
     ...items,
   ];
 

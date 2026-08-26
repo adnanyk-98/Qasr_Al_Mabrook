@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { locales, type Locale } from "@/lib/locales";
-import { createPublicPageMetadata } from "@/lib/seo";
+import { createOrganizationStructuredData, createPublicPageMetadata, createWebSiteStructuredData } from "@/lib/seo";
 import { NextIntlClientProvider } from "next-intl";
 
 import arMessages from "@/i18n/messages/ar.json";
@@ -45,6 +45,8 @@ export default async function LocaleLayout({ children, params }: { children: Rea
   return (
     <div>
       <NextIntlClientProvider key={currentLocale} locale={currentLocale} messages={messages[currentLocale]}>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: createOrganizationStructuredData() }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: createWebSiteStructuredData() }} />
         {children}
       </NextIntlClientProvider>
     </div>

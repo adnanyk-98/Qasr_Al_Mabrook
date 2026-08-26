@@ -1,4 +1,4 @@
-import { boolean, integer, jsonb, numeric, pgEnum, pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { boolean, integer, jsonb, numeric, pgEnum, pgTable, text, timestamp, uniqueIndex, uuid, varchar } from "drizzle-orm/pg-core";
 
 export const entityStatusEnum = pgEnum("entity_status", ["DRAFT", "PUBLISHED", "ARCHIVED"]);
 export const localeEnum = pgEnum("locale", ["en", "ar"]);
@@ -31,7 +31,9 @@ export const categoryTranslations = pgTable("category_translations", {
   seoDescription: text("seo_description"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}, (table) => [
+  uniqueIndex("category_translations_category_locale_unique").on(table.categoryId, table.locale),
+]);
 
 export const brands = pgTable("brands", {
   id: uuid("id").primaryKey().defaultRandom(),

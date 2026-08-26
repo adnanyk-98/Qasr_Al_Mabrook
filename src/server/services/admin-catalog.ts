@@ -10,7 +10,7 @@ import {
   createBrand,
   createCategory,
   createCategoryAttribute,
-  createCategoryTranslation,
+  upsertCategoryTranslation,
   createHomepageSection,
   createProduct,
   getHomepageSectionById,
@@ -380,14 +380,15 @@ export async function upsertCategoryTranslationAction(formData: FormData) {
     redirect("/admin/translations");
   }
 
-  await createCategoryTranslation({
+  const input = {
     categoryId,
     locale: localeSchema.parse(String(formData.get("locale") ?? "en")),
     name: String(formData.get("name") ?? "").trim(),
     description: String(formData.get("description") ?? "") || null,
     seoTitle: String(formData.get("seoTitle") ?? "") || null,
     seoDescription: String(formData.get("seoDescription") ?? "") || null,
-  });
+  };
+  await upsertCategoryTranslation(input);
 
   redirect("/admin/translations");
 }

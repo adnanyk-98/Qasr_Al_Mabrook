@@ -415,6 +415,46 @@ export async function createCategoryTranslation(input: { categoryId: string; loc
   return rows[0] ?? null;
 }
 
+export async function updateCategoryTranslation(input: { categoryId: string; locale: "en" | "ar"; name: string; description?: string | null; seoTitle?: string | null; seoDescription?: string | null }) {
+  const rows = await db
+    .update(categoryTranslations)
+    .set({
+      name: input.name,
+      description: input.description ?? null,
+      seoTitle: input.seoTitle ?? null,
+      seoDescription: input.seoDescription ?? null,
+    })
+    .where(and(eq(categoryTranslations.categoryId, input.categoryId), eq(categoryTranslations.locale, input.locale)))
+    .returning();
+
+  return rows[0] ?? null;
+}
+
+export async function upsertCategoryTranslation(input: { categoryId: string; locale: "en" | "ar"; name: string; description?: string | null; seoTitle?: string | null; seoDescription?: string | null }) {
+  const rows = await db
+    .insert(categoryTranslations)
+    .values({
+      categoryId: input.categoryId,
+      locale: input.locale,
+      name: input.name,
+      description: input.description ?? null,
+      seoTitle: input.seoTitle ?? null,
+      seoDescription: input.seoDescription ?? null,
+    })
+    .onConflictDoUpdate({
+      target: [categoryTranslations.categoryId, categoryTranslations.locale],
+      set: {
+        name: input.name,
+        description: input.description ?? null,
+        seoTitle: input.seoTitle ?? null,
+        seoDescription: input.seoDescription ?? null,
+      },
+    })
+    .returning();
+
+  return rows[0] ?? null;
+}
+
 export async function listSpecificationTranslations() {
   return db.select().from(specificationTranslations).orderBy(asc(specificationTranslations.locale), asc(specificationTranslations.name));
 }

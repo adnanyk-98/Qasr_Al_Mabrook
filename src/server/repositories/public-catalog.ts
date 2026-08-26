@@ -196,7 +196,7 @@ export async function listCategoryProducts(locale: Locale, categoryId: string) {
     .innerJoin(products, eq(productCategories.productId, products.id))
     .leftJoin(productTranslations, and(eq(productTranslations.productId, products.id), eq(productTranslations.locale, locale)))
     .where(and(eq(productCategories.categoryId, categoryId), eq(products.status, "PUBLISHED")))
-    .orderBy(desc(products.createdAt));
+    .orderBy(desc(products.createdAt), asc(products.id));
 
   return localizeProductRows(rows, locale);
 }
@@ -215,7 +215,7 @@ export async function listPublishedProducts(locale: Locale, options?: { category
       .innerJoin(products, eq(productCategories.productId, products.id))
       .leftJoin(productTranslations, and(eq(productTranslations.productId, products.id), eq(productTranslations.locale, locale)))
       .where(and(eq(productCategories.categoryId, categoryId), eq(products.status, "PUBLISHED")))
-      .orderBy(desc(products.createdAt))
+      .orderBy(desc(products.createdAt), asc(products.id))
       .limit(options?.limit ?? 40);
 
     return localizeProductRows(rows, locale);
@@ -239,9 +239,9 @@ export async function listPublishedProducts(locale: Locale, options?: { category
         .from(products)
         .leftJoin(productTranslations, eq(productTranslations.productId, products.id))
         .where(and(eq(products.status, "PUBLISHED"), or(ilike(productTranslations.name, `%${search}%`), ilike(products.slug, `%${search}%`))))
-        .orderBy(desc(products.createdAt))
+        .orderBy(desc(products.createdAt), asc(products.id))
         .limit(options?.limit ?? 40)
-    : await baseQuery.orderBy(desc(products.createdAt)).limit(options?.limit ?? 40);
+    : await baseQuery.orderBy(desc(products.createdAt), asc(products.id)).limit(options?.limit ?? 40);
 
   return localizeProductRows(rows, locale);
 }
@@ -392,7 +392,7 @@ export async function listRelatedProducts(locale: Locale, currentProductId: stri
     .innerJoin(products, eq(productCategories.productId, products.id))
     .leftJoin(productTranslations, and(eq(productTranslations.productId, products.id), eq(productTranslations.locale, locale)))
     .where(and(eq(products.status, "PUBLISHED"), eq(productCategories.categoryId, categoryIds[0])))
-    .orderBy(desc(products.createdAt))
+    .orderBy(desc(products.createdAt), asc(products.id))
     .limit(6);
 
   return localizeProductRows(rows
@@ -433,7 +433,7 @@ export async function searchPublishedProducts(locale: Locale, query: string) {
         ),
       ),
     )
-    .orderBy(desc(products.createdAt))
+    .orderBy(desc(products.createdAt), asc(products.id))
     .limit(20);
 
   return localizeProductRows(rows, locale);

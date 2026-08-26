@@ -11,7 +11,8 @@ import { PublicImageSlot } from "@/components/public/public-image-slot";
 import { HeroCarousel } from "@/components/public/hero-carousel";
 import { PublicShell } from "@/components/public/public-shell";
 import { TestimonialsSection } from "@/components/public/testimonials-section";
-import { listPublishedCategories, listPublishedHomepageSections, listPublishedProducts } from "@/server/repositories/public-catalog";
+import { BrandsSection } from "@/components/public/brands-section";
+import { listPublishedCategories, listPublishedHomepageSections, listPublishedProducts, getPublishedBrands } from "@/server/repositories/public-catalog";
 import { localePath, locales, type Locale } from "@/lib/locales";
 import { readLocalizedConfigString } from "@/lib/homepage-content";
 import { getTranslations } from "next-intl/server";
@@ -44,10 +45,11 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ loc
   const currentLocale = locale as Locale;
   const t = await getTranslations({ locale: currentLocale, namespace: "home" });
   const highlights = await getTranslations({ locale: currentLocale, namespace: "highlights" });
-  const [sections, categories, featuredProducts] = await Promise.all([
+  const [sections, categories, featuredProducts, brands] = await Promise.all([
     listPublishedHomepageSections(),
     listPublishedCategories(currentLocale),
     listPublishedProducts(currentLocale, { limit: 6 }),
+    getPublishedBrands(),
   ]);
   const heroSections = sections.filter((section) => section.sectionType.toUpperCase() === "HERO");
   const promotionalSections = sections.filter((section) => !heroSections.includes(section));
@@ -188,6 +190,7 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ loc
             />
           </Container>
         </Section>
+        <BrandsSection locale={currentLocale} brands={brands.filter((brand): brand is typeof brand & { logoUrl: string } => Boolean(brand.logoUrl))} />
         <TestimonialsSection locale={currentLocale} />
       </main>
     </PublicShell>

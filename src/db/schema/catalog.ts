@@ -38,6 +38,10 @@ export const categoryTranslations = pgTable("category_translations", {
 export const brands = pgTable("brands", {
   id: uuid("id").primaryKey().defaultRandom(),
   slug: varchar("slug", { length: 255 }).notNull().unique(),
+  name: varchar("name", { length: 255 }).notNull().default(""),
+  logoUrl: text("logo_url"),
+  sortOrder: integer("sort_order").notNull().default(0),
+  enabled: boolean("enabled").notNull().default(true),
   status: entityStatusEnum("status").notNull().default("DRAFT"),
   logoImageId: uuid("logo_image_id"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

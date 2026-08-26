@@ -8,6 +8,8 @@ import {
   createAttributeTranslation,
   createAttributeValue,
   createBrand,
+  updateBrand,
+  deleteBrandById,
   createCategory,
   createCategoryAttribute,
   upsertCategoryTranslation,
@@ -124,13 +126,30 @@ export async function upsertCategoryAction(formData: FormData) {
 
 export async function upsertBrandAction(formData: FormData) {
   await authorizeAdminMutation();
-  const slug = slugify(String(formData.get("slug") ?? "")) || slugify(String(formData.get("name") ?? ""));
+  const name = String(formData.get("name") ?? "").trim();
+  const slug = slugify(String(formData.get("slug") ?? "")) || slugify(name);
+  const brandId = String(formData.get("brandId") ?? "");
+  const logoUrl = String(formData.get("logoUrl") ?? "").trim() || null;
+  const sortOrder = sortOrderSchema.parse(formData.get("sortOrder") ?? 0);
+  const enabled = String(formData.get("enabled") ?? "") === "on";
+  if (!name || !slug || (enabled && !logoUrl)) redirect("/admin/brands");
 
-  await createBrand({
-    slug,
-    status: statusSchema.parse(String(formData.get("status") ?? "DRAFT")),
-  });
+  if (brandId) {
+    if (!idSchema.safeParse(brandId).success) redirect("/admin/brands");
+    await updateBrand({ id: brandId, name, slug, logoUrl, sortOrder, enabled });
+  } else {
+    await createBrand({ name, slug, logoUrl, sortOrder, enabled });
+  }
 
+  redirect("/admin/brands");
+}
+
+export async function deleteBrandAction(formData: FormData) {
+  await authorizeAdminMutation();
+  const brandId = String(formData.get("brandId") ?? "");
+  if (!idSchema.safeParse(brandId).success) redirect("/admin/brands");
+  const result = await deleteBrandById(brandId);
+  if (!result.ok) redirect(`/admin/brands?error=${encodeURIComponent(result.reason)}`);
   redirect("/admin/brands");
 }
 

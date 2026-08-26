@@ -13,6 +13,8 @@
     "e2e:catalogue-localization": "tsx scripts/playwright-catalogue-localization-e2e.ts",
     "e2e:locale-switch": "tsx scripts/playwright-locale-switch-e2e.ts",
     "catalogue:populate-content": "tsx scripts/populate-catalogue-content.ts",
+    "brands:seed": "tsx scripts/seed-brands.ts",
+    "e2e:brands": "tsx scripts/playwright-admin-brands-e2e.ts",
     "hero:import-fancy-suit": "tsx scripts/import-fancy-suit-hero.ts",
     "hero:normalize-super-market-cta": "tsx scripts/normalize-super-market-cta.ts",
     "readiness:check": "tsx scripts/check-production-readiness.ts",

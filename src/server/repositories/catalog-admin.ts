@@ -73,20 +73,36 @@ export async function listBrandTranslations() {
 }
 
 export async function listBrands() {
-  return db.select().from(brands).orderBy(desc(brands.createdAt));
+  return db.select().from(brands).orderBy(asc(brands.sortOrder), asc(brands.name), desc(brands.createdAt));
 }
 
-export async function createBrand(input: { slug: string; status: "DRAFT" | "PUBLISHED" | "ARCHIVED"; logoImageId?: string | null }) {
+export async function createBrand(input: { name: string; slug: string; logoUrl?: string | null; sortOrder?: number; enabled?: boolean; status?: "DRAFT" | "PUBLISHED" | "ARCHIVED"; logoImageId?: string | null }) {
   const rows = await db
     .insert(brands)
     .values({
+      name: input.name,
       slug: input.slug,
-      status: input.status,
+      logoUrl: input.logoUrl ?? null,
+      sortOrder: input.sortOrder ?? 0,
+      enabled: input.enabled ?? true,
+      status: input.status ?? "PUBLISHED",
       logoImageId: input.logoImageId ?? null,
     })
     .returning();
 
   return rows[0] ?? null;
+}
+
+export async function updateBrand(input: { id: string; name: string; slug: string; logoUrl?: string | null; sortOrder: number; enabled: boolean }) {
+  const rows = await db.update(brands).set({ name: input.name, slug: input.slug, logoUrl: input.logoUrl ?? null, sortOrder: input.sortOrder, enabled: input.enabled, status: input.enabled ? "PUBLISHED" : "DRAFT" }).where(eq(brands.id, input.id)).returning();
+  return rows[0] ?? null;
+}
+
+export async function deleteBrandById(id: string) {
+  const referenced = await db.select({ id: products.id }).from(products).where(eq(products.brandId, id)).limit(1);
+  if (referenced.length) return { ok: false as const, reason: "Brand is assigned to a product and cannot be deleted. Disable it instead." };
+  const rows = await db.delete(brands).where(eq(brands.id, id)).returning();
+  return rows[0] ? { ok: true as const, brand: rows[0] } : { ok: false as const, reason: "Brand not found." };
 }
 
 export async function listAttributes() {

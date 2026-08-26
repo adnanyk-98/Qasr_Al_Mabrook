@@ -26,7 +26,12 @@ import {
   variantCombinations,
   variantDefinitions,
   variantImages,
+  brands,
 } from "@/db/schema";
+
+export async function getPublishedBrands() {
+  return db.select({ id: brands.id, name: brands.name, logoUrl: brands.logoUrl }).from(brands).where(and(eq(brands.enabled, true), eq(brands.status, "PUBLISHED"))).orderBy(asc(brands.sortOrder), asc(brands.name));
+}
 
 export async function listPublishedHomepageSections() {
   return db

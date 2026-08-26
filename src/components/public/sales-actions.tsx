@@ -10,7 +10,7 @@ export async function SalesActions({ locale, phone, email, whatsapp, productName
   return (
     <div className="flex flex-wrap gap-3">
       <a href={localePath(locale, productSlug ? `/request-quote?source=PRODUCT&product=${encodeURIComponent(productSlug)}${variantId ? `&variant=${encodeURIComponent(variantId)}` : ""}` : "/request-quote?source=CONTACT")}>
-        <Button variant="primary">{locale === "ar" ? "طلب عرض سعر" : "Request Quote"}</Button>
+        <Button variant="primary" size="lg">{locale === "ar" ? "طلب عرض سعر" : "Request Quote"}</Button>
       </a>
       {cleanWhatsapp ? <a href={`https://wa.me/${cleanWhatsapp}`} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center rounded-[var(--radius-md)] bg-[var(--brand-primary-light)] px-4 text-sm font-medium text-[var(--brand-primary)]">{t("whatsapp")}</a> : null}
       {phone ? <a href={`tel:${phone}`} className="inline-flex h-10 items-center rounded-[var(--radius-md)] border border-[var(--brand-border)] bg-white px-4 text-sm font-medium text-[var(--foreground)]">{t("call")}</a> : null}

@@ -377,14 +377,14 @@ export function HeroCarousel({
       ref={rootRef}
       id={id}
       dir={locale === "ar" ? "rtl" : "ltr"}
-      className="relative overflow-hidden border border-[var(--brand-border)] bg-[var(--brand-surface-alt)] shadow-[var(--shadow-md)]"
+      className="relative overflow-hidden max-w-full border border-[var(--brand-border)] bg-[var(--brand-surface-alt)] shadow-[var(--shadow-md)] [contain:paint]"
       tabIndex={0}
       role="region"
       aria-roledescription="carousel"
       aria-label={id}
       aria-live="polite"
     >
-      <div className="relative w-full overflow-hidden">
+      <div className="relative w-full h-full max-w-full overflow-hidden">
         <div
           className="w-full flex transition-transform duration-500 ease-out"
           style={{ transform: `translateX(${direction * active * 100}%)` }}

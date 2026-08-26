@@ -76,6 +76,11 @@ export async function listBrands() {
   return db.select().from(brands).orderBy(asc(brands.sortOrder), asc(brands.name), desc(brands.createdAt));
 }
 
+export async function getBrandById(id: string) {
+  const rows = await db.select().from(brands).where(eq(brands.id, id)).limit(1);
+  return rows[0] ?? null;
+}
+
 export async function createBrand(input: { name: string; slug: string; logoUrl?: string | null; sortOrder?: number; enabled?: boolean; status?: "DRAFT" | "PUBLISHED" | "ARCHIVED"; logoImageId?: string | null }) {
   const rows = await db
     .insert(brands)

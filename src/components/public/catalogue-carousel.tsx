@@ -113,7 +113,7 @@ export function CatalogueCarousel({
   );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 overflow-hidden">
       <div className="flex items-end justify-between gap-4">
         {title}
 
@@ -178,7 +178,7 @@ export function CatalogueCarousel({
           aria-roledescription="carousel"
           aria-label={id}
           onKeyDown={handleKeyDown}
-          className="overflow-x-auto pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          className="relative overflow-x-auto max-w-full pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         >
           <div className="flex w-full items-stretch gap-4 md:gap-5 lg:gap-6">
             {items.map((item, index) => (

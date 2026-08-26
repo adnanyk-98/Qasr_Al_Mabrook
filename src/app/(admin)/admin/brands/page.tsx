@@ -3,7 +3,7 @@ import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Input, Label } from "@/components/ui/form";
 import { BrandLogoField } from "@/components/admin/brand-logo-field";
 import { listBrands } from "@/server/repositories/catalog-admin";
-import { deleteBrandAction, upsertBrandAction } from "@/server/services/admin-catalog";
+import { deleteBrandAction, upsertBrandAction } from "./actions";
 import { requireAdminSession } from "@/server/services/admin-auth";
 
 export default async function BrandsPage({ searchParams }: { searchParams: Promise<{ edit?: string; error?: string }> }) {

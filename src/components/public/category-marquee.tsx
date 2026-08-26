@@ -93,7 +93,7 @@ export function CategoryMarquee({ locale, categories }: { locale: "en" | "ar"; c
   return (
     <div
       ref={viewportRef}
-      className="qam-category-viewport relative w-full min-w-0 h-full max-h-full overflow-hidden py-3 touch-pan-y [contain:layout_style_paint]"
+      className="qam-category-viewport relative w-full min-w-0 overflow-hidden py-3 touch-pan-y [contain:paint]"
       role="region"
       aria-roledescription="carousel"
       aria-label={locale === "ar" ? "تصفح الفئات" : "Browse categories"}
@@ -102,7 +102,7 @@ export function CategoryMarquee({ locale, categories }: { locale: "en" | "ar"; c
       onPointerUp={handlePointerEnd}
       onPointerCancel={handlePointerEnd}
     >
-      <div ref={trackRef} dir={locale === "ar" ? "rtl" : "ltr"} className={`qam-category-track absolute inset-y-0 left-0 flex w-max max-w-full min-w-full h-full shrink-0 ${reducedMotion ? "[animation-play-state:paused]" : ""}`}>
+      <div ref={trackRef} dir={locale === "ar" ? "rtl" : "ltr"} className={`qam-category-track flex w-max ${reducedMotion ? "[animation-play-state:paused]" : ""}`}>
         {loopItems.map(({ category, copy }, index) => (
           <Link
             key={`${category.id}-${copy}-${index}`}

@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 
 import { db } from "@/db";
 import {
@@ -11,6 +11,7 @@ import {
   categoryAttributes,
   categoryTranslations,
   homepageSections,
+  homepageDeals,
   productCategories,
   productImages,
   productTranslations,
@@ -157,6 +158,70 @@ export async function createAttributeValue(input: { attributeId: string; code: s
 
 export async function listProducts() {
   return db.select().from(products).orderBy(desc(products.createdAt));
+}
+
+async function attachAdminProductImages(items: Array<typeof products.$inferSelect & { name: string }>) {
+  const productIds = items.map((product) => product.id);
+  const images = productIds.length
+    ? await db.select().from(productImages).where(inArray(productImages.productId, productIds))
+    : [];
+
+  return items.map((product) => {
+    const productImagesForProduct = images.filter((image) => image.productId === product.id);
+    const primaryImage = productImagesForProduct.find((image) => image.id === product.primaryImageId) ?? productImagesForProduct.find((image) => image.isPrimary) ?? productImagesForProduct[0];
+    return { ...product, primaryImageUrl: primaryImage?.publicUrl ?? null };
+  });
+}
+
+export async function listHomepageDeals() {
+  const rows = await db
+    .select({ deal: homepageDeals, product: products, translation: productTranslations })
+    .from(homepageDeals)
+    .innerJoin(products, eq(homepageDeals.productId, products.id))
+    .leftJoin(productTranslations, and(eq(productTranslations.productId, products.id), eq(productTranslations.locale, "en")))
+    .orderBy(asc(homepageDeals.sortOrder), asc(homepageDeals.createdAt));
+  const productsWithNames = await attachAdminProductImages(rows.map(({ product, translation }) => ({ ...product, name: translation?.name ?? product.slug })));
+  const productMap = new Map(productsWithNames.map((product) => [product.id, product]));
+  return rows.map(({ deal }) => ({ ...deal, product: productMap.get(deal.productId)! }));
+}
+
+export async function getHomepageDealById(id: string) {
+  const deals = await listHomepageDeals();
+  return deals.find((deal) => deal.id === id) ?? null;
+}
+
+export async function getHomepageDealByProductId(productId: string) {
+  const deals = await listHomepageDeals();
+  return deals.find((deal) => deal.productId === productId) ?? null;
+}
+
+export async function createHomepageDeal(input: { productId: string; discountPercent: number; isActive: boolean; sortOrder: number }) {
+  const rows = await db.insert(homepageDeals).values(input).returning();
+  return rows[0] ?? null;
+}
+
+export async function updateHomepageDeal(input: { id: string; productId: string; discountPercent: number; isActive: boolean; sortOrder: number }) {
+  const rows = await db.update(homepageDeals).set({ ...input, updatedAt: new Date() }).where(eq(homepageDeals.id, input.id)).returning();
+  return rows[0] ?? null;
+}
+
+export async function deactivateHomepageDeal(id: string) {
+  const rows = await db.update(homepageDeals).set({ isActive: false, updatedAt: new Date() }).where(eq(homepageDeals.id, id)).returning();
+  return rows[0] ?? null;
+}
+
+export async function listProductsForDealSelector(search = "") {
+  const trimmedSearch = search.trim();
+  const searchClause = trimmedSearch
+    ? sql`(products.slug ILIKE ${"%" + trimmedSearch + "%"} OR products.default_sku ILIKE ${"%" + trimmedSearch + "%"} OR EXISTS (SELECT 1 FROM product_translations pt WHERE pt.product_id = products.id AND pt.locale = 'en' AND pt.name ILIKE ${"%" + trimmedSearch + "%"}))`
+    : undefined;
+  const rows = await db
+    .select({ product: products, translation: productTranslations })
+    .from(products)
+    .leftJoin(productTranslations, and(eq(productTranslations.productId, products.id), eq(productTranslations.locale, "en")))
+    .where(and(eq(products.status, "PUBLISHED"), searchClause as any))
+    .orderBy(asc(productTranslations.name), asc(products.slug));
+  return attachAdminProductImages(rows.map(({ product, translation }) => ({ ...product, name: translation?.name ?? product.slug })));
 }
 
 export async function listProductsPaginated({ page = 1, pageSize = 10, search = "" }: { page?: number; pageSize?: number; search?: string }) {

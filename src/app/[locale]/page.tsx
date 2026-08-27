@@ -13,7 +13,7 @@ import { TestimonialsSection } from "@/components/public/testimonials-section";
 import { BrandsSection } from "@/components/public/brands-section";
 import { HomeIntroSection } from "@/components/public/home-intro-section";
 import { SpecialOffersSection } from "@/components/public/special-offers-section";
-import { listPublishedCategories, listPublishedHomepageSections, listPublishedProducts, getPublishedBrands } from "@/server/repositories/public-catalog";
+import { listPublishedCategories, listPublishedHomepageDeals, listPublishedHomepageSections, listPublishedProducts, getPublishedBrands } from "@/server/repositories/public-catalog";
 import { localePath, locales, type Locale } from "@/lib/locales";
 import { readLocalizedConfigString } from "@/lib/homepage-content";
 import { getTranslations } from "next-intl/server";
@@ -61,11 +61,12 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ loc
   const currentLocale = locale as Locale;
   const t = await getTranslations({ locale: currentLocale, namespace: "home" });
   const highlights = await getTranslations({ locale: currentLocale, namespace: "highlights" });
-  const [sections, categories, featuredProducts, brands] = await Promise.all([
+  const [sections, categories, featuredProducts, brands, deals] = await Promise.all([
     listPublishedHomepageSections(),
     listPublishedCategories(currentLocale),
     listPublishedProducts(currentLocale, { limit: 6 }),
     getPublishedBrands(),
+    listPublishedHomepageDeals(currentLocale),
   ]);
   const heroSections = sections.filter((section) => section.sectionType.toUpperCase() === "HERO");
   const heroBanners = heroSections.map((section) => ({
@@ -144,31 +145,15 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ loc
 
         <SpecialOffersSection
           locale={currentLocale}
-          offers={[
-            {
-              title: t("dealFormalSuits"),
-              discount: t("dealFormalDiscount"),
-              imageUrl: "/catalogue/FANCY%20SUIT/FANCY%20SUIT-%2301.jpg",
-              imageAlt: t("dealFormalSuits"),
-              href: localePath(currentLocale, "/products/fancy-suit"),
-              productSlug: "fancy-suit",
-            },
-            {
-              title: t("dealCasualShoes"),
-              discount: t("dealCasualDiscount"),
-              imageUrl: null,
-              imageAlt: t("dealCasualShoes"),
-              href: localePath(currentLocale, "/products"),
-            },
-            {
-              title: t("dealHardware"),
-              discount: t("dealHardwareDiscount"),
-              imageUrl: "/catalogue/Measuring%20Tape/5M-Measuring-Tape-Green-%2301.jpg",
-              imageAlt: t("dealHardware"),
-              href: localePath(currentLocale, "/products/5m-measuring-tape-green"),
-              productSlug: "5m-measuring-tape-green",
-            },
-          ]}
+          offers={deals.map((deal) => ({
+            title: deal.product.name,
+            discount: t("dealDiscount", { percent: deal.discountPercent }),
+            imageUrl: deal.product.primaryImageUrl,
+            imageAlt: deal.product.primaryImageAlt ?? deal.product.name,
+            href: localePath(currentLocale, `/products/${deal.product.slug}`),
+            productId: deal.product.id,
+            productSlug: deal.product.slug,
+          }))}
         />
 
         <HomeIntroSection locale={currentLocale} />

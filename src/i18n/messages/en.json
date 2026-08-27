@@ -85,7 +85,8 @@
     "dealHardware": "Hardware Essentials",
     "dealFormalDiscount": "Up to 20% off",
     "dealCasualDiscount": "Up to 15% off",
-    "dealHardwareDiscount": "Up to 25% off"
+    "dealHardwareDiscount": "Up to 25% off",
+    "dealDiscount": "Up to {percent}% off"
   },
   "highlights": {
     "eyebrow": "Our difference",

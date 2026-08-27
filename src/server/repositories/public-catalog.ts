@@ -12,6 +12,7 @@ import {
   categoryAttributes,
   categoryTranslations,
   homepageSections,
+  homepageDeals,
   productAttributeValues,
   productCategories,
   productImages,
@@ -39,6 +40,32 @@ export async function listPublishedHomepageSections() {
     .from(homepageSections)
     .where(eq(homepageSections.status, "PUBLISHED"))
     .orderBy(asc(homepageSections.sortOrder), desc(homepageSections.createdAt));
+}
+
+export async function listPublishedHomepageDeals(locale: Locale, limit = 3) {
+  const rows = await db
+    .select({ deal: homepageDeals, product: products })
+    .from(homepageDeals)
+    .innerJoin(products, eq(homepageDeals.productId, products.id))
+    .where(and(eq(homepageDeals.isActive, true), eq(products.status, "PUBLISHED")))
+    .orderBy(asc(homepageDeals.sortOrder), asc(homepageDeals.createdAt))
+    .limit(limit);
+
+  const productIds = rows.map(({ product }) => product.id);
+  const translations = productIds.length
+    ? await db.select().from(productTranslations).where(inArray(productTranslations.productId, productIds))
+    : [];
+  const localizedProducts = rows.map(({ deal, product }) => {
+    const candidates = translations.filter((translation) => translation.productId === product.id);
+    const translation = candidates.find((candidate) => candidate.locale === locale) ?? candidates.find((candidate) => candidate.locale === "en");
+    return { ...product, name: translation?.name ?? product.slug, deal };
+  });
+  const withImages = await attachPrimaryImages(localizedProducts, locale);
+
+  return withImages.map(({ deal, ...product }) => ({
+    ...deal,
+    product,
+  }));
 }
 
 export async function getPublishedStaticPage(locale: Locale, slug: string) {

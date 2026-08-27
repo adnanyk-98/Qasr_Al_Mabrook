@@ -8,6 +8,34 @@
       "when": 1787256110509,
       "tag": "0000_swift_pretty_boy",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1787256110510,
+      "tag": "0001_add_category_image",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1787256110511,
+      "tag": "0002_unique_category_translation_locale",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1787256110512,
+      "tag": "0003_homepage_brands",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1787256110513,
+      "tag": "0004_homepage_deals",
+      "breakpoints": true
     }
   ]
 }

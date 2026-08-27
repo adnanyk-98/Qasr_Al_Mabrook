@@ -85,7 +85,8 @@
     "dealHardware": "مستلزمات الأدوات",
     "dealFormalDiscount": "خصم يصل إلى 20٪",
     "dealCasualDiscount": "خصم يصل إلى 15٪",
-    "dealHardwareDiscount": "خصم يصل إلى 25٪"
+    "dealHardwareDiscount": "خصم يصل إلى 25٪",
+    "dealDiscount": "خصم يصل إلى {percent}٪"
   },
   "highlights": {
     "eyebrow": "ما يميزنا",

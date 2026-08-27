@@ -19,6 +19,8 @@
     "hero:normalize-super-market-cta": "tsx scripts/normalize-super-market-cta.ts",
     "readiness:check": "tsx scripts/check-production-readiness.ts",
     "db:migration:check": "drizzle-kit check",
+    "db:migration:verify-baseline": "tsx scripts/verify-migration-baseline.ts",
+    "db:migration:adopt-baseline": "tsx scripts/adopt-migration-baseline.ts",
     "db:migration:apply": "tsx scripts/apply-migrations.ts",
     "db:bootstrap-admin": "tsx scripts/bootstrap-admin.ts",
     "db:reset-admin-password": "tsx scripts/reset-admin-password.ts",

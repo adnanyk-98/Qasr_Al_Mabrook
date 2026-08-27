@@ -17,7 +17,7 @@ function parseHostPort(connString: string) {
 async function tryConnect(url: string, timeoutMs = 5000) {
   let sql: any;
   try {
-    sql = postgres(url, { ssl: false });
+    sql = postgres(url, { ssl: 'require' });
     const p = sql`select 1 as ok`;
     const res = await Promise.race([
       p,

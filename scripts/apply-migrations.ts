@@ -27,6 +27,13 @@ if (confirmation !== 'APPLY_MIGRATIONS') {
   // spawn drizzle-kit migrate with the chosen DB URL available as DIRECT_DATABASE_URL
   const env = { ...process.env, DIRECT_DATABASE_URL: sel.url };
   const command = process.platform === 'win32' ? 'npx.cmd' : 'npx';
-  const result = spawnSync(command, ['drizzle-kit', 'migrate'], { stdio: 'inherit', env });
+  const args = ['drizzle-kit', 'migrate'];
+  const result = spawnSync(command, args, { stdio: 'inherit', env, shell: process.platform === 'win32' });
+  if (result.status !== 0) {
+    console.error('Migration command:', [command, ...args].join(' '));
+    console.error('Migration exit status:', result.status);
+    console.error('Migration signal:', result.signal ?? 'none');
+    if (result.error) console.error('Migration spawn error:', result.error.message);
+  }
   process.exit(result.status ?? 1);
 })();

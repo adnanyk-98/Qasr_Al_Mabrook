@@ -51,6 +51,16 @@ export function HeroCarousel({
   const suppressClickRef = useRef(false);
   const autoplayTimerRef = useRef<number | null>(null);
   const direction = locale === "ar" ? 1 : -1;
+
+  const restartAutoplay = useCallback(() => {
+    if (autoplayTimerRef.current) window.clearInterval(autoplayTimerRef.current);
+    autoplayTimerRef.current = null;
+    if (autoplay && !reducedMotion && banners.length > 1 && document.visibilityState === "visible") {
+      autoplayTimerRef.current = window.setInterval(() => {
+        if (document.visibilityState === "visible") setActive((current) => current + 1);
+      }, autoplayInterval);
+    }
+  }, [autoplay, autoplayInterval, banners.length, reducedMotion]);
   
   const bannerSignature = useMemo(
     () => banners.map((banner) => [banner.desktopImageUrl, banner.mobileImageUrl, banner.imageUrl, banner.title, banner.subtitle, banner.ctaLabel, banner.ctaHref].join("\u0001")).join("\u0002"),
@@ -87,15 +97,10 @@ export function HeroCarousel({
       setActive(index);
       // reset autoplay timer on manual navigation
       if (autoplay) {
-        if (autoplayTimerRef.current) window.clearInterval(autoplayTimerRef.current);
-        if (!reducedMotion && banners.length > 1) {
-          autoplayTimerRef.current = window.setInterval(() => {
-            setActive((c) => c + 1);
-          }, autoplayInterval);
-        }
+        restartAutoplay();
       }
     },
-    [autoplay, autoplayInterval, banners.length, reducedMotion],
+    [autoplay, restartAutoplay],
   );
 
   const prev = useCallback(() => goTo(active - 1), [active, goTo]);
@@ -113,15 +118,47 @@ export function HeroCarousel({
   useEffect(() => {
     // centralised autoplay management with infinite looping
     if (!autoplay || reducedMotion || banners.length <= 1) return;
-    if (autoplayTimerRef.current) window.clearInterval(autoplayTimerRef.current);
-    autoplayTimerRef.current = window.setInterval(() => {
-      setActive((current) => current + 1);
-    }, autoplayInterval);
+    restartAutoplay();
     return () => {
       if (autoplayTimerRef.current) window.clearInterval(autoplayTimerRef.current);
       autoplayTimerRef.current = null;
     };
-  }, [autoplay, autoplayInterval, banners.length, reducedMotion]);
+  }, [autoplay, banners.length, reducedMotion, restartAutoplay]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      const root = rootRef.current;
+      const container = root?.querySelector('.relative.w-full.overflow-hidden') as HTMLElement | null;
+      const slider = container?.querySelector('.w-full.flex') as HTMLElement | null;
+
+      if (document.visibilityState === "hidden") {
+        if (autoplayTimerRef.current) window.clearInterval(autoplayTimerRef.current);
+        autoplayTimerRef.current = null;
+        return;
+      }
+
+      if (banners.length === 0) return;
+
+      const nextActive = ((active - 1) % banners.length + banners.length) % banners.length + 1;
+      isRepositioningRef.current = true;
+      if (slider) {
+        slider.style.transition = "none";
+        slider.style.transform = `translateX(${direction * nextActive * 100}%)`;
+      }
+      setActive(nextActive);
+      requestAnimationFrame(() => {
+        isRepositioningRef.current = false;
+        if (slider) slider.style.transition = "";
+      });
+
+      if (autoplay && !reducedMotion && banners.length > 1) {
+        restartAutoplay();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, [active, autoplay, autoplayInterval, banners.length, direction, reducedMotion, restartAutoplay]);
 
   // Handle infinite loop repositioning
   // Handle infinite loop repositioning when transition completes
@@ -304,10 +341,7 @@ export function HeroCarousel({
       }, 50);
 
       // restart autoplay timer with infinite looping
-      if (autoplay && !reducedMotion && banners.length > 1) {
-        if (autoplayTimerRef.current) window.clearInterval(autoplayTimerRef.current);
-        autoplayTimerRef.current = window.setInterval(() => setActive((c) => c + 1), autoplayInterval);
-      }
+      if (autoplay && !reducedMotion && banners.length > 1) restartAutoplay();
     };
 
     const onPointerCancel = (e: PointerEvent) => {

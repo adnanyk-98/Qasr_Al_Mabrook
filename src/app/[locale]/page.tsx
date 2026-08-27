@@ -7,12 +7,12 @@ import { CatalogueCarousel } from "@/components/public/catalogue-carousel";
 import { CategoryMarquee } from "@/components/public/category-marquee";
 import { Container, Section } from "@/components/ui/layout";
 import { ProductCard } from "@/components/public/product-card";
-import { PromotionalBanner } from "@/components/public/promotional-banner";
-import { PublicImageSlot } from "@/components/public/public-image-slot";
 import { HeroCarousel } from "@/components/public/hero-carousel";
 import { PublicShell } from "@/components/public/public-shell";
 import { TestimonialsSection } from "@/components/public/testimonials-section";
 import { BrandsSection } from "@/components/public/brands-section";
+import { HomeIntroSection } from "@/components/public/home-intro-section";
+import { SpecialOffersSection } from "@/components/public/special-offers-section";
 import { listPublishedCategories, listPublishedHomepageSections, listPublishedProducts, getPublishedBrands } from "@/server/repositories/public-catalog";
 import { localePath, locales, type Locale } from "@/lib/locales";
 import { readLocalizedConfigString } from "@/lib/homepage-content";
@@ -68,7 +68,6 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ loc
     getPublishedBrands(),
   ]);
   const heroSections = sections.filter((section) => section.sectionType.toUpperCase() === "HERO");
-  const promotionalSections = sections.filter((section) => !heroSections.includes(section));
   const heroBanners = heroSections.map((section) => ({
     desktopImageUrl: readLocalizedConfigString(section.configurationJson, "desktopImageUrl", currentLocale) ?? readLocalizedConfigString(section.configurationJson, "imageUrl", currentLocale) ?? null,
     mobileImageUrl: readLocalizedConfigString(section.configurationJson, "mobileImageUrl", currentLocale) ?? null,
@@ -141,22 +140,38 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ loc
           </div>
         </section>
 
-        {promotionalSections.length > 0 ? (
-          <Section className="py-0">
-            <Container className="space-y-6">
-              {promotionalSections.map((section) => {
-                const title = readLocalizedConfigString(section.configurationJson, "title", currentLocale) ?? t("featuredCollection");
-                const subtitle = readLocalizedConfigString(section.configurationJson, "subtitle", currentLocale);
-                const imageUrl = readLocalizedConfigString(section.configurationJson, "imageUrl", currentLocale) ?? readLocalizedConfigString(section.configurationJson, "image", currentLocale);
-                const imageAlt = readLocalizedConfigString(section.configurationJson, "imageAlt", currentLocale) ?? title;
-                const ctaLabel = readLocalizedConfigString(section.configurationJson, "ctaLabel", currentLocale);
-                const ctaHref = readLocalizedConfigString(section.configurationJson, "ctaHref", currentLocale);
+        <BrandsSection locale={currentLocale} brands={brands.filter((brand): brand is typeof brand & { logoUrl: string } => Boolean(brand.logoUrl))} />
 
-                return <PromotionalBanner key={section.id} locale={currentLocale} title={title} subtitle={subtitle} imageUrl={imageUrl} imageAlt={imageAlt} ctaLabel={ctaLabel} ctaHref={ctaHref} />;
-              })}
-            </Container>
-          </Section>
-        ) : null}
+        <SpecialOffersSection
+          locale={currentLocale}
+          offers={[
+            {
+              title: t("dealFormalSuits"),
+              discount: t("dealFormalDiscount"),
+              imageUrl: "/catalogue/FANCY%20SUIT/FANCY%20SUIT-%2301.jpg",
+              imageAlt: t("dealFormalSuits"),
+              href: localePath(currentLocale, "/products/fancy-suit"),
+              productSlug: "fancy-suit",
+            },
+            {
+              title: t("dealCasualShoes"),
+              discount: t("dealCasualDiscount"),
+              imageUrl: null,
+              imageAlt: t("dealCasualShoes"),
+              href: localePath(currentLocale, "/products"),
+            },
+            {
+              title: t("dealHardware"),
+              discount: t("dealHardwareDiscount"),
+              imageUrl: "/catalogue/Measuring%20Tape/5M-Measuring-Tape-Green-%2301.jpg",
+              imageAlt: t("dealHardware"),
+              href: localePath(currentLocale, "/products/5m-measuring-tape-green"),
+              productSlug: "5m-measuring-tape-green",
+            },
+          ]}
+        />
+
+        <HomeIntroSection locale={currentLocale} />
 
         <Section className="!pt-8 !pb-8 sm:!pt-10 sm:!pb-12">
           <Container className="space-y-6">
@@ -206,7 +221,6 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ loc
             />
           </Container>
         </Section>
-        <BrandsSection locale={currentLocale} brands={brands.filter((brand): brand is typeof brand & { logoUrl: string } => Boolean(brand.logoUrl))} />
         <TestimonialsSection locale={currentLocale} />
       </main>
     </PublicShell>

@@ -57,7 +57,7 @@ export function HeroCarousel({
     autoplayTimerRef.current = null;
     if (autoplay && !reducedMotion && banners.length > 1 && document.visibilityState === "visible") {
       autoplayTimerRef.current = window.setInterval(() => {
-        if (document.visibilityState === "visible") setActive((current) => current + 1);
+        if (document.visibilityState === "visible") setActive((current) => Math.min(current + 1, banners.length + 1));
       }, autoplayInterval);
     }
   }, [autoplay, autoplayInterval, banners.length, reducedMotion]);
@@ -103,8 +103,8 @@ export function HeroCarousel({
     [autoplay, restartAutoplay],
   );
 
-  const prev = useCallback(() => goTo(active - 1), [active, goTo]);
-  const next = useCallback(() => goTo(active + 1), [active, goTo]);
+  const prev = useCallback(() => goTo(Math.max(0, active - 1)), [active, goTo]);
+  const next = useCallback(() => goTo(Math.min(banners.length + 1, active + 1)), [active, banners.length, goTo]);
 
   useEffect(() => {
     setActive(1); // Reset to first real slide
@@ -322,9 +322,9 @@ export function HeroCarousel({
       // decide change with infinite looping
       if (Math.abs(dx) > THRESHOLD) {
         if (dx < 0) {
-          setActive((c) => c + 1);
+          setActive((c) => Math.min(c + 1, banners.length + 1));
         } else {
-          setActive((c) => c - 1);
+          setActive((c) => Math.max(c - 1, 0));
         }
       } else {
         // snap back

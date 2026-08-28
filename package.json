@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit",
     "e2e:catalogue-localization": "tsx scripts/playwright-catalogue-localization-e2e.ts",
     "e2e:locale-switch": "tsx scripts/playwright-locale-switch-e2e.ts",
+    "e2e:hero-carousel": "tsx scripts/playwright-hero-carousel-e2e.ts",
     "catalogue:populate-content": "tsx scripts/populate-catalogue-content.ts",
     "brands:seed": "tsx scripts/seed-brands.ts",
     "e2e:brands": "tsx scripts/playwright-admin-brands-e2e.ts",

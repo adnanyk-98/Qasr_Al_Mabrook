@@ -167,7 +167,9 @@ export function HeroCarousel({
     const container = rootRef.current.querySelector('.relative.w-full.overflow-hidden') as HTMLElement | null;
     const slider = container?.querySelector('.w-full.flex') as HTMLElement | null;
     if (!container || !slider) return;
-    const handleTransitionEnd = () => {
+    const handleTransitionEnd = (event: TransitionEvent) => {
+      if (event.target !== slider) return;
+      if (event.propertyName !== 'transform') return;
       if (active === 0) {
         isRepositioningRef.current = true;
         slider.style.transition = 'none';

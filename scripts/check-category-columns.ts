@@ -18,7 +18,7 @@ async function main() {
       where table_name = 'categories'
         and column_name in ('image_object_key','image_public_url','image_width','image_height')
     `;
-    const found = cols.map((r: any) => r.column_name);
+    const found = cols.map((r) => (r as { column_name: string }).column_name);
     console.log('Found columns:', found);
     const missing = ['image_object_key','image_public_url','image_width','image_height'].filter(c => !found.includes(c));
     if (missing.length) {
@@ -27,8 +27,9 @@ async function main() {
     }
     console.log('All expected columns exist.');
     process.exit(0);
-  } catch (e: any) {
-    console.error('Error querying DB:', e.message ?? e);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('Error querying DB:', message);
     process.exit(1);
   } finally {
     await sql.end();

@@ -2,14 +2,18 @@ import { NextResponse } from "next/server";
 import { getCurrentAdmin } from "@/server/services/admin-auth";
 import { deleteCategoryById } from "@/server/repositories/catalog-admin";
 
+type DeleteRequestBody = {
+  categoryId?: string;
+};
+
 export async function POST(request: Request) {
   const admin = await getCurrentAdmin();
   if (!admin) return NextResponse.json({ success: false, error: "Not authenticated" }, { status: 401 });
 
-  let body: any;
+  let body: DeleteRequestBody;
   try {
-    body = await request.json();
-  } catch (e) {
+    body = (await request.json()) as DeleteRequestBody;
+  } catch {
     return NextResponse.json({ success: false, error: "Invalid JSON" }, { status: 400 });
   }
 
@@ -18,12 +22,13 @@ export async function POST(request: Request) {
 
   try {
     const result = await deleteCategoryById(categoryId);
-    if (result && (result as any).ok === false) {
-      return NextResponse.json({ success: false, error: (result as any).reason }, { status: 400 });
+    if (result && typeof result === "object" && "ok" in result && result.ok === false) {
+      const failure = result as { reason?: string };
+      return NextResponse.json({ success: false, error: String(failure.reason ?? "Delete failed") }, { status: 400 });
     }
     return NextResponse.json({ success: true });
-  } catch (e: any) {
-    console.error(e);
-    return NextResponse.json({ success: false, error: String(e?.message ?? e) }, { status: 500 });
+  } catch (error: unknown) {
+    console.error(error);
+    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }

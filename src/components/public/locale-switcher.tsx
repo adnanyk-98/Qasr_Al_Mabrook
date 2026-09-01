@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { getAlternateLocale, localePath, type Locale } from "@/lib/locales";
 import { TrackedLink } from "@/components/analytics/tracked-link";
 

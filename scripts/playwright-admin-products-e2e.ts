@@ -21,8 +21,8 @@ async function main() {
 
   // listeners
   const consoleMessages: string[] = [];
-  const requests: any[] = [];
-  const responses: any[] = [];
+  const requests: Array<{ url: string; method: string; postData: string | null }> = [];
+  const responses: Array<{ url: string; status: number; body: string | null }> = [];
   let dialogSeen: { type: string; message: string } | null = null;
   page.on('console', (c) => consoleMessages.push(`${c.type()}: ${c.text()}`));
   page.on('request', (r) => requests.push({ url: r.url(), method: r.method(), postData: r.postData() }));
@@ -163,13 +163,13 @@ async function main() {
     await sql`delete from products where slug like ${`e2e-pagination-product-${ts}-%`}`;
 
     console.log('Products E2E finished successfully');
-  } catch (e: any) {
+  } catch (error) {
     const now = Date.now();
     const html = await page.content().catch(() => '');
     fs.writeFileSync(path.join(outDir, `failure-${now}.html`), html);
     fs.writeFileSync(path.join(outDir, `console-${now}.log`), consoleMessages.join('\n'));
     fs.writeFileSync(path.join(outDir, `responses-${now}.json`), JSON.stringify(responses, null, 2));
-    console.error(e);
+    console.error(error);
     process.exit(2);
   } finally {
     await sql.end();

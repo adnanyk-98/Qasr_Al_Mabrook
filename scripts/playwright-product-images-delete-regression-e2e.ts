@@ -41,13 +41,15 @@ async function main() {
   const context = await browser.newContext();
   const page = await context.newPage();
   const consoleMessages: string[] = [];
-  const requests: any[] = [];
-  const responses: any[] = [];
+  const requests: Array<{ url: string; method: string; postData: string | null }> = [];
+  const responses: Array<{ url: string; status: number; body: string | null }> = [];
   page.on('console', (c) => consoleMessages.push(`${c.type()}: ${c.text()}`));
   page.on('request', (r) => requests.push({ url: r.url(), method: r.method(), postData: r.postData() }));
   page.on('response', async (r) => {
     let body: string | null = null;
-    try { body = await r.text(); } catch {};
+    try { body = await r.text(); } catch {
+      body = null;
+    }
     responses.push({ url: r.url(), status: r.status(), body });
   });
 
@@ -95,15 +97,11 @@ async function main() {
     process.exit(3);
   }
 
-  // capture expected ids and keys for deterministic assertions
-  const expectedImageIds = rows.map((r: any) => r.id);
-  const expectedObjectKeys = rows.map((r: any) => r.object_key);
-  const expectedPublicUrls = rows.map((r: any) => r.public_url);
-  const expectedPrimaryId = rows.find((r: any) => r.is_primary)?.id ?? null;
+  // Capture expected IDs for deterministic DOM assertions.
+  const expectedImageIds = rows.map((r) => r.id as string);
 
   // Choose a non-primary image to delete
-  const primary = rows.find((r: any) => r.is_primary);
-  const nonPrimary = rows.find((r: any) => !r.is_primary) as any;
+  const nonPrimary = rows.find((r) => !r.is_primary) as { object_key: string; id: string } | undefined;
   if (!nonPrimary) {
     console.error('No non-primary image to delete');
     process.exit(4);
@@ -120,7 +118,6 @@ async function main() {
   }
 
   // find the remove button for the non-primary image using the hidden input value
-  const objectKey = nonPrimary.object_key;
   const imageIdToDelete = nonPrimary.id;
   const removeButton = await page.$(`xpath=//div[.//input[@data-testid='product-image-id' and @value='${imageIdToDelete}']]//button[@data-testid='product-image-remove']`);
   if (!removeButton) throw new Error('Remove button not found for non-primary image');
@@ -175,7 +172,7 @@ async function main() {
   }
 
   // Now delete primary image
-  const primaryRow = rows.find((r: any) => r.is_primary) ?? rows[0];
+  const primaryRow = rows.find((r) => r.is_primary) ?? rows[0];
   // open edit
   await page.goto(`${base}/admin/products?edit=${productId}`);
   await page.waitForSelector('text=Editing:', { timeout: 20000 });
@@ -207,7 +204,7 @@ async function main() {
     console.error('Expected 1 product_images after deleting primary, got', rows.length);
     process.exit(6);
   }
-  const newPrimary = rows.find((r: any) => r.is_primary) ?? rows[0];
+  const newPrimary = rows.find((r) => r.is_primary) ?? rows[0];
   // verify products.primaryImageId
   const prodRow = await sql`select primary_image_id from products where id = ${productId} limit 1`;
   if ((prodRow[0].primary_image_id ?? null) !== (newPrimary.id ?? null)) {

@@ -1,4 +1,4 @@
-import { chromium, devices } from 'playwright';
+import { chromium } from 'playwright';
 
 const locales = ['en', 'ar'];
 const viewports = [ { width: 430, height: 932 }, { width: 412, height: 915 }, { width: 390, height: 844 } ];
@@ -8,7 +8,7 @@ async function inspect(locale: string, viewport: { width: number; height: number
   const context = await browser.newContext({ viewport });
   const page = await context.newPage();
 
-  const errors: any[] = [];
+  const errors: Array<{ kind: string; message: string }> = [];
   page.on('pageerror', (e) => errors.push({ kind: 'pageerror', message: String(e) }));
   page.on('console', (c) => { if (c.type() === 'error') errors.push({ kind: 'console', message: c.text() }); });
 
@@ -69,7 +69,7 @@ async function inspect(locale: string, viewport: { width: number; height: number
 }
 
 (async () => {
-  const results: any[] = [];
+  const results: Array<Awaited<ReturnType<typeof inspect>>> = [];
   for (const locale of locales) {
     for (const vp of viewports) {
       results.push(await inspect(locale, vp));

@@ -23,8 +23,8 @@ async function main() {
     });
     console.log('Migration applied');
     process.exit(0);
-  } catch (e: any) {
-    console.error('Migration failed:', e.message ?? e);
+  } catch (error: unknown) {
+    console.error('Migration failed:', error instanceof Error ? error.message : String(error));
     process.exit(1);
   } finally {
     await sql.end();

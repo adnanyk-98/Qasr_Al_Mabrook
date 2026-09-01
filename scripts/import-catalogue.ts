@@ -5,8 +5,6 @@ import {
   buildCatalogueImportPlan,
   validateLocalImportMode,
 } from "@/lib/catalogue-import";
-import { isLocalDatabaseUrl } from "@/lib/catalogue-import";
-
 const sourceArgument = process.argv.find((argument) =>
   argument.startsWith("--source="),
 );

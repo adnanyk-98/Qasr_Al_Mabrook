@@ -1,6 +1,6 @@
-import { chromium } from 'playwright';
+import { chromium, type Page } from 'playwright';
 
-const locales = ['en', 'ar'];
+const locales = ['en', 'ar'] as const;
 const viewports = [
   { width: 1920, height: 1080 },
   { width: 1440, height: 900 },
@@ -9,32 +9,18 @@ const viewports = [
   { width: 390, height: 844 },
 ];
 
-async function getActiveIndex(page: any, heroSelector = '#homepage-hero') {
-  return page.$eval(`${heroSelector} button[aria-label^='Go to slide'], ${heroSelector} button[aria-label^='الانتقال إلى الشريحة']`, () => null).catch(async () => {
-    // fallback: inspect dots
-    const res = await page.$$eval(`${heroSelector} button`, (btns: any) => {
-      for (let i = 0; i < btns.length; i++) {
-        const cls = (btns[i] as any).className as string;
-        if (cls.includes('w-9')) return i;
-      }
-      return null;
-    });
-    return res;
-  });
-}
-
-async function activeIndex(page: any, heroSelector = '#homepage-hero') {
-  const idx = await page.$$eval(`${heroSelector} button`, (btns: any) => {
+async function activeIndex(page: Page, heroSelector = '#homepage-hero') {
+  const idx = await page.$$eval(`${heroSelector} button`, (btns) => {
     for (let i = 0; i < btns.length; i++) {
-      const cls = (btns[i] as any).className as string;
-      if (cls.includes('w-9')) return i;
+      const cls = (btns[i] as HTMLButtonElement).className;
+      if (String(cls).includes('w-9')) return i;
     }
     return null;
   });
   return idx;
 }
 
-async function swipeOn(page: any, selector: string, startX: number, startY: number, endX: number, endY: number) {
+async function swipeOn(page: Page, selector: string, startX: number, startY: number, endX: number, endY: number) {
   await page.dispatchEvent(selector, 'pointerdown', { clientX: startX, clientY: startY, pointerId: 1 });
   // few moves
   const steps = 5;
@@ -49,7 +35,7 @@ async function swipeOn(page: any, selector: string, startX: number, startY: numb
 
 (async () => {
   const browser = await chromium.launch();
-  const results: any[] = [];
+  const results: Array<{ locale: string; viewport: { width: number; height: number }; before: number | null; afterNext: number | null; afterPrev: number | null; afterSmall: number | null; imgSrc: string }> = [];
   for (const locale of locales) {
     for (const vp of viewports) {
       const context = await browser.newContext({ viewport: vp });

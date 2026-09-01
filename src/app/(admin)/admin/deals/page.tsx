@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 import { DealProductSelector } from "@/components/admin/deal-product-selector";
 import { Button } from "@/components/ui/button";
@@ -58,7 +59,7 @@ export default async function DealsPage({ searchParams }: PageProps) {
                 </div>
                 <label className="flex items-center gap-2 text-sm text-[var(--foreground)]"><input type="checkbox" name="isActive" defaultChecked={editingDeal?.isActive ?? true} /> Active on homepage</label>
                 <Button type="submit" className="w-full">Save deal</Button>
-                {editingDeal ? <a href="/admin/deals" className="block text-center text-sm text-[var(--brand-primary)]">Cancel edit</a> : null}
+                {editingDeal ? <Link href="/admin/deals" className="block text-center text-sm text-[var(--brand-primary)]">Cancel edit</Link> : null}
               </form>
 
               <div className="mt-6 border-t border-[var(--brand-border)] pt-5">
@@ -86,7 +87,7 @@ export default async function DealsPage({ searchParams }: PageProps) {
                     <p className="text-xs text-[var(--text-muted)]">{deal.isActive ? "Active" : "Inactive"} · /products/{deal.product.slug}</p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <a href={`/admin/deals?edit=${deal.id}${productSearch ? `&productSearch=${encodeURIComponent(productSearch)}` : ""}`} className="text-sm text-[var(--brand-primary)]">Edit</a>
+                    <Link href={`/admin/deals?edit=${deal.id}${productSearch ? `&productSearch=${encodeURIComponent(productSearch)}` : ""}`} className="text-sm text-[var(--brand-primary)]">Edit</Link>
                     {deal.isActive ? <form action={deactivateHomepageDealAction}><input type="hidden" name="dealId" value={deal.id} /><button type="submit" className="text-sm text-red-600">Deactivate</button></form> : null}
                   </div>
                 </div>

@@ -44,14 +44,15 @@ function getSlideAriaLabel(locale: "en" | "ar", index: number) {
 }
 
 async function waitForHeroHydrated(page: Page, locale: "en" | "ar") {
-  await page.waitForFunction(({ locale: targetLocale }) => {
+  void locale;
+  await page.waitForFunction(() => {
     const hero = document.querySelector("#homepage-hero");
     if (!hero) return false;
     const indicators = Array.from(hero.querySelectorAll("button[aria-label^='Go to slide'], button[aria-label^='الانتقال إلى الشريحة']"));
     if (indicators.length !== 4) return false;
     const slideImages = Array.from(hero.querySelectorAll("img"));
     return slideImages.length > 0 && indicators.every((item) => item instanceof HTMLElement);
-  }, { locale });
+  });
 }
 
 async function waitForActiveSlide(page: Page, locale: "en" | "ar", index: number) {
@@ -68,6 +69,7 @@ async function waitForActiveSlide(page: Page, locale: "en" | "ar", index: number
 }
 
 async function waitForFancySuitVisible(page: Page, locale: "en" | "ar") {
+  void locale;
   await page.waitForFunction(() => {
     const hero = document.querySelector("#homepage-hero");
     if (!hero) return false;
@@ -139,6 +141,8 @@ async function checkFancySuitHero(page: Page, locale: "en" | "ar", viewport: { w
   }
 }
 
+// This helper is retained for the optional desktop interaction diagnostic.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function verifyDesktopHeroInteraction(page: Page, locale: "en" | "ar") {
   await page.goto(`${base}/${locale}`, { waitUntil: "networkidle" });
   await waitForHeroHydrated(page, locale);
@@ -229,6 +233,7 @@ async function verifyDesktopHeroInteraction(page: Page, locale: "en" | "ar") {
 }
 
 async function verifyInfiniteLooping(page: Page, locale: "en" | "ar", viewport: { width: number; height: number }) {
+  void viewport;
   await page.goto(`${base}/${locale}`, { waitUntil: "networkidle" });
   await waitForHeroHydrated(page, locale);
 

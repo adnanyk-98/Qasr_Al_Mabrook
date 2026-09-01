@@ -1,4 +1,4 @@
-import { boolean, integer, jsonb, numeric, pgEnum, pgTable, text, timestamp, uniqueIndex, uuid, varchar } from "drizzle-orm/pg-core";
+import { boolean, integer, numeric, pgEnum, pgTable, text, timestamp, uniqueIndex, uuid, varchar } from "drizzle-orm/pg-core";
 
 export const entityStatusEnum = pgEnum("entity_status", ["DRAFT", "PUBLISHED", "ARCHIVED"]);
 export const localeEnum = pgEnum("locale", ["en", "ar"]);

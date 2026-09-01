@@ -14,6 +14,8 @@ export function BrandsSection({ locale, brands }: { locale: Locale; brands: Arra
           <div className="flex snap-x gap-4 overflow-x-auto pb-2 sm:grid sm:grid-cols-3 sm:gap-5 sm:overflow-visible lg:grid-cols-6" aria-label={locale === "ar" ? "العلامات التجارية" : "Brands"}>
             {brands.map((brand) => (
               <div key={brand.id} className="flex min-w-[calc(50%-0.5rem)] snap-start items-center justify-center rounded-[var(--radius-md)] border border-[var(--brand-border)] bg-white p-5 sm:min-w-0 sm:p-6">
+                {/* Brand URLs may be external and are intentionally left unoptimized. */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={brand.logoUrl} alt={`${brand.name} logo`} className="h-20 w-full object-contain" />
               </div>
             ))}

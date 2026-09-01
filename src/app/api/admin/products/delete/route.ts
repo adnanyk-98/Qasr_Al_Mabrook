@@ -2,14 +2,18 @@ import { NextResponse } from "next/server";
 import { getCurrentAdmin } from "@/server/services/admin-auth";
 import { deleteProductById } from "@/server/repositories/catalog-admin";
 
+type DeleteRequestBody = {
+  productId?: string;
+};
+
 export async function POST(request: Request) {
   const admin = await getCurrentAdmin();
   if (!admin) return NextResponse.json({ success: false, error: "Not authenticated" }, { status: 401 });
 
-  let body: any;
+  let body: DeleteRequestBody;
   try {
-    body = await request.json();
-  } catch (e) {
+    body = (await request.json()) as DeleteRequestBody;
+  } catch {
     return NextResponse.json({ success: false, error: "Invalid JSON" }, { status: 400 });
   }
 
@@ -20,8 +24,8 @@ export async function POST(request: Request) {
     const deleted = await deleteProductById(productId);
     if (!deleted) return NextResponse.json({ success: false, error: "Product not found" }, { status: 404 });
     return NextResponse.json({ success: true });
-  } catch (e: any) {
-    console.error(e);
-    return NextResponse.json({ success: false, error: String(e?.message ?? e) }, { status: 500 });
+  } catch (error: unknown) {
+    console.error(error);
+    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }

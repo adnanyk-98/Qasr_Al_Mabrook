@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { HeroImageField } from "@/components/admin/hero-image-field";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
@@ -9,7 +7,6 @@ import ClientHomepageList from "@/components/admin/homepage-list";
 import ClientAdminPagination from "@/components/admin/admin-pagination";
 import AdminPageSizeSelect from "@/components/admin/admin-page-size-select";
 import { requireAdminSession } from "@/server/services/admin-auth";
-import { setHomepageSectionStatusAction } from "@/server/services/admin-catalog";
 
 type PageProps = {
   searchParams: Promise<{ edit?: string; error?: string; page?: string; pageSize?: string; search?: string }>;
@@ -144,12 +141,9 @@ export default async function HomepagePage({ searchParams }: PageProps) {
                     </div>
                   </div>
 
-                  {/* Client homepage list */}
-                  {/* @ts-ignore */}
                   <ClientHomepageList initialItems={homepageSections} total={homepageSectionsPaginated.total} page={homepageSectionsPaginated.page} pageSize={homepageSectionsPaginated.pageSize} basePath="/admin/homepage" search={searchQ} />
 
                   <div className="mt-4">
-                    {/* @ts-ignore */}
                     <ClientAdminPagination total={homepageSectionsPaginated.total} page={homepageSectionsPaginated.page} pageSize={homepageSectionsPaginated.pageSize} basePath="/admin/homepage" search={searchQ} />
                   </div>
                 </>

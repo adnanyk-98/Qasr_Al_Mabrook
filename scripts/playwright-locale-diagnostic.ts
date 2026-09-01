@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { chromium } from 'playwright';
 import fs from 'fs';
 import path from 'path';
@@ -21,7 +20,7 @@ async function run() {
   const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
   const page = await context.newPage();
 
-  const events: any[] = [];
+  const events: Array<Record<string, unknown>> = [];
 
   page.on('request', (req) => {
     events.push({ type: 'request', time: Date.now(), url: req.url(), method: req.method(), resourceType: req.resourceType() });
@@ -35,11 +34,11 @@ async function run() {
       let body = null;
       // only capture bodies for HTML, JSON, or RSC (text/x-component)
       if (ct.includes('text/html') || ct.includes('application/json') || ct.includes('text/x-component') || url.includes('/en/about-us')) {
-        try { body = await res.text(); } catch (e) { body = `<unreadable: ${e.message}>`; }
+        try { body = await res.text(); } catch (error) { body = `<unreadable: ${error instanceof Error ? error.message : String(error)}>`; }
       }
       events.push({ type: 'response', time: Date.now(), url, status, contentType: ct, bodySummary: body ? (body.slice(0, 5000)) : null });
-    } catch (e) {
-      events.push({ type: 'response', time: Date.now(), error: e.message });
+    } catch (error) {
+      events.push({ type: 'response', time: Date.now(), error: error instanceof Error ? error.message : String(error) });
     }
   });
 
@@ -58,20 +57,20 @@ async function run() {
   try {
     mainResp = await page.goto(target, { waitUntil: 'domcontentloaded', timeout: 30000 });
     events.push({ type: 'navigation', time: Date.now(), url: target, status: mainResp ? mainResp.status() : null });
-  } catch (e) {
-    events.push({ type: 'navigation_error', time: Date.now(), url: target, error: e.message });
+  } catch (error) {
+    events.push({ type: 'navigation_error', time: Date.now(), url: target, error: error instanceof Error ? error.message : String(error) });
   }
 
   // capture snapshot & HTML
-  try { await page.screenshot({ path: pngPath, fullPage: true }); } catch (e) { /* ignore */ }
-  try { const content = await page.content(); fs.writeFileSync(htmlPath, content); } catch (e) { /* ignore */ }
+  try { await page.screenshot({ path: pngPath, fullPage: true }); } catch { /* ignore */ }
+  try { const content = await page.content(); fs.writeFileSync(htmlPath, content); } catch { /* ignore */ }
 
   // reload and do a client-side navigation to simulate app behavior
   try {
     await page.reload({ waitUntil: 'domcontentloaded' });
     events.push({ type: 'reload', time: Date.now() });
   } catch (e) {
-    events.push({ type: 'reload_error', time: Date.now(), error: e.message });
+    events.push({ type: 'reload_error', time: Date.now(), error: e instanceof Error ? e.message : String(e) });
   }
 
   // attempt a client-side navigation: navigate to /en then click about-us link if present
@@ -86,7 +85,7 @@ async function run() {
       events.push({ type: 'client_nav_skipped', time: Date.now(), reason: 'no-about-us-link' });
     }
   } catch (e) {
-    events.push({ type: 'client_nav_error', time: Date.now(), error: e.message });
+    events.push({ type: 'client_nav_error', time: Date.now(), error: e instanceof Error ? e.message : String(e) });
   }
 
   // write diagnostic JSON including console messages

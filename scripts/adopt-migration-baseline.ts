@@ -2,7 +2,7 @@ import { config } from "dotenv";
 import postgres from "postgres";
 
 import { resolveMigrationDatabase } from "./migration-db";
-import { baselineMigrations, getBaselineIdentities } from "./migration-baseline-manifest";
+import { getBaselineIdentities } from "./migration-baseline-manifest";
 import { validateBaselineAdoptionState } from "./baseline-adoption-policy";
 
 config({ path: process.env.DOTENV_CONFIG_PATH ?? ".env.local" });

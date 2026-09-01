@@ -22,21 +22,18 @@ export default function ProductList({ initialItems, total, page, pageSize, baseP
     try {
       const res = await fetch('/api/admin/products/delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ productId: id }) });
       const body = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(body?.error || `Delete failed ${res.status}`);
-      // remove locally
+      if (!res.ok) throw new Error((body as { error?: string } | undefined)?.error || `Delete failed ${res.status}`);
       const newItems = items.filter((i) => i.id !== id);
       setItems(newItems);
-      // adjust total and possibly navigate if page becomes invalid
       const newTotal = total - 1;
       const totalPages = Math.max(1, Math.ceil(newTotal / pageSize));
       if (page > totalPages) {
         router.replace(`${basePath}?page=${totalPages}${search ? `&search=${encodeURIComponent(search)}` : ''}`);
       } else {
-        // simple refresh to update counts or keep local
         router.refresh();
       }
-    } catch (e: any) {
-      alert(String(e?.message ?? e));
+    } catch (error: unknown) {
+      alert(error instanceof Error ? error.message : String(error));
     } finally {
       setLoading(false);
       setConfirm(null);
@@ -80,7 +77,7 @@ export default function ProductList({ initialItems, total, page, pageSize, baseP
 
       {/* Mobile cards */}
       <div className="md:hidden space-y-3">
-        {items.map((p, idx) => (
+        {items.map((p) => (
           <div key={p.id} className="rounded border p-3 bg-white">
             <div className="flex items-center justify-between">
               <div>

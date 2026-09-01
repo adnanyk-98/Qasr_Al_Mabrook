@@ -72,7 +72,7 @@ async function main() {
       form.appendChild(inp1); form.appendChild(inp2);
       document.body.appendChild(form);
       form.submit();
-    }, { id: sectionId as any, base });
+    }, { id: sectionId, base });
     await page.waitForNavigation({ url: '**/admin/homepage**', timeout: 10000 }).catch(() => {});
 
     // verify DB shows PUBLISHED
@@ -117,15 +117,13 @@ async function main() {
           try {
             const client = postgres(u.url, { ssl: 'require' });
             const rows = await client`select count(*) as cnt from homepage_sections where id = ${delId}`;
-            // eslint-disable-next-line no-console
             console.log(`DB check (${u.name}): host=${new URL(u.url).hostname} count=${rows?.[0]?.cnt ?? 'unknown'}`);
             await client.end();
-          } catch (e) {
-            // eslint-disable-next-line no-console
-            console.error(`DB check (${u.name}) failed:`, String(e));
+          } catch (error) {
+            console.error(`DB check (${u.name}) failed:`, String(error));
           }
         }
-      } catch (e) {
+      } catch {
         // ignore diagnostics errors
       }
     // verify DB row removed (poll briefly to allow any async propagation)
@@ -143,11 +141,11 @@ async function main() {
     await sql`delete from homepage_sections where configuration_json->>'title' like ${`%e2e-section-${ts}-%`}`;
 
     console.log('Homepage E2E finished');
-  } catch (e: any) {
+  } catch (error) {
     const now = Date.now();
     const html = await page.content().catch(() => '');
     fs.writeFileSync(path.join(outDir, `failure-${now}.html`), html);
-    console.error(e);
+    console.error(error);
     process.exit(2);
   } finally {
     await sql.end();

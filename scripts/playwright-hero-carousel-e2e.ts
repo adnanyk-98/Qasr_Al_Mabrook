@@ -142,23 +142,19 @@ async function runTestCycle(
     }
 
     // Verify all visible images are properly loaded
-    let loadFailure = false;
     for (const img of state.visibleImages) {
       if (!img.src) {
         failures.push(
           `${locale}/${viewport.width}x${viewport.height}: cycle ${cycleNum}, swipe ${swipeIdx} - visible image has no src`
         );
-        loadFailure = true;
       } else if (!img.complete) {
         failures.push(
           `${locale}/${viewport.width}x${viewport.height}: cycle ${cycleNum}, swipe ${swipeIdx} - visible image not complete: ${img.src}`
         );
-        loadFailure = true;
       } else if (img.naturalWidth === 0) {
         failures.push(
           `${locale}/${viewport.width}x${viewport.height}: cycle ${cycleNum}, swipe ${swipeIdx} - BROKEN IMAGE: naturalWidth=0: ${img.src}`
         );
-        loadFailure = true;
       }
     }
 
@@ -184,14 +180,15 @@ async function run() {
 
     // Prevent carousel link navigation during testing
     await page.addInitScript(() => {
-      (window as any).__heroTestMode = true;
+      const globalWindow = window as typeof window & { __heroTestMode?: boolean };
+      globalWindow.__heroTestMode = true;
       document.addEventListener(
         "click",
         (event) => {
           const hero = (event.target as HTMLElement)?.closest("#homepage-hero");
           if (hero) {
             const link = (event.target as HTMLElement)?.closest("a[href]");
-            if (link && (window as any).__heroTestMode) {
+            if (link && globalWindow.__heroTestMode) {
               event.preventDefault();
               event.stopPropagation();
             }

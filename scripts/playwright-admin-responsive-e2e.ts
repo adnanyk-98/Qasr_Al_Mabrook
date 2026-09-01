@@ -77,7 +77,7 @@ async function main() {
               await page.waitForSelector(sel, { timeout: 2000 });
               foundList = true;
               break;
-            } catch (e) {
+            } catch {
               // try next
             }
           }
@@ -127,7 +127,7 @@ async function main() {
                   rows = await page.$$eval(sel, (els) => els.length);
                   matched = true;
                   break;
-                } catch (e) {
+                } catch {
                   // try next
                 }
               }
@@ -148,7 +148,7 @@ async function main() {
                   rowsC = await page.$$eval(sel, (els) => els.length);
                   matchedc = true;
                   break;
-                } catch (e) {
+                } catch {
                   // try next
                 }
               }
@@ -166,7 +166,7 @@ async function main() {
                   await page.waitForSelector(sel, { timeout: 3000 });
                   matchedH = true;
                   break;
-                } catch (e) {}
+                } catch {}
               }
               if (!matchedH) failures.push(`${p.key}: list not found after search at ${v.w}x${v.h}`);
             }
@@ -186,8 +186,8 @@ async function main() {
     }
 
     console.log('Responsive checks passed');
-  } catch (e: any) {
-    console.error('Responsive checks failed:', e);
+  } catch (error) {
+    console.error('Responsive checks failed:', error);
     process.exit(2);
   } finally {
     // cleanup

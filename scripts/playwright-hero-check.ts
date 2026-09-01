@@ -21,7 +21,8 @@ async function inspect(locale: string, viewport: { width: number; height: number
   }).catch(() => null);
   const metrics = await page.evaluate(() => {
     const dpr = window.devicePixelRatio;
-    const vvs = (window as any).visualViewport ? (window as any).visualViewport.scale ?? null : null;
+    const globalWindow = window as typeof window & { visualViewport?: { scale: number | null } };
+    const vvs = globalWindow.visualViewport ? globalWindow.visualViewport.scale ?? null : null;
     const hero = document.querySelector('#homepage-hero') as HTMLElement | null;
     const heroStyle = hero ? getComputedStyle(hero) : null;
     const aspectBox = hero ? hero.querySelector('[class*="aspect-"]') as HTMLElement | null : null;
@@ -77,7 +78,7 @@ async function inspect(locale: string, viewport: { width: number; height: number
 }
 
 (async () => {
-  const results: any[] = [];
+  const results: Array<{ locale: string; viewport: { width: number; height: number }; slideCount: number; imgs: Array<{ currentSrc: string; naturalWidth: number; naturalHeight: number }>; heroRect: { width: number; height: number } | null; metrics: unknown; diagnostics: unknown; active: number; firstSrc: { currentSrc: string; naturalWidth: number; naturalHeight: number } | null; afterNextSrc: string | null }> = [];
   for (const locale of locales) {
     for (const vp of desktopViewports) {
       results.push(await inspect(locale, vp));

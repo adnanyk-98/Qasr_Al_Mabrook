@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '.env.local' });
+import 'dotenv/config';
 
 (async () => {
   const host = process.env.DEV_HOST ?? 'http://localhost:3000';

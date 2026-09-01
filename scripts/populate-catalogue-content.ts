@@ -7,12 +7,10 @@ import { and, asc, eq } from "drizzle-orm";
 import type {
   categories,
   categoryTranslations,
-  productCategories,
   productTranslations,
   products,
 } from "@/db/schema";
 
-type Locale = "en" | "ar";
 type Product = typeof products.$inferSelect;
 type ProductTranslation = typeof productTranslations.$inferSelect;
 type Category = typeof categories.$inferSelect;
@@ -72,8 +70,8 @@ function arabicCategoryName(category: Category) {
   return arabicCategoryBySlug[category.slug] ?? category.slug.replaceAll("-", " ");
 }
 
-function buildProductCopy(product: Product, englishName?: string) {
-  const name = englishName ?? product.slug.replaceAll("-", " ");
+function buildProductCopy(product: Product) {
+  const name = product.slug.replaceAll("-", " ");
   let englishShortDescription = `${name} is identified by its established catalogue name.`;
   let englishDescription = `${name} is an item in the Qasr Al Mabrook catalogue, identified by its established product name. The current database record does not include further technical specifications or a detailed application for this item.`;
   let arabicShortDescription = `${arabicProductName(product)} معروف باسمه المعتمد في الكتالوج.`;
@@ -110,7 +108,6 @@ function buildProductCopy(product: Product, englishName?: string) {
 }
 
 function buildCategoryCopy(category: Category, productNames: string[]) {
-  const englishName = category.slug.replaceAll("-", " ");
   const productContext = productNames.length ? ` Products currently listed include ${productNames.join(", ")}.` : "";
   const arabicName = arabicCategoryName(category);
   return {
@@ -136,14 +133,6 @@ function buildCategoryCopy(category: Category, productNames: string[]) {
   };
 }
 
-function isGenericProductCopy(value: string | null | undefined) {
-  return Boolean(value && (/listed in the .* category\.?$/i.test(value.trim()) || /This catalogue entry is presented under/i.test(value) || /مدرج ضمن فئة/.test(value) || /هذا المنتج مسجل ضمن فئة/.test(value)));
-}
-
-function isGenericCategoryCopy(value: string | null | undefined) {
-  return Boolean(value && (/products available in the catalogue/i.test(value) || /منتجات .* المتاحة في الكتالوج/.test(value)));
-}
-
 async function buildPlan() {
   const { db } = await import("@/db");
   const { categories, categoryTranslations, productCategories, productTranslations, products } = await import("@/db/schema");
@@ -165,7 +154,7 @@ async function buildPlan() {
       });
     const categorySlugs = relatedCategories.map(({ slug }) => slug).filter((slug): slug is string => Boolean(slug));
     const categoryNames = relatedCategories.map(({ name }) => name).filter((name): name is string => Boolean(name));
-    const copy = buildProductCopy(product, english?.name);
+    const copy = buildProductCopy(product);
     return { product, english, arabic, categorySlugs, categoryNames, ...copy };
   });
 

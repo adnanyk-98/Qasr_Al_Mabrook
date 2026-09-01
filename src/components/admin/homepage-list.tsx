@@ -8,11 +8,10 @@ type Section = {
   id: string;
   sectionType: string;
   status: string;
-  sortOrder: number;
-  configurationJson?: Record<string, any>;
+  sortOrder: number | string;
 };
 
-export default function HomepageList({ initialItems, total, page, pageSize, basePath, search }: { initialItems: Section[]; total: number; page: number; pageSize: number; basePath: string; search?: string | null }) {
+export default function HomepageList({ initialItems, total, page, pageSize, basePath }: { initialItems: Section[]; total: number; page: number; pageSize: number; basePath: string; search?: string | null }) {
   const [items, setItems] = useState<Section[]>(initialItems);
   const [confirm, setConfirm] = useState<{ id: string; label: string } | null>(null);
   const [loading, setLoading] = useState(false);
@@ -23,7 +22,7 @@ export default function HomepageList({ initialItems, total, page, pageSize, base
     try {
       const res = await fetch('/api/admin/homepage/delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sectionId: id }) });
       const body = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(body?.error || `Delete failed ${res.status}`);
+      if (!res.ok) throw new Error((body as { error?: string } | undefined)?.error || `Delete failed ${res.status}`);
       const newItems = items.filter((i) => i.id !== id);
       setItems(newItems);
       const newTotal = total - 1;
@@ -33,8 +32,8 @@ export default function HomepageList({ initialItems, total, page, pageSize, base
       } else {
         router.refresh();
       }
-    } catch (e: any) {
-      alert(String(e?.message ?? e));
+    } catch (error: unknown) {
+      alert(error instanceof Error ? error.message : String(error));
     } finally {
       setLoading(false);
       setConfirm(null);

@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '.env.local' });
+import 'dotenv/config';
 import { chromium } from 'playwright';
 
 (async () => {

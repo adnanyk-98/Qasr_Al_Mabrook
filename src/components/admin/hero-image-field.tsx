@@ -85,8 +85,8 @@ export function HeroImageField({ fieldName, uploadRole, label, currentImageUrl, 
       setPreviewUrl(body.publicUrl ?? previewUrl);
       setSelectedFileName(selectedFile.name);
       setStatus(`✓ Uploaded ${label.toLowerCase()}`);
-    } catch (err: any) {
-      setUploadError(String(err?.message ?? err));
+    } catch (err: unknown) {
+      setUploadError(err instanceof Error ? err.message : String(err));
       setStatus("Upload failed");
     } finally {
       setUploading(false);
@@ -125,6 +125,7 @@ export function HeroImageField({ fieldName, uploadRole, label, currentImageUrl, 
         </div>
         {previewUrl ? (
           <div className="mt-3 w-full overflow-hidden rounded" style={{ aspectRatio: uploadRole === "mobile" ? "1080 / 1200" : "1920 / 720" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={previewUrl} alt={currentAlt ?? "Hero banner preview"} className="h-full w-full object-contain" onLoad={(event) => setDimensions(`${event.currentTarget.naturalWidth} × ${event.currentTarget.naturalHeight}`)} />
           </div>
         ) : null}

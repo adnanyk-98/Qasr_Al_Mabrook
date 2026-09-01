@@ -98,14 +98,14 @@ async function main() {
       process.exit(2);
     }
     productId = prod[0].id;
-    let rows = await sql`select id, public_url, object_key, is_primary from product_images where product_id = ${productId}`;
+    const rows = await sql`select id, public_url, object_key, is_primary from product_images where product_id = ${productId}`;
     console.log('product_images rows count after create:', rows.length);
     if (rows.length !== 3) {
       console.error('Expected 3 product_images after initial create');
       process.exit(3);
     }
-  } catch (e: any) {
-    console.error('DB verification failed:', e.message ?? e);
+  } catch (error: unknown) {
+    console.error('DB verification failed:', error instanceof Error ? error.message : String(error));
     await sql.end();
     process.exit(1);
   }
@@ -144,8 +144,8 @@ async function main() {
       console.error('DB changed after save without upload');
       process.exit(6);
     }
-  } catch (e: any) {
-    console.error('DB verification failed:', e.message ?? e);
+  } catch (error: unknown) {
+    console.error('DB verification failed:', error instanceof Error ? error.message : String(error));
     await sql.end();
     process.exit(1);
   }
@@ -170,15 +170,15 @@ async function main() {
       console.error('Expected 4 product_images after adding one');
       process.exit(7);
     }
-    const primaryCount = rowsFinal.filter((r: any) => r.is_primary).length;
+    const primaryCount = rowsFinal.filter((row) => row.is_primary).length;
     console.log('primary count=', primaryCount);
     if (primaryCount !== 1) {
       console.error('Expected exactly one primary image');
       process.exit(8);
     }
     await sql.end();
-  } catch (e: any) {
-    console.error('DB verification failed:', e.message ?? e);
+  } catch (error: unknown) {
+    console.error('DB verification failed:', error instanceof Error ? error.message : String(error));
     await sql.end();
     process.exit(1);
   }

@@ -5,7 +5,7 @@ import { StoreGallery } from "@/components/public/store-gallery";
 import { Container, Section } from "@/components/ui/layout";
 import { listPublishedHomepageSections } from "@/server/repositories/public-catalog";
 import { createPublicPageMetadata } from "@/lib/seo";
-import { localePath, locales, type Locale } from "@/lib/locales";
+import { locales, type Locale } from "@/lib/locales";
 import { readLocalizedConfigString } from "@/lib/homepage-content";
 import { getTranslations } from "next-intl/server";
 import { PublicShell } from "@/components/public/public-shell";

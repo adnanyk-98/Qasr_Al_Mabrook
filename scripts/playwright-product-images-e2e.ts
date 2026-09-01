@@ -99,10 +99,13 @@ async function main() {
     const productId = prod[0].id;
     const rows = await sql`select id, public_url, object_key, is_primary from product_images where product_id = ${productId}`;
     console.log('product_images rows count:', rows.length);
-    rows.forEach((r: any, i: number) => console.log(i + 1, r.public_url, r.object_key, 'primary=', r.is_primary));
+    rows.forEach((r, i: number) => {
+      const row = r as { public_url: string; object_key: string; is_primary: boolean };
+      console.log(i + 1, row.public_url, row.object_key, 'primary=', row.is_primary);
+    });
     await sql.end();
-  } catch (e: any) {
-    console.error('DB verification failed:', e.message ?? e);
+  } catch (error: unknown) {
+    console.error('DB verification failed:', error instanceof Error ? error.message : String(error));
     await sql.end();
     process.exit(1);
   }

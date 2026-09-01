@@ -7,7 +7,6 @@ import {
   listCategories,
   listProductImagesForProduct,
   listProductTranslationsForProduct,
-  listProducts,
 } from "@/server/repositories/catalog-admin";
 import { ProductImageField } from "@/components/admin/product-image-field";
 import { requireAdminSession } from "@/server/services/admin-auth";
@@ -122,7 +121,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
                   </Select>
                 </div>
 
-                <ProductImageField productId={editingProduct?.id} currentImages={editingImages.map((img) => ({ id: img.id, publicUrl: img.publicUrl, objectKey: img.objectKey, width: img.width, height: img.height, isPrimary: img.isPrimary }))} />
+                <ProductImageField key={editingProduct?.id ?? "new"} currentImages={editingImages.map((img) => ({ id: img.id, publicUrl: img.publicUrl, objectKey: img.objectKey, width: img.width, height: img.height, isPrimary: img.isPrimary }))} />
 
                 <Button type="submit" className="w-full">
                   Save product
@@ -252,7 +251,6 @@ export default async function ProductsPage({ searchParams }: PageProps) {
                 </div>
 
                 {/* Product list component (responsive) */}
-                {/* @ts-ignore server-to-client */}
                 <div>
                   {/* Client component will manage delete UX */}
                   <ClientProductList initialItems={products} total={productsPaginated.total} page={productsPaginated.page} pageSize={productsPaginated.pageSize} basePath="/admin/products" search={searchQ} />

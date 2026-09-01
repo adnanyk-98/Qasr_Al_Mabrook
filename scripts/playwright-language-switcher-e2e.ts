@@ -1,11 +1,10 @@
-// @ts-nocheck
-import { chromium } from 'playwright';
+import { chromium, type Page } from 'playwright';
 import fs from 'fs';
 import path from 'path';
 
 const base = process.env.BASE_URL ?? 'http://127.0.0.1:3000';
 
-async function captureFailure(page, name) {
+async function captureFailure(page: Page, name: string) {
   const dir = path.resolve(process.cwd(), 'tmp');
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
   const png = path.join(dir, `lang-switcher-${name}.png`);
@@ -52,7 +51,7 @@ async function runViewport(viewport: { width: number; height: number } | null, l
         if (body.includes('NEXT_HTTP_ERROR_FALLBACK') || body.includes('Page not found') || body.includes('next-error')) {
           continue;
         }
-      } catch (e) {
+      } catch {
         // ignore navigation errors and try next
         continue;
       }
@@ -157,7 +156,7 @@ async function runViewport(viewport: { width: number; height: number } | null, l
     // append console messages and error to the log file
     try {
       const logText = [
-        `Error: ${err.message}`,
+        `Error: ${err instanceof Error ? err.message : String(err)}`,
         `URL: ${page.url()}`,
         '',
         'Console messages:',
@@ -167,15 +166,15 @@ async function runViewport(viewport: { width: number; height: number } | null, l
         ...networkEvents,
       ].join('\n');
       fs.appendFileSync(files.log, logText);
-    } catch (e) {
+    } catch {
       // ignore logging errors
     }
-    console.error(`Viewport ${label}: FAIL`, err.message);
+    console.error(`Viewport ${label}: FAIL`, err instanceof Error ? err.message : String(err));
     console.error('Saved artifacts:', files);
     await context.close();
     await browser.close();
     console.error('Console log snapshot:\n', consoleMessages.join('\n'));
-    return { success: false, label, error: err.message, files, consoleMessages };
+    return { success: false, label, error: err instanceof Error ? err.message : String(err), files, consoleMessages };
   }
 }
 

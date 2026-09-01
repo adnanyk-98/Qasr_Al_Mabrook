@@ -1,13 +1,16 @@
-// @ts-nocheck
 import { chromium, devices } from 'playwright';
 
-async function dispatchPointerSequence(page, selector, seq) {
+async function dispatchPointerSequence(
+  page: { waitForSelector: (selector: string, options?: { timeout?: number }) => Promise<unknown>; evaluate: (fn: (args: { sel: string; s: Array<{ type: string; x: number; y: number; pointerId?: number; pointerType?: string; delay?: number }> }) => Promise<void>, args: { sel: string; s: Array<{ type: string; x: number; y: number; pointerId?: number; pointerType?: string; delay?: number }> }) => Promise<void> },
+  selector: string,
+  seq: Array<{ type: string; x: number; y: number; pointerId?: number; pointerType?: string; delay?: number }>
+) {
   await page.waitForSelector(selector, { timeout: 20000 });
   await page.evaluate(async ({ sel, s }) => {
     const el = document.querySelector(sel);
     if (!el) throw new Error('element not found');
     for (const ev of s) {
-      const init: any = {
+      const init: PointerEventInit & { clientX: number; clientY: number; pointerId: number; pointerType: string } = {
         clientX: ev.x,
         clientY: ev.y,
         pointerId: ev.pointerId ?? 1,
@@ -15,7 +18,7 @@ async function dispatchPointerSequence(page, selector, seq) {
         bubbles: true,
         cancelable: true,
       };
-      let eventName = 'pointermove';
+      let eventName: 'pointerdown' | 'pointermove' | 'pointerup' = 'pointermove';
       if (ev.type === 'down') eventName = 'pointerdown';
       if (ev.type === 'up') eventName = 'pointerup';
       const pe = new PointerEvent(eventName, init);
@@ -25,7 +28,10 @@ async function dispatchPointerSequence(page, selector, seq) {
   }, { sel: selector, s: seq });
 }
 
-function activeIndicatorIndex(page, heroSelector) {
+function activeIndicatorIndex(
+  page: { evaluate: (fn: (sel: string) => number, arg: string) => Promise<number> },
+  heroSelector: string
+) {
   return page.evaluate((sel) => {
     const root = document.querySelector(sel);
     if (!root) return -1;
@@ -35,38 +41,41 @@ function activeIndicatorIndex(page, heroSelector) {
     });
     for (let i = 0; i < btns.length; i++) {
       const b = btns[i];
-      try { if ((b as HTMLElement).classList.contains('w-9')) return i; } catch {}
+      try { if ((b as HTMLElement).classList.contains('w-9')) return i; } catch { /* ignore */ }
     }
     return -1;
   }, heroSelector);
 }
 
-async function ensureClickableFlag(page, anchorSel) {
+async function ensureClickableFlag(
+  page: { waitForSelector: (selector: string, options?: { timeout?: number }) => Promise<unknown>; evaluate: (fn: (sel: string) => void, arg: string) => Promise<void> },
+  anchorSel: string
+) {
   await page.waitForSelector(anchorSel, { timeout: 20000 });
   await page.evaluate((sel) => {
-    window.__heroClicked = 0;
+    (window as typeof window & { __heroClicked?: number }).__heroClicked = 0;
     const a = document.querySelector(sel);
     if (a) {
       a.addEventListener('click', function (e) {
-        try { e.preventDefault(); } catch {}
-        // @ts-ignore
-        window.__heroClicked = (window.__heroClicked || 0) + 1;
+        try { e.preventDefault(); } catch { /* ignore */ }
+        const heroWindow = window as typeof window & { __heroClicked?: number };
+        heroWindow.__heroClicked = (heroWindow.__heroClicked || 0) + 1;
       }, { capture: true });
     } else {
       const container = document.querySelector('#homepage-hero .relative.w-full.overflow-hidden');
       if (container) {
         container.addEventListener('click', function (e) {
-          try { e.preventDefault(); } catch {}
-          // @ts-ignore
-          window.__heroClicked = (window.__heroClicked || 0) + 1;
+          try { e.preventDefault(); } catch { /* ignore */ }
+          const heroWindow = window as typeof window & { __heroClicked?: number };
+          heroWindow.__heroClicked = (heroWindow.__heroClicked || 0) + 1;
         }, { capture: true });
       }
     }
   }, anchorSel);
 }
 
-async function getClickCount(page) {
-  return page.evaluate(() => (window.__heroClicked || 0));
+async function getClickCount(page: { evaluate: (fn: () => number) => Promise<number> }) {
+  return page.evaluate(() => (window as typeof window & { __heroClicked?: number }).__heroClicked || 0);
 }
 
 async function runTest() {
@@ -101,8 +110,6 @@ async function runTest() {
 
   // ensure click counter hooks are installed on the chosen interactive selector
   await ensureClickableFlag(page, interactiveSel);
-  const firstAnchorSel = interactiveSel;
-
   // get current slide
   const before = await activeIndicatorIndex(page, heroSel);
 
@@ -133,7 +140,7 @@ async function runTest() {
   console.log('TEST Normal Click: clickCount', clickCount, 'before', before, 'after', afterClickSlide);
 
   // reset counter
-  await page.evaluate(() => { window.__heroClicked = 0; });
+  await page.evaluate(() => { (window as typeof window & { __heroClicked?: number }).__heroClicked = 0; });
 
   // Test 2: Mobile swipe should change slide and NOT trigger click
   const startX = Math.round(box.x + box.width * 0.75);
@@ -171,7 +178,6 @@ async function runTest() {
     interactiveSel2 = `${heroSel} .w-full.flex > div img`;
   }
   await ensureClickableFlag(page2, interactiveSel2);
-  const firstAnchorSel2 = interactiveSel2;
   const beforeDrag = await activeIndicatorIndex(page2, heroSel);
   const sX = Math.round(box2.x + box2.width * 0.75);
   const mY = Math.round(box2.y + box2.height * 0.5);
@@ -188,7 +194,7 @@ async function runTest() {
   console.log('TEST Desktop Drag: before', beforeDrag, 'after', afterDrag, 'clicks', clicksAfterDrag);
 
   // Test 4: Small movement should not change slide and click should still work
-  await page2.evaluate(() => { window.__heroClicked = 0; });
+  await page2.evaluate(() => { (window as typeof window & { __heroClicked?: number }).__heroClicked = 0; });
   const box3 = box2;
   const smallStart = Math.round(box3.x + box3.width * 0.5);
   const beforeSmall = await activeIndicatorIndex(page2, heroSel);
@@ -199,7 +205,7 @@ async function runTest() {
   ]);
   await page2.waitForTimeout(200);
   // now click normally
-  await page2.click(firstAnchorSel2);
+  await page2.click(interactiveSel2);
   await page2.waitForTimeout(150);
   const clicksSmall = await getClickCount(page2);
   const afterSmallSlide = await activeIndicatorIndex(page2, heroSel);

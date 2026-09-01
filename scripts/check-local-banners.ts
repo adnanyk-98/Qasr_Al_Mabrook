@@ -10,9 +10,17 @@ function normalizeName(name: string) {
     .replace(/[^a-z0-9]/g, '');
 }
 
+type BannerFile = { name: string; path: string; width?: number; height?: number; size?: number };
+type BannerReport = {
+  root: string;
+  desktop: BannerFile[];
+  mobile: BannerFile[];
+  mapping: Record<string, string | null>;
+};
+
 async function inspectDir(dir: string) {
   const entries = await fs.readdir(dir, { withFileTypes: true });
-  const files = [] as Array<{ name: string; path: string; width?: number; height?: number; size?: number }>;
+  const files: BannerFile[] = [];
   for (const e of entries) {
     if (e.isFile()) {
       const p = path.join(dir, e.name);
@@ -20,7 +28,7 @@ async function inspectDir(dir: string) {
         const buf = await fs.readFile(p);
         const meta = await sharp(buf).metadata();
         files.push({ name: e.name, path: p, width: meta.width, height: meta.height, size: buf.length });
-      } catch (err) {
+      } catch {
         files.push({ name: e.name, path: p });
       }
     }
@@ -31,20 +39,19 @@ async function inspectDir(dir: string) {
 async function main() {
   const root = path.join(process.cwd(), 'catalogue', 'Banner');
   const mobile = path.join(root, 'Mobile');
-  const report: any = { root, desktop: [], mobile: [], mapping: {} };
+  const report: BannerReport = { root, desktop: [], mobile: [], mapping: {} };
   try {
     report.desktop = await inspectDir(root);
-  } catch (e) {
-    console.error('Failed to read desktop banner folder', root, e);
+  } catch (error) {
+    console.error('Failed to read desktop banner folder', root, error);
     process.exit(2);
   }
   try {
     report.mobile = await inspectDir(mobile);
-  } catch (e) {
+  } catch {
     report.mobile = [];
   }
 
-  // build quick mapping by normalized names
   const mobileMap = new Map<string, string>();
   for (const m of report.mobile) {
     mobileMap.set(normalizeName(m.name), m.name);
@@ -58,7 +65,7 @@ async function main() {
   console.log(JSON.stringify(report, null, 2));
 }
 
-main().catch((e) => {
-  console.error(e);
+main().catch((error) => {
+  console.error(error);
   process.exit(2);
 });

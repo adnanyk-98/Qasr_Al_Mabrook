@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { ProductCard } from "@/components/public/product-card";
-import { PublicImageSlot } from "@/components/public/public-image-slot";
 import ProductGallery from '@/components/public/product-gallery';
 import { SalesActions } from "@/components/public/sales-actions";
 import { PublicShell } from "@/components/public/public-shell";

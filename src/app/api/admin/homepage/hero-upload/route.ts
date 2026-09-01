@@ -23,10 +23,10 @@ export async function POST(request: Request) {
   }
 
   const formData = await request.formData();
-  const file = formData.get("imageFile");
+  const rawFile = formData.get("imageFile");
   const role = String(formData.get("role") ?? "desktop") === "mobile" ? "mobile" : "desktop";
 
-  if (!file || typeof file !== "object" || !("arrayBuffer" in file) || !(file as any).name) {
+  if (!(rawFile instanceof File)) {
     return NextResponse.json({ success: false, error: "No file provided" }, { status: 400 });
   }
 
@@ -38,13 +38,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false, error: "R2 is not configured" }, { status: 500 });
   }
 
-  const buffer = Buffer.from(await file.arrayBuffer());
+  const buffer = Buffer.from(await rawFile.arrayBuffer());
   const dims = await readOriginalProductImageMetadata(buffer);
 
   const validation = validateHeroImageUpload({
     role,
-    mimeType: (file as any).type,
-    size: (file as any).size,
+    mimeType: rawFile.type,
+    size: rawFile.size,
     width: dims.width ?? undefined,
     height: dims.height ?? undefined,
   });
@@ -64,7 +64,7 @@ export async function POST(request: Request) {
   });
 
   const safeSlug = slugify(role === "mobile" ? "hero-mobile" : "hero-desktop");
-  const originalName = (file as any).name || "hero";
+  const originalName = rawFile.name || "hero";
   const safeFilename = originalName.trim().replace(/\s+/g, "-").replace(/[^a-zA-Z0-9.\-_]/g, "");
   const key = `hero/${safeSlug}/${safeFilename}`;
 
@@ -73,7 +73,7 @@ export async function POST(request: Request) {
       Bucket: bucket,
       Key: key,
       Body: buffer,
-      ContentType: (file as any).type || "application/octet-stream",
+      ContentType: rawFile.type || "application/octet-stream",
     }),
   );
 

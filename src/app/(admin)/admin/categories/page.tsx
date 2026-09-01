@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Input, Label, Select } from "@/components/ui/form";
@@ -94,12 +92,9 @@ export default async function CategoriesPage({ searchParams }: PageProps) {
                     </div>
                   </div>
 
-                  {/* Client category list */}
-                  {/* @ts-ignore */}
                   <ClientCategoryList initialItems={categories} total={categoriesPaginated.total} page={categoriesPaginated.page} pageSize={categoriesPaginated.pageSize} basePath="/admin/categories" search={searchQ} />
 
                   <div className="mt-4">
-                    {/* @ts-ignore */}
                     <ClientAdminPagination total={categoriesPaginated.total} page={categoriesPaginated.page} pageSize={categoriesPaginated.pageSize} basePath="/admin/categories" search={searchQ} />
                   </div>
                 </>

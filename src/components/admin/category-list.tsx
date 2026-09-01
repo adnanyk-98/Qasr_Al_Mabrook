@@ -22,7 +22,7 @@ export default function CategoryList({ initialItems, total, page, pageSize, base
     try {
       const res = await fetch('/api/admin/categories/delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ categoryId: id }) });
       const body = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(body?.error || `Delete failed ${res.status}`);
+      if (!res.ok) throw new Error((body as { error?: string } | undefined)?.error || `Delete failed ${res.status}`);
       const newItems = items.filter((i) => i.id !== id);
       setItems(newItems);
       const newTotal = total - 1;
@@ -32,8 +32,8 @@ export default function CategoryList({ initialItems, total, page, pageSize, base
       } else {
         router.refresh();
       }
-    } catch (e: any) {
-      alert(String(e?.message ?? e));
+    } catch (error: unknown) {
+      alert(error instanceof Error ? error.message : String(error));
     } finally {
       setLoading(false);
       setConfirm(null);
@@ -64,7 +64,7 @@ export default function CategoryList({ initialItems, total, page, pageSize, base
       </div>
 
             <div className="md:hidden space-y-3">
-        {items.map((c, idx) => (
+        {items.map((c) => (
           <div key={c.id} className="rounded border p-3 bg-white">
             <div className="flex items-center justify-between">
               <div>

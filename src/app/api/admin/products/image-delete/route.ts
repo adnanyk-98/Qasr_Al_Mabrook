@@ -8,10 +8,10 @@ export async function POST(request: Request) {
   const admin = await getCurrentAdmin();
   if (!admin) return NextResponse.json({ success: false, error: "Not authenticated" }, { status: 401 });
 
-  let body: any;
+  let body: Record<string, unknown> | null;
   try {
-    body = await request.json();
-  } catch (e) {
+    body = (await request.json()) as Record<string, unknown> | null;
+  } catch {
     return NextResponse.json({ success: false, error: "Invalid JSON" }, { status: 400 });
   }
 
@@ -37,10 +37,8 @@ export async function POST(request: Request) {
 
   try {
     await s3.send(new DeleteObjectCommand({ Bucket: bucket, Key: objectKey }));
-  } catch (e: any) {
-    // if object not found or other error, continue but surface error if critical
-    // Cloudflare R2 DeleteObject succeeds even if missing; still allow proceeding
-    console.error('R2 delete error', e?.message ?? e);
+  } catch (error) {
+    console.error("R2 delete error", error instanceof Error ? error.message : String(error));
   }
 
   // Delete DB row

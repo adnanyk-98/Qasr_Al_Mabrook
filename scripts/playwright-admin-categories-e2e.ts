@@ -124,12 +124,12 @@ async function main() {
     await sql`delete from categories where slug like ${`e2e-pagination-category-${ts}-%`}`;
 
     console.log('Categories E2E finished');
-  } catch (e: any) {
+  } catch (error: unknown) {
     const now = Date.now();
     const html = await page.content().catch(() => '');
     fs.writeFileSync(path.join(outDir, `failure-${now}.html`), html);
     fs.writeFileSync(path.join(outDir, `console-${now}.log`), '');
-    console.error(e);
+    console.error(error);
     process.exit(2);
   } finally {
     await sql.end();

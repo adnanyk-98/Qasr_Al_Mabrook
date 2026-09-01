@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
@@ -6,7 +5,7 @@ import { Container, Section } from "@/components/ui/layout";
 import { ProductCard } from "@/components/public/product-card";
 import { PublicShell } from "@/components/public/public-shell";
 import { getCategoryBySlug, listCategoryProducts } from "@/server/repositories/public-catalog";
-import { localePath, locales, type Locale } from "@/lib/locales";
+import { locales, type Locale } from "@/lib/locales";
 import { createBreadcrumbStructuredData, createCategoryMetadata } from "@/lib/seo";
 import { getTranslations } from "next-intl/server";
 import { AnalyticsTracker } from "@/components/analytics/analytics-tracker";

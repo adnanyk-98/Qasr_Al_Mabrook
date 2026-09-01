@@ -76,8 +76,8 @@ export function CategoryImageField({ currentImageUrl }: Props) {
       setPreviewUrl(body.publicUrl ?? previewUrl);
       setSelectedFileName(selectedFile.name);
       setStatus("✓ Uploaded image");
-    } catch (err: any) {
-      setUploadError(String(err?.message ?? err));
+    } catch (err: unknown) {
+      setUploadError(err instanceof Error ? err.message : String(err));
       setStatus("Upload failed");
     } finally {
       setUploading(false);
@@ -110,7 +110,12 @@ export function CategoryImageField({ currentImageUrl }: Props) {
             <span className={status.startsWith("✓") ? "text-sm text-emerald-600" : status === "No file selected" ? "text-sm text-[var(--text-muted)]" : "text-sm text-red-600"}>{status}</span>
           </div>
         </div>
-        {previewUrl ? <img src={previewUrl} alt={"Category preview"} className="mt-3 h-28 w-full rounded object-contain" /> : null}
+        {previewUrl ? (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={previewUrl} alt="Category preview" className="mt-3 h-28 w-full rounded object-contain" />
+          </>
+        ) : null}
         <div className="mt-3 flex items-center gap-2">
           <button type="button" onClick={uploadImage} disabled={uploading} className="rounded bg-[var(--brand-primary)] px-3 py-1 text-white">
             {uploading ? "Uploading…" : "Upload image"}

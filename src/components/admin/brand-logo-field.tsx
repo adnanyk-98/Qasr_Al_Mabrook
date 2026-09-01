@@ -78,7 +78,12 @@ export function BrandLogoField({ currentImageUrl }: { currentImageUrl?: string |
         <div className="flex justify-between gap-3"><span className="text-[var(--text-muted)]">Filename</span><span>{file?.name ?? (currentImageUrl ? "Existing logo" : "No file selected")}</span></div>
         <div className="flex justify-between gap-3"><span className="text-[var(--text-muted)]">Dimensions</span><span>{dimensions}</span></div>
         <div className="flex justify-between gap-3"><span className="text-[var(--text-muted)]">Status</span><span>{status}</span></div>
-        {preview ? <img src={preview} alt="Brand logo preview" className="mx-auto mt-3 h-28 w-28 rounded object-contain" /> : null}
+        {preview ? (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={preview} alt="Brand logo preview" className="mx-auto mt-3 h-28 w-28 rounded object-contain" />
+          </>
+        ) : null}
         <button type="button" onClick={(event) => { event.preventDefault(); void upload(); }} disabled={uploading || status === "Invalid dimensions"} className="rounded bg-[var(--brand-primary)] px-3 py-1.5 text-white disabled:opacity-50">{uploading ? "Uploading..." : "Upload logo"}</button>
         {error ? <p className="text-red-600" role="alert">{error}</p> : null}
       </div>

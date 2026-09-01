@@ -27,7 +27,7 @@ async function inspect(locale: string, viewport: { width: number; height: number
   await page.goto(url, { waitUntil: 'networkidle' });
   await page.waitForTimeout(250);
 
-  const results: any = { locale, viewport, url, fonts: {} };
+  const results: { locale: string; viewport: { width: number; height: number }; url: string; fonts: Record<string, string | null> } = { locale, viewport, url, fonts: {} };
   for (const s of selectors) {
     const exists = await page.$(s.sel);
     if (!exists) {
@@ -46,13 +46,19 @@ async function inspect(locale: string, viewport: { width: number; height: number
 }
 
 (async () => {
-  const out: any[] = [];
+  const out: Array<{
+    locale: string;
+    viewport: { width: number; height: number };
+    url?: string;
+    fonts?: Record<string, string | null>;
+    error?: string;
+  }> = [];
   for (const locale of locales) {
     for (const vp of viewports) {
       try {
         out.push(await inspect(locale, vp));
-      } catch (e) {
-        out.push({ locale, viewport: vp, error: String(e) });
+      } catch (error) {
+        out.push({ locale, viewport: vp, error: String(error) });
       }
     }
   }

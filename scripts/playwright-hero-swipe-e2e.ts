@@ -1,14 +1,15 @@
-// @ts-nocheck
-import { chromium, devices } from 'playwright';
+import { chromium, devices, type Page } from 'playwright';
 
-async function dispatchPointerSequence(page, selector, seq) {
+type PointerSequenceEvent = { type: 'down' | 'move' | 'up'; x: number; y: number; pointerId?: number; pointerType?: string; delay?: number };
+
+async function dispatchPointerSequence(page: { waitForSelector: (selector: string, options: { timeout: number }) => Promise<unknown>; evaluate: (fn: (args: { sel: string; s: PointerSequenceEvent[] }) => Promise<void>, args: { sel: string; s: PointerSequenceEvent[] }) => Promise<void> }, selector: string, seq: PointerSequenceEvent[]) {
   // seq: array of { type: 'down'|'move'|'up', x, y, pointerType, pointerId }
   await page.waitForSelector(selector, { timeout: 20000 });
   await page.evaluate(async ({ sel, s }) => {
     const el = document.querySelector(sel);
     if (!el) throw new Error('element not found');
     for (const ev of s) {
-      const init: any = {
+      const init: PointerEventInit = {
         clientX: ev.x,
         clientY: ev.y,
         pointerId: ev.pointerId ?? 1,
@@ -22,13 +23,12 @@ async function dispatchPointerSequence(page, selector, seq) {
       const pe = new PointerEvent(eventName, init);
       el.dispatchEvent(pe);
       // small pause to allow handlers
-      // eslint-disable-next-line no-await-in-loop
       await new Promise((r) => setTimeout(r, ev.delay ?? 16));
     }
   }, { sel: selector, s: seq });
 }
 
-function activeIndicatorIndex(page, heroSelector) {
+function activeIndicatorIndex(page: Page, heroSelector: string) {
   return page.evaluate((sel) => {
     const root = document.querySelector(sel);
     if (!root) return -1;
@@ -44,7 +44,7 @@ function activeIndicatorIndex(page, heroSelector) {
   }, heroSelector);
 }
 
-async function runMobileSwipeTest(base) {
+async function runMobileSwipeTest(base: string) {
   const iPhone = devices['iPhone 12'];
   const browser = await chromium.launch();
   const context = await browser.newContext({ ...iPhone, locale: 'en-US' });
@@ -123,7 +123,7 @@ async function runMobileSwipeTest(base) {
   return { before, after };
 }
 
-async function runDesktopDragTest(base) {
+async function runDesktopDragTest(base: string) {
   const browser = await chromium.launch();
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
   const page = await context.newPage();

@@ -1,9 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 
-import { buildLoopedCategorySequence } from "@/lib/homepage-content";
 import { localePath } from "@/lib/locales";
 import { TrackedLink } from "@/components/analytics/tracked-link";
 

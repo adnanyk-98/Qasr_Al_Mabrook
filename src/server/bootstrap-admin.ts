@@ -27,6 +27,7 @@ export async function ensureBootstrapAdmin() {
       displayName: "System Administrator",
       role: "SUPER_ADMIN",
       status: "ACTIVE",
+      permissions: ["users.view", "users.create", "users.edit", "users.delete", "users.manage_access"],
     })
     .returning();
 

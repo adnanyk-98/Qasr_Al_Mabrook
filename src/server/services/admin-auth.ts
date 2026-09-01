@@ -10,6 +10,7 @@ import {
   findAdminUserByEmail,
   getAdminSessionWithUser,
   revokeSession,
+  setAdminUserLastLogin,
 } from "@/server/repositories/admin";
 
 export const ADMIN_SESSION_COOKIE = "qm_admin_session";
@@ -40,6 +41,145 @@ async function deriveScrypt(password: string, salt: Buffer, keyLength: number, o
 
 export type AdminUserRecord = typeof adminUsers.$inferSelect;
 
+export const ADMIN_USER_PERMISSIONS = [
+  "users.view",
+  "users.create",
+  "users.edit",
+  "users.delete",
+  "users.manage_access",
+] as const;
+
+export type AdminUserPermission = typeof ADMIN_USER_PERMISSIONS[number];
+
+export function normalizePermissions(value: unknown): AdminUserPermission[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  const seen = new Set<string>();
+  const normalized: AdminUserPermission[] = [];
+
+  for (const entry of value) {
+    const permission = String(entry ?? "").trim().toLowerCase();
+    if (permission && ADMIN_USER_PERMISSIONS.includes(permission as AdminUserPermission) && !seen.has(permission)) {
+      seen.add(permission);
+      normalized.push(permission as AdminUserPermission);
+    }
+  }
+
+  return normalized;
+}
+
+export function isSuperAdmin(admin: { role?: string | null } | null | undefined) {
+  return admin?.role === "SUPER_ADMIN";
+}
+
+export function adminHasPermission(admin: { role?: string | null; permissions?: unknown } | null | undefined, permission: string) {
+  if (!admin) return false;
+  if (isSuperAdmin(admin)) return true;
+
+  const normalizedPermission = String(permission ?? "").trim().toLowerCase();
+  return normalizePermissions(admin.permissions).includes(normalizedPermission as AdminUserPermission);
+}
+
+export async function requireAdminPermission(permission: AdminUserPermission) {
+  const admin = await requireAdminSession();
+
+  if (!adminHasPermission(admin, permission)) {
+    redirect("/admin");
+  }
+
+  return admin;
+}
+
+export async function ensureAdminSessionIsActive(admin: { status?: string | null } | null | undefined) {
+  if (!admin || admin.status !== "ACTIVE") {
+    redirect("/admin/login");
+  }
+
+  return admin;
+}
+
+export async function ensureSuperAdminOrDeny() {
+  const admin = await requireAdminSession();
+  if (admin.role !== "SUPER_ADMIN") {
+    redirect("/admin");
+  }
+  return admin;
+}
+export async function validateAdminCanMutateUser(
+  actorId: string,
+  targetUserId: string,
+  targetRole: string,
+  targetStatus?: string,
+) {
+  const { findAdminUserById, countActiveSuperAdmins } = await import("@/server/repositories/admin");
+
+  const actor = await findAdminUserById(actorId);
+  const target = await findAdminUserById(targetUserId);
+
+  if (!actor || !target) {
+    return { allowed: false, reason: "Invalid user" };
+  }
+
+  // SUPER_ADMIN can mutate anyone except for last-super-admin safety
+  if (actor.role === "SUPER_ADMIN") {
+    // Cannot demote/disable/delete the last active SUPER_ADMIN
+    if (target.role === "SUPER_ADMIN" && target.status === "ACTIVE") {
+      const activeSuperAdminCount = await countActiveSuperAdmins();
+      if (activeSuperAdminCount <= 1) {
+        if (targetStatus === "DISABLED" || targetRole === "ADMIN") {
+          return { allowed: false, reason: "Cannot disable or demote the last active SUPER_ADMIN" };
+        }
+      }
+    }
+    return { allowed: true };
+  }
+
+  // ADMIN cannot mutate SUPER_ADMIN users
+  if (target.role === "SUPER_ADMIN") {
+    return { allowed: false, reason: "Insufficient permissions to manage SUPER_ADMIN users" };
+  }
+
+  // ADMIN can only mutate if they have the necessary permission
+  if (!adminHasPermission(actor, "users.manage_access")) {
+    return { allowed: false, reason: "You do not have permission to manage users" };
+  }
+
+  return { allowed: true };
+}
+
+export async function validatePermissionGrant(actorId: string, permissionsToGrant: string[]) {
+  const { findAdminUserById } = await import("@/server/repositories/admin");
+  const actor = await findAdminUserById(actorId);
+
+  if (!actor) {
+    return { allowed: false, reason: "Invalid actor" };
+  }
+
+  // SUPER_ADMIN can grant any permission
+  if (actor.role === "SUPER_ADMIN") {
+    return { allowed: true, sanitized: permissionsToGrant };
+  }
+
+  // ADMIN can only grant permissions they themselves possess
+  const actorPermissions = normalizePermissions(actor.permissions);
+  const sanitizedPermissions: string[] = [];
+
+  for (const perm of permissionsToGrant) {
+    const normalized = String(perm).trim().toLowerCase();
+    if (!ADMIN_USER_PERMISSIONS.includes(normalized as AdminUserPermission)) {
+      return { allowed: false, reason: `Unknown permission: ${perm}` };
+    }
+    if (actorPermissions.includes(normalized as AdminUserPermission)) {
+      sanitizedPermissions.push(normalized);
+    } else {
+      return { allowed: false, reason: `You cannot grant ${perm} because you do not possess it` };
+    }
+  }
+
+  return { allowed: true, sanitized: sanitizedPermissions };
+}
 function parseScryptHash(storedHash: string) {
   const match = storedHash.match(SCRYPT_HASH_PATTERN);
 
@@ -131,7 +271,15 @@ export async function getCurrentAdmin() {
     return null;
   }
 
-  return session.user;
+  if (session.user.status !== "ACTIVE") {
+    cookieStore.delete(ADMIN_SESSION_COOKIE);
+    return null;
+  }
+
+  return {
+    ...session.user,
+    permissions: normalizePermissions(session.user.permissions),
+  };
 }
 
 export async function requireAdminSession() {
@@ -177,6 +325,8 @@ export async function loginAdmin(email: string, password: string) {
     tokenHash: hashSessionToken(token),
     expiresAt: new Date(Date.now() + DEFAULT_SESSION_TTL_DAYS * 24 * 60 * 60 * 1000),
   });
+
+  await setAdminUserLastLogin(user.id);
 
   cookieStore.set(ADMIN_SESSION_COOKIE, token, {
     httpOnly: true,

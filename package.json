@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "tsx --test \"tests/*.test.ts\"",
+    "test": "tsx --require ./tests/setup.ts --test \"tests/*.test.ts\"",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",

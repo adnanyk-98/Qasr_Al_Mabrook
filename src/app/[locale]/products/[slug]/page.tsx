@@ -79,6 +79,13 @@ export default async function ProductDetailPage({ params, searchParams }: { para
     slug: category.slug,
     name: translation?.name ?? category.slug,
   }));
+  const relatedHeading = productCategoryNames[0]?.name
+    ? currentLocale === "ar"
+      ? `استكشف المزيد من ${productCategoryNames[0].name}`
+      : `Explore more from ${productCategoryNames[0].name}`
+    : currentLocale === "ar"
+      ? "منتجات ذات صلة"
+      : "Related products";
   const variantGroups = await listProductVariantGroups(product.id, currentLocale);
   const selectedVariant = variants.find((variant) => variant.id === query.variant) ?? variants[0] ?? null;
   const defaultImage = images.find((image) => image.isPrimary) ?? images[0] ?? null;
@@ -120,7 +127,7 @@ export default async function ProductDetailPage({ params, searchParams }: { para
               ]),
             }}
           />
-          <div className="flex flex-wrap items-center gap-2 text-sm text-[var(--text-muted)]">
+          <div className="flex flex-wrap items-center gap-2 text-sm text-[var(--text-muted)]" dir={currentLocale === "ar" ? "rtl" : "ltr"}>
             <Link href={localePath(currentLocale, "/products")} className="text-[var(--brand-primary)] hover:text-[var(--brand-primary-dark)]">
               {t("products")}
             </Link>
@@ -140,29 +147,26 @@ export default async function ProductDetailPage({ params, searchParams }: { para
 
           <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)] lg:gap-12">
             <div>
-              {/* Client-side gallery component */}
-              <div>
-                <ProductGallery
-                  images={images.map((img) => ({
-                    id: img.id,
-                    publicUrl: img.publicUrl,
-                    width: img.width,
-                    height: img.height,
-                    altTextEn: img.altTextEn,
-                    altTextAr: img.altTextAr,
-                    sortOrder: img.sortOrder,
-                    isPrimary: img.isPrimary,
-                  }))}
-                  locale={currentLocale}
-                  productName={product.name}
-                />
-              </div>
+              <ProductGallery
+                images={images.map((img) => ({
+                  id: img.id,
+                  publicUrl: img.publicUrl,
+                  width: img.width,
+                  height: img.height,
+                  altTextEn: img.altTextEn,
+                  altTextAr: img.altTextAr,
+                  sortOrder: img.sortOrder,
+                  isPrimary: img.isPrimary,
+                }))}
+                locale={currentLocale}
+                productName={product.name}
+              />
             </div>
 
-            <div className="space-y-6 lg:pt-2">
+            <div className="space-y-6 lg:pt-2" dir={currentLocale === "ar" ? "rtl" : "ltr"}>
               <div>
                 {product.brandName ? <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">{product.brandName}</p> : null}
-                <h1 className="mt-2 text-4xl font-semibold text-[var(--foreground)]">{product.name}</h1>
+                <h1 className="mt-2 text-3xl font-semibold text-[var(--foreground)] sm:text-4xl">{product.name}</h1>
               </div>
 
               {product.shortDescription ? (
@@ -191,6 +195,7 @@ export default async function ProductDetailPage({ params, searchParams }: { para
               ) : null}
 
               <SalesActions locale={currentLocale} phone={contactSettings.business_phone} email={contactSettings.business_email} whatsapp={contactSettings.whatsapp_number} productName={product.name} productSlug={product.slug} variantId={selectedVariant?.id} />
+
               {(Boolean(selectedVariant?.sku ?? product.defaultSku) || productCategoryNames.length > 0) ? (
                 <dl className="grid max-w-xl grid-cols-1 gap-3 rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-[var(--brand-surface-alt)] p-4 sm:grid-cols-2">
                   {selectedVariant?.sku ?? product.defaultSku ? (
@@ -207,45 +212,55 @@ export default async function ProductDetailPage({ params, searchParams }: { para
                   ) : null}
                 </dl>
               ) : null}
-              <Link href={localePath(currentLocale, "/products")} className="text-sm font-medium text-[var(--brand-primary)] hover:text-[var(--brand-primary-dark)]">
-                {common("backToCatalogue")}
-              </Link>
             </div>
           </div>
 
-          <div className="grid gap-8 xl:grid-cols-[0.95fr_1.05fr]">
-            {specifications.length > 0 ? (
-            <section className="rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-white p-6 shadow-[var(--shadow-sm)]">
-              <h2 className="text-2xl font-semibold text-[var(--foreground)]">{t("specifications")}</h2>
-              <div className="mt-5 space-y-3">
-                {specifications.map((specification) => (
-                  <div key={specification.id} className="flex items-center justify-between border-b border-[var(--brand-border)] py-2 text-sm">
-                    <span className="font-medium text-[var(--foreground)]">{specification.name}</span>
-                    <span className="text-[var(--text-muted)]">{specification.value}</span>
-                  </div>
-                ))}
-              </div>
-            </section>
-            ) : null}
+          <div className="mx-auto max-w-[820px] pt-2" dir={currentLocale === "ar" ? "rtl" : "ltr"}>
+            {specifications.length > 0 || product.description ? (
+              <div className="space-y-6">
+                {specifications.length > 0 ? (
+                  <section className="rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-white p-6 shadow-[var(--shadow-sm)]">
+                    <h2 className="text-2xl font-semibold text-[var(--foreground)]">{t("specifications")}</h2>
+                    <div className="mt-5 space-y-3">
+                      {specifications.map((specification) => (
+                        <div key={specification.id} className="flex items-center justify-between gap-4 border-b border-[var(--brand-border)] py-2 text-sm">
+                          <span className="font-medium text-[var(--foreground)]">{specification.name}</span>
+                          <span className="text-[var(--text-muted)]">{specification.value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                ) : null}
 
-            {product.description ? (
-            <section className="rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-white p-6 shadow-[var(--shadow-sm)]">
-              <h2 className="text-2xl font-semibold text-[var(--foreground)]">{t("details")}</h2>
-              <div className="prose mt-5 max-w-3xl text-sm leading-7 text-[var(--text-muted)]">
-                <div dangerouslySetInnerHTML={{ __html: product.description }} />
+                {product.description ? (
+                  <section className="rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-white p-6 shadow-[var(--shadow-sm)]">
+                    <h2 className="text-2xl font-semibold text-[var(--foreground)]">{t("details")}</h2>
+                    <div className="prose mt-5 max-w-none text-sm leading-7 text-[var(--text-muted)]">
+                      <div dangerouslySetInnerHTML={{ __html: product.description }} />
+                    </div>
+                  </section>
+                ) : null}
               </div>
-            </section>
             ) : null}
           </div>
 
           {relatedProducts.length > 0 ? (
-            <section className="space-y-6">
-              <h2 className="text-2xl font-semibold text-[var(--foreground)]">{t("related")}</h2>
+            <section className="space-y-6" dir={currentLocale === "ar" ? "rtl" : "ltr"}>
+              <h2 className="text-2xl font-semibold text-[var(--foreground)]">{relatedHeading}</h2>
               <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
                 {relatedProducts.map((item) => <ProductCard key={item.id} locale={currentLocale} product={item} />)}
               </div>
             </section>
           ) : null}
+
+          <section className="border-t border-[var(--brand-border)] pt-8" dir={currentLocale === "ar" ? "rtl" : "ltr"}>
+            <div className="mx-auto max-w-xl text-center">
+              <p className="text-lg font-medium text-[var(--foreground)]">{currentLocale === "ar" ? "هل أنت مهتم بهذا المنتج؟" : "Interested in this product?"}</p>
+              <div className="mt-4 flex justify-center">
+                <SalesActions locale={currentLocale} phone={contactSettings.business_phone} email={contactSettings.business_email} whatsapp={contactSettings.whatsapp_number} productName={product.name} productSlug={product.slug} variantId={selectedVariant?.id} />
+              </div>
+            </div>
+          </section>
         </Container>
       </Section>
     </PublicShell>

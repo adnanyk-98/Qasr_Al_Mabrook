@@ -9,7 +9,6 @@ import {
   attributes,
   brandTranslations,
   categories,
-  categoryAttributes,
   categoryTranslations,
   homepageSections,
   homepageDeals,
@@ -26,7 +25,6 @@ import {
   variantCombinationValues,
   variantCombinations,
   variantDefinitions,
-  variantImages,
   brands,
 } from "@/db/schema";
 
@@ -405,26 +403,40 @@ export async function listVariantCombinationValuesForProduct(productId: string, 
   }));
 }
 
+export function isRelatedProductEligible(product: { id: string; status: string; categoryIds: string[] }, currentProductId: string, categoryIds: Set<string>) {
+  if (product.id === currentProductId) return false;
+  if (product.status !== "PUBLISHED") return false;
+  if (!product.categoryIds.length) return false;
+  return product.categoryIds.some((categoryId) => categoryIds.has(categoryId));
+}
+
 export async function listRelatedProducts(locale: Locale, currentProductId: string, categoryIds: string[]) {
   if (categoryIds.length === 0) {
     return [];
   }
 
+  const uniqueCategoryIds = [...new Set(categoryIds)];
   const rows = await db
     .select({
       product: products,
       translation: productTranslations,
+      categoryId: productCategories.categoryId,
     })
     .from(productCategories)
     .innerJoin(products, eq(productCategories.productId, products.id))
     .leftJoin(productTranslations, and(eq(productTranslations.productId, products.id), eq(productTranslations.locale, locale)))
-    .where(and(eq(products.status, "PUBLISHED"), eq(productCategories.categoryId, categoryIds[0])))
-    .orderBy(desc(products.createdAt), asc(products.id))
-    .limit(6);
+    .where(and(eq(products.status, "PUBLISHED"), inArray(productCategories.categoryId, uniqueCategoryIds)))
+    .orderBy(desc(products.createdAt), asc(products.id));
 
-  return localizeProductRows(rows
-    .filter(({ product }) => product.id !== currentProductId)
-    , locale);
+  const seen = new Set<string>();
+  const eligible = rows.filter(({ product, categoryId }) => {
+    if (product.id === currentProductId) return false;
+    if (seen.has(product.id)) return false;
+    seen.add(product.id);
+    return categoryId && uniqueCategoryIds.includes(categoryId);
+  });
+
+  return localizeProductRows(eligible, locale);
 }
 
 export async function searchPublishedProducts(locale: Locale, query: string) {

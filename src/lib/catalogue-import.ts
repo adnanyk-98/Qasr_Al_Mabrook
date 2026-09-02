@@ -96,7 +96,6 @@ export function validateLocalImportMode(stage: string, confirmed: boolean, datab
     // Basic validation: DATABASE_URL must be a valid URL (we don't restrict hostnames here)
     // to allow development targets such as Supabase-hosted dev DBs.
     // Keep secrets out of messages by not echoing the URL.
-    // eslint-disable-next-line no-new
     new URL(databaseUrl);
   } catch {
     return { ok: false, message: "Refusing local import: DATABASE_URL is malformed." };

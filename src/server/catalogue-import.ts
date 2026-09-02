@@ -166,7 +166,7 @@ export async function importLocalCatalogue(report: DiscoveryReport) {
       try {
         await s3.send(new HeadObjectCommand({ Bucket: bucket, Key: key }));
         objectExists = true;
-      } catch (err) {
+      } catch {
         objectExists = false;
       }
 

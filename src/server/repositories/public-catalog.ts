@@ -28,8 +28,22 @@ import {
   brands,
 } from "@/db/schema";
 
-export async function getPublishedBrands() {
-  return db.select({ id: brands.id, name: brands.name, logoUrl: brands.logoUrl }).from(brands).where(and(eq(brands.enabled, true), eq(brands.status, "PUBLISHED"))).orderBy(asc(brands.sortOrder), asc(brands.name));
+export async function getPublishedBrands(locale: Locale) {
+  const publishedBrands = await db
+    .select({ id: brands.id, baseName: brands.name, logoUrl: brands.logoUrl, sortOrder: brands.sortOrder })
+    .from(brands)
+    .where(and(eq(brands.enabled, true), eq(brands.status, "PUBLISHED")))
+    .orderBy(asc(brands.sortOrder), asc(brands.name));
+  const brandIds = publishedBrands.map((brand) => brand.id);
+  const translations = brandIds.length
+    ? await db.select().from(brandTranslations).where(inArray(brandTranslations.brandId, brandIds))
+    : [];
+
+  return publishedBrands.map((brand) => {
+    const candidates = translations.filter((translation) => translation.brandId === brand.id);
+    const translation = candidates.find((candidate) => candidate.locale === locale) ?? candidates.find((candidate) => candidate.locale === "en");
+    return { id: brand.id, name: translation?.name ?? brand.baseName, logoUrl: brand.logoUrl };
+  });
 }
 
 export async function listPublishedHomepageSections() {
@@ -485,7 +499,7 @@ export async function listProductCategoriesForProduct(productId: string, locale:
     })
     .from(productCategories)
     .innerJoin(categories, eq(productCategories.categoryId, categories.id))
-    .where(eq(productCategories.productId, productId))
+    .where(and(eq(productCategories.productId, productId), eq(categories.status, "PUBLISHED")))
     .orderBy(asc(categories.sortOrder));
   const categoryIds = rows.map(({ category }) => category.id);
   const translations = categoryIds.length

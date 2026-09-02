@@ -65,7 +65,7 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ loc
     listPublishedHomepageSections(),
     listPublishedCategories(currentLocale),
     listPublishedProducts(currentLocale, { limit: 6 }),
-    getPublishedBrands(),
+    getPublishedBrands(currentLocale),
     listPublishedHomepageDeals(currentLocale),
   ]);
   const heroSections = sections.filter((section) => section.sectionType.toUpperCase() === "HERO");

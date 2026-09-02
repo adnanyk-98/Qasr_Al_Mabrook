@@ -100,7 +100,7 @@ export default async function ProductDetailPage({ params, searchParams }: { para
   return (
     <PublicShell locale={currentLocale} path={`/products/${slug}${query.variant ? `?variant=${encodeURIComponent(query.variant)}` : ""}`}>
       <Section>
-        <Container className="space-y-10">
+        <Container className="space-y-8">
           <AnalyticsTracker event="product_view" params={{ product_id: product.id, product_name: product.name, product_slug: product.slug, sku: selectedVariant?.sku ?? product.defaultSku, category: productCategoryNames.map((category) => category.name).join(", "), locale: currentLocale }} />
           {/* JSON-LD Structured Data for Product */}
           <script
@@ -215,7 +215,7 @@ export default async function ProductDetailPage({ params, searchParams }: { para
             </div>
           </div>
 
-          <div className="mx-auto max-w-[820px] pt-2" dir={currentLocale === "ar" ? "rtl" : "ltr"}>
+          <div className="mx-auto max-w-[820px]" dir={currentLocale === "ar" ? "rtl" : "ltr"}>
             {specifications.length > 0 || product.description ? (
               <div className="space-y-6">
                 {specifications.length > 0 ? (

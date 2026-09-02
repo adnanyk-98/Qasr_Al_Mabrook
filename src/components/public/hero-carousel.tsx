@@ -3,9 +3,8 @@
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { PublicImageSlot } from "@/components/public/public-image-slot";
 import { localizedHref } from "@/lib/locales";
 import { trackEvent } from "@/lib/analytics";
 
@@ -107,7 +106,6 @@ export function HeroCarousel({
   const next = useCallback(() => goTo(Math.min(banners.length + 1, active + 1)), [active, banners.length, goTo]);
 
   useEffect(() => {
-    setActive(1); // Reset to first real slide
     dragXRef.current = 0;
     isDraggingRef.current = false;
     hasDraggedRef.current = false;
@@ -236,8 +234,7 @@ export function HeroCarousel({
     let capturedElement: HTMLElement | null = null;
 
     const onPointerDown = (e: PointerEvent) => {
-      // only left button / touch
-      if ((e as any).button && (e as any).button !== 0) return;
+      if (e.pointerType !== 'touch' && e.button !== 0) return;
       pointerIdRef.current = e.pointerId;
       startXRef.current = e.clientX;
       startYRef.current = e.clientY;
@@ -381,7 +378,7 @@ export function HeroCarousel({
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
     };
-  }, [active, autoplay, autoplayInterval, banners.length, direction, reducedMotion]);
+  }, [active, autoplay, autoplayInterval, banners.length, direction, reducedMotion, restartAutoplay]);
 
   // sync slider transform when active changes (non-dragging)
 
@@ -459,12 +456,15 @@ export function HeroCarousel({
                       <div className="relative w-full aspect-[9/10] md:aspect-[8/3] overflow-hidden">
                         <picture>
                           {banner.mobileImageUrl ? <source media="(max-width: 767px)" srcSet={banner.mobileImageUrl} /> : null}
-                          <img
-                            src={banner.desktopImageUrl ?? banner.imageUrl ?? ''}
+                          <Image
+                            src={banner.desktopImageUrl ?? banner.imageUrl ?? ""}
                             alt={banner.imageAlt ?? banner.title ?? `Hero banner ${getRealSlideIndex(index) + 1}`}
                             draggable={false}
                             onDragStart={(event) => event.preventDefault()}
-                            className="w-full h-full object-contain object-center"
+                            className="h-full w-full object-contain object-center"
+                            fill
+                            sizes="(max-width: 767px) 100vw, 100vw"
+                            unoptimized
                           />
                         </picture>
                       </div>
@@ -474,12 +474,15 @@ export function HeroCarousel({
                       <div className="relative w-full aspect-[9/10] md:aspect-[8/3] overflow-hidden">
                         <picture>
                           {banner.mobileImageUrl ? <source media="(max-width: 767px)" srcSet={banner.mobileImageUrl} /> : null}
-                          <img
-                            src={banner.desktopImageUrl ?? banner.imageUrl ?? ''}
+                          <Image
+                            src={banner.desktopImageUrl ?? banner.imageUrl ?? ""}
                             alt={banner.imageAlt ?? banner.title ?? `Hero banner ${getRealSlideIndex(index) + 1}`}
                             draggable={false}
                             onDragStart={(event) => event.preventDefault()}
-                            className="w-full h-full object-contain object-center"
+                            className="h-full w-full object-contain object-center"
+                            fill
+                            sizes="(max-width: 767px) 100vw, 100vw"
+                            unoptimized
                           />
                         </picture>
                       </div>
@@ -492,6 +495,7 @@ export function HeroCarousel({
         </div>
       </div>
 
+      {overlay ? <div className="absolute inset-x-0 bottom-0 z-20 pointer-events-none">{overlay}</div> : null}
       <div className="absolute inset-x-0 bottom-4 z-30 flex items-center justify-center gap-2 sm:bottom-5">
         {banners.map((banner, index) => (
           <button

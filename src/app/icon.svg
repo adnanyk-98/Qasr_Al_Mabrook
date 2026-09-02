@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Qasr Al Mabrook icon">
+  <rect width="512" height="512" rx="64" fill="#fffaf5"/>
+  <g fill="#7f1518">
+    <rect x="66" y="132" width="52" height="192" rx="18"/>
+    <rect x="394" y="132" width="52" height="192" rx="18"/>
+    <rect x="118" y="94" width="52" height="106" rx="18"/>
+    <rect x="342" y="94" width="52" height="106" rx="18"/>
+    <path d="M124 236h264v26H124zm-18 26h300v42H106zm30-112h240v44H136zm48 36h144v24H184zm-18 66h180v42H166z"/>
+    <rect x="182" y="174" width="148" height="154" rx="18"/>
+    <rect x="210" y="126" width="92" height="48" rx="14"/>
+    <rect x="108" y="332" width="296" height="28" rx="12"/>
+  </g>
+</svg>

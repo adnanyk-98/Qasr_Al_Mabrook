@@ -10,7 +10,7 @@ export function Card({
   return (
     <div
       className={[
-        "rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-[var(--background)] shadow-[var(--shadow-sm)]",
+        "overflow-hidden rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-[var(--background)] shadow-[var(--shadow-sm)]",
         className,
       ].join(" ")}
     >

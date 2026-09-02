@@ -34,8 +34,8 @@ export async function listCategoriesPaginated({ page = 1, pageSize = 10, search 
   const whereClause = search
     ? sql`(categories.slug ILIKE ${"%" + search + "%"} OR EXISTS (SELECT 1 FROM category_translations ct WHERE ct.category_id = categories.id AND ct.name ILIKE ${"%" + search + "%"}))`
     : undefined;
-  const totalRows = await db.select({ count: sql<number>`count(*)` }).from(categories).where(whereClause as any);
-  const items = await db.select().from(categories).where(whereClause as any).orderBy(asc(categories.sortOrder), asc(categories.createdAt)).limit(pageSize).offset(offset);
+  const totalRows = await db.select({ count: sql<number>`count(*)` }).from(categories).where(whereClause);
+  const items = await db.select().from(categories).where(whereClause).orderBy(asc(categories.sortOrder), asc(categories.createdAt)).limit(pageSize).offset(offset);
   const total = Number(totalRows[0]?.count ?? 0);
   return { items, total, page, pageSize, totalPages: Math.ceil(total / pageSize) || 1 };
 }
@@ -219,7 +219,7 @@ export async function listProductsForDealSelector(search = "") {
     .select({ product: products, translation: productTranslations })
     .from(products)
     .leftJoin(productTranslations, and(eq(productTranslations.productId, products.id), eq(productTranslations.locale, "en")))
-    .where(and(eq(products.status, "PUBLISHED"), searchClause as any))
+    .where(searchClause ? and(eq(products.status, "PUBLISHED"), searchClause) : eq(products.status, "PUBLISHED"))
     .orderBy(asc(productTranslations.name), asc(products.slug));
   return attachAdminProductImages(rows.map(({ product, translation }) => ({ ...product, name: translation?.name ?? product.slug })));
 }
@@ -229,8 +229,8 @@ export async function listProductsPaginated({ page = 1, pageSize = 10, search = 
   const searchClause = search
     ? sql`(products.slug ILIKE ${"%" + search + "%"} OR products.default_sku ILIKE ${"%" + search + "%"} OR products.id::text ILIKE ${"%" + search + "%"} OR EXISTS (SELECT 1 FROM product_translations pt WHERE pt.product_id = products.id AND pt.name ILIKE ${"%" + search + "%"}))`
     : undefined;
-  const totalRows = await db.select({ count: sql<number>`count(*)` }).from(products).where(searchClause as any);
-  const items = await db.select().from(products).where(searchClause as any).orderBy(desc(products.createdAt)).limit(pageSize).offset(offset);
+  const totalRows = await db.select({ count: sql<number>`count(*)` }).from(products).where(searchClause);
+  const items = await db.select().from(products).where(searchClause).orderBy(desc(products.createdAt)).limit(pageSize).offset(offset);
   const total = Number(totalRows[0]?.count ?? 0);
   return { items, total, page, pageSize, totalPages: Math.ceil(total / pageSize) || 1 };
 }
@@ -364,14 +364,14 @@ export async function setProductPrimaryImage(productId: string, imageId: string)
       .set({ isPrimary: true })
       .where(and(eq(productImages.id, imageId), eq(productImages.productId, productId)))
       .returning();
-    if (!primaryRows[0]) return null;
+    if (!primaryRows[0]) throw new Error("Primary image disappeared during selection.");
 
     const productRows = await transaction
       .update(products)
       .set({ primaryImageId: imageId })
       .where(eq(products.id, productId))
       .returning();
-    if (!productRows[0]) return null;
+    if (!productRows[0]) throw new Error("Product disappeared during primary image selection.");
 
     return primaryRows[0];
   });
@@ -393,12 +393,6 @@ export async function createProductImage(input: { productId: string; objectKey: 
     })
     .returning();
 
-  return rows[0] ?? null;
-}
-
-export async function setProductImagePrimary(productId: string, imageId: string) {
-  await db.update(productImages).set({ isPrimary: false }).where(eq(productImages.productId, productId));
-  const rows = await db.update(productImages).set({ isPrimary: true }).where(and(eq(productImages.id, imageId), eq(productImages.productId, productId))).returning();
   return rows[0] ?? null;
 }
 
@@ -464,8 +458,8 @@ export async function listHomepageSections() {
 export async function listHomepageSectionsPaginated({ page = 1, pageSize = 10, search = "" }: { page?: number; pageSize?: number; search?: string }) {
   const offset = Math.max(0, (page - 1) * pageSize);
   const whereClause = search ? sql`(homepage_sections.section_type ILIKE ${"%" + search + "%"})` : undefined;
-  const totalRows = await db.select({ count: sql<number>`count(*)` }).from(homepageSections).where(whereClause as any);
-  const items = await db.select().from(homepageSections).where(whereClause as any).orderBy(asc(homepageSections.sortOrder), desc(homepageSections.createdAt)).limit(pageSize).offset(offset);
+  const totalRows = await db.select({ count: sql<number>`count(*)` }).from(homepageSections).where(whereClause);
+  const items = await db.select().from(homepageSections).where(whereClause).orderBy(asc(homepageSections.sortOrder), desc(homepageSections.createdAt)).limit(pageSize).offset(offset);
   const total = Number(totalRows[0]?.count ?? 0);
   return { items, total, page, pageSize, totalPages: Math.ceil(total / pageSize) || 1 };
 }

@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { serverEnv } from "@/config/env";
 
 import {
   createAttribute,
@@ -26,15 +27,10 @@ import {
   createSpecificationTranslation,
   createVariantCombination,
   createVariantDefinition,
-  createVariantImage,
   updateProductImage,
 } from "@/server/repositories/catalog-admin";
 import { getProductById, updateCategory, getCategoryById, setCategoryImage } from "@/server/repositories/catalog-admin";
 import { requireAdminSession } from "@/server/services/admin-auth";
-import { serverEnv } from "@/config/env";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-import { generateR2PublicUrl, readOriginalProductImageMetadata } from "@/lib/catalogue-import";
-import { validateHeroImageUpload } from "@/lib/hero-media";
 import { resolvePrimaryProductImageId } from "@/lib/product-image-primary";
 
 const idSchema = z.string().uuid();

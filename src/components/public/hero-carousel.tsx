@@ -454,7 +454,7 @@ export function HeroCarousel({
                     >
                       {/* Responsive picture: mobile source first, desktop as fallback */}
                       <div className="relative w-full aspect-[9/10] md:aspect-[8/3] overflow-hidden">
-                        <picture>
+                        <picture className="relative block h-full w-full">
                           {banner.mobileImageUrl ? <source media="(max-width: 767px)" srcSet={banner.mobileImageUrl} /> : null}
                           <Image
                             src={banner.desktopImageUrl ?? banner.imageUrl ?? ""}
@@ -472,7 +472,7 @@ export function HeroCarousel({
                   ) : (
                     <div className="block w-full h-full">
                       <div className="relative w-full aspect-[9/10] md:aspect-[8/3] overflow-hidden">
-                        <picture>
+                        <picture className="relative block h-full w-full">
                           {banner.mobileImageUrl ? <source media="(max-width: 767px)" srcSet={banner.mobileImageUrl} /> : null}
                           <Image
                             src={banner.desktopImageUrl ?? banner.imageUrl ?? ""}

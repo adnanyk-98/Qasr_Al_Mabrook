@@ -53,6 +53,7 @@ export default function ProductGallery({
               alt={locale === "ar" ? displayed.altTextAr ?? displayed.altTextEn ?? productName ?? "" : displayed.altTextEn ?? displayed.altTextAr ?? productName ?? ""}
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
+              loading={displayed.id === first?.id ? "eager" : "lazy"}
               unoptimized
               className="object-contain object-center"
             />

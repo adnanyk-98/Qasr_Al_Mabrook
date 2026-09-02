@@ -5,6 +5,7 @@ import sharp from "sharp";
 
 import { readOriginalProductImageMetadata, validateLocalImportMode } from "@/lib/catalogue-import";
 import { validateR2Configuration } from "@/lib/production-readiness";
+import { resolvePrimaryProductImageId } from "@/server/services/admin-catalog";
 
 test("local DATABASE_URL accepted", () => {
   const mode = validateLocalImportMode("local", true, "postgresql://user:pass@localhost:5432/db");
@@ -78,4 +79,24 @@ test("reads original product image dimensions without trimming", async () => {
 
   const metadata = await readOriginalProductImageMetadata(buffer);
   assert.deepEqual(metadata, { width: 3, height: 2 });
+});
+
+test("keeps the current primary image unless the new image is explicitly marked primary", () => {
+  assert.equal(
+    resolvePrimaryProductImageId({
+      currentPrimaryImageId: "existing-primary",
+      candidateImageId: "new-upload",
+      isPrimaryChecked: false,
+    }),
+    "existing-primary",
+  );
+
+  assert.equal(
+    resolvePrimaryProductImageId({
+      currentPrimaryImageId: null,
+      candidateImageId: "new-upload",
+      isPrimaryChecked: true,
+    }),
+    "new-upload",
+  );
 });

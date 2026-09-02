@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getCurrentAdmin } from "@/server/services/admin-auth";
 import { serverEnv } from "@/config/env";
 import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { getProductImageById, deleteProductImageById, listProductImagesForProduct, setProductImagePrimary, setProductPrimaryImage, clearProductPrimaryImage } from "@/server/repositories/catalog-admin";
+import { getProductImageById, deleteProductImageById, listProductImagesForProduct, setProductPrimaryImage, clearProductPrimaryImage } from "@/server/repositories/catalog-admin";
 
 export async function POST(request: Request) {
   const admin = await getCurrentAdmin();
@@ -53,7 +53,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, newPrimaryImageId: null });
     } else {
       const newPrimary = remaining[0];
-      await setProductImagePrimary(productId, newPrimary.id);
       await setProductPrimaryImage(productId, newPrimary.id);
       return NextResponse.json({ success: true, newPrimaryImageId: newPrimary.id });
     }

@@ -350,8 +350,31 @@ export async function listProductImages() {
 }
 
 export async function setProductPrimaryImage(productId: string, imageId: string) {
-  const rows = await db.update(products).set({ primaryImageId: imageId }).where(eq(products.id, productId)).returning();
-  return rows[0] ?? null;
+  return db.transaction(async (transaction) => {
+    const target = await transaction
+      .select({ id: productImages.id })
+      .from(productImages)
+      .where(and(eq(productImages.id, imageId), eq(productImages.productId, productId)))
+      .limit(1);
+    if (!target[0]) return null;
+
+    await transaction.update(productImages).set({ isPrimary: false }).where(eq(productImages.productId, productId));
+    const primaryRows = await transaction
+      .update(productImages)
+      .set({ isPrimary: true })
+      .where(and(eq(productImages.id, imageId), eq(productImages.productId, productId)))
+      .returning();
+    if (!primaryRows[0]) return null;
+
+    const productRows = await transaction
+      .update(products)
+      .set({ primaryImageId: imageId })
+      .where(eq(products.id, productId))
+      .returning();
+    if (!productRows[0]) return null;
+
+    return primaryRows[0];
+  });
 }
 
 export async function createProductImage(input: { productId: string; objectKey: string; publicUrl: string; altTextEn?: string | null; altTextAr?: string | null; width?: number | null; height?: number | null; sortOrder?: number; isPrimary?: boolean }) {
@@ -375,12 +398,25 @@ export async function createProductImage(input: { productId: string; objectKey: 
 
 export async function setProductImagePrimary(productId: string, imageId: string) {
   await db.update(productImages).set({ isPrimary: false }).where(eq(productImages.productId, productId));
-  const rows = await db.update(productImages).set({ isPrimary: true }).where(eq(productImages.id, imageId)).returning();
+  const rows = await db.update(productImages).set({ isPrimary: true }).where(and(eq(productImages.id, imageId), eq(productImages.productId, productId))).returning();
+  return rows[0] ?? null;
+}
+
+export async function updateProductImage(input: { id: string; productId: string; sortOrder?: number; isPrimary?: boolean }) {
+  const rows = await db
+    .update(productImages)
+    .set({
+      sortOrder: input.sortOrder ?? productImages.sortOrder,
+      isPrimary: input.isPrimary ?? productImages.isPrimary,
+    })
+    .where(and(eq(productImages.id, input.id), eq(productImages.productId, input.productId)))
+    .returning();
+
   return rows[0] ?? null;
 }
 
 export async function listProductImagesForProduct(productId: string) {
-  return db.select().from(productImages).where(eq(productImages.productId, productId)).orderBy(asc(productImages.sortOrder), asc(productImages.createdAt));
+  return db.select().from(productImages).where(eq(productImages.productId, productId)).orderBy(asc(productImages.sortOrder), asc(productImages.createdAt), asc(productImages.id));
 }
 
 export async function getProductImageById(id: string) {

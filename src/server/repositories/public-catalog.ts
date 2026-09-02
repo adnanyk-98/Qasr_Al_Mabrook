@@ -342,7 +342,7 @@ export async function listProductImagesForPublic(productId: string) {
     .select()
     .from(productImages)
     .where(eq(productImages.productId, productId))
-    .orderBy(asc(productImages.sortOrder), desc(productImages.createdAt));
+    .orderBy(asc(productImages.sortOrder), desc(productImages.createdAt), asc(productImages.id));
 }
 
 export async function listProductVariantGroups(productId: string, locale: Locale) {

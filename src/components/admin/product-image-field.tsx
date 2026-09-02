@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Label } from "@/components/ui/form";
+import { reorderProductImages } from "@/lib/product-image-order";
 
 type ImageEntry = {
   id?: string;
@@ -13,11 +14,10 @@ type ImageEntry = {
 };
 
 type Props = {
-  productId?: string | null;
   currentImages?: ImageEntry[];
 };
 
-export function ProductImageField({ productId = null, currentImages = [] }: Props) {
+export function ProductImageField({ currentImages = [] }: Props) {
   const [images, setImages] = useState<ImageEntry[]>(() =>
     currentImages.map((i) => ({ ...i })),
   );
@@ -25,11 +25,6 @@ export function ProductImageField({ productId = null, currentImages = [] }: Prop
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [confirmTarget, setConfirmTarget] = useState<{ id: string; idx: number; objectKey: string } | null>(null);
-
-  // Sync images when editing product changes (handles client-side navigation without refresh)
-  useEffect(() => {
-    setImages(currentImages.map((i) => ({ ...i })));
-  }, [productId]);
 
   const handleFiles = (files: FileList | null) => {
     if (!files || files.length === 0) return;
@@ -74,8 +69,8 @@ export function ProductImageField({ productId = null, currentImages = [] }: Prop
             isPrimary: images.length === 0 && !images.some((i) => i.isPrimary),
           };
           setImages((prev) => [...prev, entry]);
-        } catch (e: any) {
-          setError(String(e?.message ?? e));
+        } catch (error: unknown) {
+          setError(error instanceof Error ? error.message : String(error));
         } finally {
           setUploading(false);
         }
@@ -98,10 +93,13 @@ export function ProductImageField({ productId = null, currentImages = [] }: Prop
   };
 
   const [deletingIds, setDeletingIds] = useState<string[]>([]);
-  
 
   const setPrimaryAt = (idx: number) => {
     setImages((prev) => prev.map((img, i) => ({ ...img, isPrimary: i === idx })));
+  };
+
+  const reorderAt = (idx: number, direction: "up" | "down") => {
+    setImages((prev) => reorderProductImages(prev, idx, direction));
   };
 
   return (
@@ -115,13 +113,21 @@ export function ProductImageField({ productId = null, currentImages = [] }: Prop
 
       <div className="mt-3 space-y-2">
         {images.map((img, idx) => (
-          <div key={img.id ?? img.objectKey} data-testid="product-image-item" className="flex items-center gap-3">
+          <div key={img.id ?? `${img.objectKey}-${idx}`} data-testid="product-image-item" className="flex items-center gap-3">
+            {/* Dynamic uploaded URLs are intentionally rendered without Next image optimization. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={img.publicUrl} alt={`Image ${idx + 1}`} className="h-16 w-16 rounded object-contain" />
             <div className="flex-1 text-sm">
               <div>{img.objectKey}</div>
               <div className="text-xs text-[var(--text-muted)]">{img.width} × {img.height}</div>
             </div>
             <div className="flex items-center gap-2">
+              <button type="button" className="text-xs text-[var(--brand-primary)] disabled:opacity-40" onClick={() => reorderAt(idx, "up")} disabled={idx === 0} aria-label="Move image up">
+                ↑
+              </button>
+              <button type="button" className="text-xs text-[var(--brand-primary)] disabled:opacity-40" onClick={() => reorderAt(idx, "down")} disabled={idx === images.length - 1} aria-label="Move image down">
+                ↓
+              </button>
               <label className="text-sm">
                 <input type="radio" name="primaryObjectKey" value={img.objectKey} checked={!!img.isPrimary} onChange={() => setPrimaryAt(idx)} /> Primary
               </label>
@@ -134,6 +140,7 @@ export function ProductImageField({ productId = null, currentImages = [] }: Prop
             <input data-testid="product-image-objectKey" type="hidden" name="objectKey" value={img.objectKey} />
             <input data-testid="product-image-width" type="hidden" name="width" value={String(img.width ?? '')} />
             <input data-testid="product-image-height" type="hidden" name="height" value={String(img.height ?? '')} />
+            <input data-testid="product-image-sort" type="hidden" name="sortOrder" value={String(idx)} />
             {img.id ? <input data-testid="product-image-id" type="hidden" name="imageId" value={img.id} /> : null}
           </div>
         ))}
@@ -173,8 +180,8 @@ export function ProductImageField({ productId = null, currentImages = [] }: Prop
                     setToast({ type: 'success', message: 'Image removed successfully.' });
                     setTimeout(() => setToast(null), 3500);
                     setConfirmTarget(null);
-                  } catch (e: any) {
-                    setToast({ type: 'error', message: String(e?.message ?? e) });
+                  } catch (error: unknown) {
+                    setToast({ type: 'error', message: error instanceof Error ? error.message : String(error) });
                     setTimeout(() => setToast(null), 5000);
                   } finally {
                     setDeletingIds((prev) => prev.filter((x) => x !== confirmTarget.id));

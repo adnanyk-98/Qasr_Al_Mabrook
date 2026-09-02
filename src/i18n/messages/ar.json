@@ -155,7 +155,11 @@
     "emptyTitle": "أدخل كلمة بحث",
     "emptyDescription": "استخدم البحث للعثور على المنتجات المناسبة.",
     "noResultsTitle": "لا توجد نتائج",
-    "noResultsDescription": "حاول كتابة كلمة أخرى أو تعديل البحث."
+    "noResultsDescription": "حاول كتابة كلمة أخرى أو تعديل البحث.",
+    "viewAll": "عرض جميع النتائج",
+    "loading": "جارٍ البحث...",
+    "noResults": "لا توجد منتجات مطابقة",
+    "error": "البحث غير متاح مؤقتاً"
   },
   "enquiry": {
     "getInTouch": "تواصل معنا",

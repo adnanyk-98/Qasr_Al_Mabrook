@@ -58,7 +58,7 @@ export default async function SearchPage({ params, searchParams }: { params: Pro
               {searchTerm ? searchTerm : t("title")}
             </h1>
             <div className="max-w-xl">
-              <SearchForm locale={currentLocale} defaultValue={searchTerm} />
+              <SearchForm locale={currentLocale} defaultValue={searchTerm} labels={{ eyebrow: t("eyebrow"), placeholder: t("placeholder"), label: t("label"), viewAll: t("viewAll"), loading: t("loading"), noResults: t("noResults"), error: t("error") }} />
             </div>
           </div>
 

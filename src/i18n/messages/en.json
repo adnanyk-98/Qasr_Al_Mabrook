@@ -155,7 +155,11 @@
     "emptyTitle": "Enter a search term",
     "emptyDescription": "Use the search form to find the right products.",
     "noResultsTitle": "No results found",
-    "noResultsDescription": "Try another keyword or broaden the query."
+    "noResultsDescription": "Try another keyword or broaden the query.",
+    "viewAll": "View all results",
+    "loading": "Searching...",
+    "noResults": "No matching products",
+    "error": "Search is temporarily unavailable"
   },
   "enquiry": {
     "getInTouch": "Get in touch",

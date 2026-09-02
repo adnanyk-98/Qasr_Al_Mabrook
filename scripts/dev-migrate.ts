@@ -4,25 +4,31 @@ import { resolveMigrationDatabase } from './migration-db';
 
 config({ path: process.env.DOTENV_CONFIG_PATH ?? '.env.local' });
 
-const stage = (process.env.DEPLOYMENT_STAGE ?? '').toLowerCase();
-const confirmation = process.env.MIGRATION_CONFIRMATION ?? '';
+function ensureExplicitMigrationIntent() {
+  const stage = (process.env.DEPLOYMENT_STAGE ?? '').toLowerCase();
+  const confirmation = process.env.MIGRATION_CONFIRMATION ?? '';
 
-if (!stage || !['staging', 'production', 'development', 'local'].includes(stage)) {
-  console.error('Refusing migration: DEPLOYMENT_STAGE must be local, development, staging, or production.');
-  process.exit(1);
-}
+  if (stage && !['development', 'local', 'staging', 'production'].includes(stage)) {
+    console.error('Refusing migration: DEPLOYMENT_STAGE must be local, development, staging, or production.');
+    process.exit(1);
+  }
 
-if ((stage === 'staging' || stage === 'production') && !['APPLY_MIGRATIONS', 'ADOPT_BASELINE_0003'].includes(confirmation)) {
-  console.error('Refusing migration: set MIGRATION_CONFIRMATION=APPLY_MIGRATIONS or ADOPT_BASELINE_0003 explicitly.');
-  process.exit(1);
+  if ((stage === 'staging' || stage === 'production') && !['APPLY_MIGRATIONS', 'ADOPT_BASELINE_0003'].includes(confirmation)) {
+    console.error('Refusing migration: set MIGRATION_CONFIRMATION=APPLY_MIGRATIONS or MIGRATION_CONFIRMATION=ADOPT_BASELINE_0003 explicitly.');
+    process.exit(1);
+  }
 }
 
 (async () => {
+  ensureExplicitMigrationIntent();
+
   const sel = await resolveMigrationDatabase();
   if (!sel) {
     console.error('No approved database target found for migrations. Aborting.');
     process.exit(1);
   }
+
+  console.log(`Applying migrations to ${sel.source}...`);
 
   const env = { ...process.env, DIRECT_DATABASE_URL: sel.url };
   const command = process.platform === 'win32' ? 'npx.cmd' : 'npx';

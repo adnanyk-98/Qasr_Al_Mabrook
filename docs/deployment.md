@@ -85,11 +85,15 @@ npm run build
 
 The readiness checker accepts `local`, `staging`, or `production`. Staging and production require HTTPS, database, authentication, R2, and SMTP configuration. It validates configuration only; it does not test connectivity or deploy anything.
 
-Migration application is explicitly guarded and must be run as a separate deployment step:
+Migration execution is deliberately fail-closed. The repository does not silently fall back from `DIRECT_DATABASE_URL` to `DATABASE_URL`.
+
+For development or local DB verification, a local host target may be used without a migration confirmation flag. For staging or production execution, migration approval must be explicit:
 
 ```text
 DEPLOYMENT_STAGE=staging MIGRATION_CONFIRMATION=APPLY_MIGRATIONS npm run db:migration:apply
 ```
+
+`MIGRATION_ALLOW_DATABASE_URL_FALLBACK=true` is only valid for an explicitly approved local or development fallback path. It is not a default behavior and should not be relied on for production.
 
 The web server must never run this command automatically. The initial administrator bootstrap is also explicit:
 
@@ -98,6 +102,14 @@ DEPLOYMENT_STAGE=staging ADMIN_BOOTSTRAP_CONFIRMATION=BOOTSTRAP_ADMIN npm run db
 ```
 
 Use injected staging/production environment variables or an explicitly selected dotenv path. Never place credentials in repository files.
+
+### Migration safety rules
+
+- `0005_admin_user_permissions.sql` is the canonical permissions migration.
+- `scripts/verify-and-fix-migration.ts` is a one-off repair script and is not the canonical migration flow.
+- Migration tooling must refuse non-local targets unless `MIGRATION_CONFIRMATION` is explicitly set.
+- Connection logging never prints the raw database URL or credential-bearing values.
+- `db:migration:apply` remains a separate deployment step and must never run automatically on application startup.
 
 ## 6. Database Migrations
 
@@ -157,6 +169,16 @@ Production database must have a tested backup/recovery strategy.
 
 Do not consider provider-level backup availability sufficient until restoration has been tested.
 
+Before every production migration or release:
+
+1. Record the database backup identifier, timestamp, retention window, and restore owner.
+2. Confirm the backup was created after the latest accepted production change.
+3. Restore the backup into an isolated database or provider-approved recovery environment.
+4. Verify schema version, representative catalogue data, admin users, and session invalidation behavior.
+5. Record the restore result and the maximum observed data-loss window.
+
+The selected provider must document backup creation, retention, point-in-time recovery, access control, and restore commands before go-live.
+
 ## 11. Monitoring
 
 Analytics is deferred.
@@ -174,6 +196,17 @@ Technical monitoring should still cover:
 Every production deployment should have a rollback strategy.
 
 Database rollback is not always equivalent to application rollback; migrations must be designed with this in mind.
+
+Provider-agnostic rollback acceptance criteria:
+
+- The previous application build remains available by immutable version or deployment identifier.
+- A failed deployment can be switched back without rebuilding from mutable source state.
+- Forward-compatible migrations are preferred; destructive schema changes require a separately tested recovery plan.
+- The rollback procedure identifies who approves it, how traffic is switched, how sessions are handled, and how database writes are reconciled.
+- A staging rollback rehearsal records start time, application version, database state, recovery point, duration, and verification results.
+- Post-rollback smoke tests cover the homepage, product pages, admin login, `/admin/users`, migrations, and enquiry handling.
+
+Do not claim rollback readiness until the selected hosting/database provider and an isolated staging environment have been used to execute and record this rehearsal.
 
 ## 13. Go-Live Checklist
 

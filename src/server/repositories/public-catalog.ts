@@ -1,3 +1,4 @@
+import { aliasedTable } from "drizzle-orm";
 import { and, asc, desc, eq, exists, ilike, inArray, or, sql } from "drizzle-orm";
 
 import { db } from "@/db";
@@ -496,24 +497,29 @@ export async function searchPublishedProductsAutocomplete(locale: Locale, query:
   const trimmed = query.trim();
   if (!trimmed) return [];
 
+  const fallbackProductTranslations = aliasedTable(productTranslations, "autocomplete_product_translations_en");
+  const fallbackCategoryTranslations = aliasedTable(categoryTranslations, "autocomplete_category_translations_en");
+
   const rows = await db
     .select({
       productId: products.id,
       slug: products.slug,
       sku: products.defaultSku,
-      productName: productTranslations.name,
+      productName: sql<string | null>`coalesce(${productTranslations.name}, ${fallbackProductTranslations.name})`,
       categoryId: categories.id,
       categorySlug: categories.slug,
-      categoryName: categoryTranslations.name,
+      categoryName: sql<string | null>`coalesce(${categoryTranslations.name}, ${fallbackCategoryTranslations.name})`,
       primaryImageUrl: productImages.publicUrl,
       primaryImageAltEn: productImages.altTextEn,
       primaryImageAltAr: productImages.altTextAr,
     })
     .from(products)
     .leftJoin(productTranslations, and(eq(productTranslations.productId, products.id), eq(productTranslations.locale, locale)))
+    .leftJoin(fallbackProductTranslations, and(eq(fallbackProductTranslations.productId, products.id), eq(fallbackProductTranslations.locale, "en")))
     .leftJoin(productCategories, eq(productCategories.productId, products.id))
     .leftJoin(categories, and(eq(categories.id, productCategories.categoryId), eq(categories.status, "PUBLISHED")))
     .leftJoin(categoryTranslations, and(eq(categoryTranslations.categoryId, categories.id), eq(categoryTranslations.locale, locale)))
+    .leftJoin(fallbackCategoryTranslations, and(eq(fallbackCategoryTranslations.categoryId, categories.id), eq(fallbackCategoryTranslations.locale, "en")))
     .leftJoin(productImages, and(eq(productImages.productId, products.id), eq(productImages.isPrimary, true)))
     .where(
       and(
@@ -532,28 +538,61 @@ export async function searchPublishedProductsAutocomplete(locale: Locale, query:
     .orderBy(desc(products.createdAt), asc(products.id))
     .limit(Math.max(1, Math.min(12, limit)));
 
-  const productIds = rows.map((row) => row.productId);
-  const fallbackProducts = productIds.length
-    ? await db.select().from(productTranslations).where(and(inArray(productTranslations.productId, productIds), eq(productTranslations.locale, "en")))
-    : [];
-  const categoryIds = rows.map((row) => row.categoryId).filter((id): id is string => Boolean(id));
-  const fallbackCategories = categoryIds.length
-    ? await db.select().from(categoryTranslations).where(and(inArray(categoryTranslations.categoryId, categoryIds), eq(categoryTranslations.locale, "en")))
-    : [];
   const seen = new Set<string>();
 
   return rows.flatMap((row) => {
     if (seen.has(row.productId)) return [];
     seen.add(row.productId);
-    const productFallback = row.productName ? null : fallbackProducts.find((translation) => translation.productId === row.productId);
-    const categoryFallback = row.categoryId && !row.categoryName
-      ? fallbackCategories.find((translation) => translation.categoryId === row.categoryId)
-      : null;
     return [{
       id: row.productId,
       slug: row.slug,
-      name: row.productName ?? productFallback?.name ?? row.slug,
-      categoryName: row.categoryName ?? categoryFallback?.name ?? row.categorySlug ?? null,
+      name: row.productName ?? row.slug,
+      categoryName: row.categoryName ?? row.categorySlug ?? null,
+      sku: row.sku,
+      imageUrl: row.primaryImageUrl,
+      imageAlt: locale === "ar" ? row.primaryImageAltAr ?? row.primaryImageAltEn : row.primaryImageAltEn ?? row.primaryImageAltAr,
+    }];
+  });
+}
+
+export async function getPublishedProductsAutocompleteIndex(locale: Locale) {
+  const fallbackProductTranslations = aliasedTable(productTranslations, "search_index_product_translations_en");
+  const fallbackCategoryTranslations = aliasedTable(categoryTranslations, "search_index_category_translations_en");
+
+  const rows = await db
+    .select({
+      productId: products.id,
+      slug: products.slug,
+      sku: products.defaultSku,
+      productName: sql<string | null>`coalesce(${productTranslations.name}, ${fallbackProductTranslations.name})`,
+      categoryId: categories.id,
+      categorySlug: categories.slug,
+      categoryName: sql<string | null>`coalesce(${categoryTranslations.name}, ${fallbackCategoryTranslations.name})`,
+      primaryImageUrl: productImages.publicUrl,
+      primaryImageAltEn: productImages.altTextEn,
+      primaryImageAltAr: productImages.altTextAr,
+    })
+    .from(products)
+    .leftJoin(productTranslations, and(eq(productTranslations.productId, products.id), eq(productTranslations.locale, locale)))
+    .leftJoin(fallbackProductTranslations, and(eq(fallbackProductTranslations.productId, products.id), eq(fallbackProductTranslations.locale, "en")))
+    .leftJoin(productCategories, eq(productCategories.productId, products.id))
+    .leftJoin(categories, and(eq(categories.id, productCategories.categoryId), eq(categories.status, "PUBLISHED")))
+    .leftJoin(categoryTranslations, and(eq(categoryTranslations.categoryId, categories.id), eq(categoryTranslations.locale, locale)))
+    .leftJoin(fallbackCategoryTranslations, and(eq(fallbackCategoryTranslations.categoryId, categories.id), eq(fallbackCategoryTranslations.locale, "en")))
+    .leftJoin(productImages, and(eq(productImages.productId, products.id), eq(productImages.isPrimary, true)))
+    .where(eq(products.status, "PUBLISHED"))
+    .orderBy(desc(products.createdAt), asc(products.id));
+
+  const seen = new Set<string>();
+
+  return rows.flatMap((row) => {
+    if (seen.has(row.productId)) return [];
+    seen.add(row.productId);
+    return [{
+      id: row.productId,
+      slug: row.slug,
+      name: row.productName ?? row.slug,
+      categoryName: row.categoryName ?? row.categorySlug ?? null,
       sku: row.sku,
       imageUrl: row.primaryImageUrl,
       imageAlt: locale === "ar" ? row.primaryImageAltAr ?? row.primaryImageAltEn : row.primaryImageAltEn ?? row.primaryImageAltAr,

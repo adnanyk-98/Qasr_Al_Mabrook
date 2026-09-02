@@ -6,6 +6,7 @@ import { and, eq, inArray } from "drizzle-orm";
 import { db } from "@/db";
 import { products } from "@/db/schema";
 import { localePath } from "@/lib/locales";
+import { filterAutocompleteResults } from "@/lib/public-search";
 import { searchPublishedProductsAutocomplete } from "@/server/repositories/public-catalog";
 
 after(async () => {
@@ -32,4 +33,16 @@ test("autocomplete returns localized, published product results with a limit", a
   assert.equal(publishedRows.length, ids.length);
   assert.equal(localePath("en", `/products/${englishResults[0].slug}`), `/en/products/${englishResults[0].slug}`);
   assert.equal(localePath("ar", `/products/${arabicResults[0].slug}`), `/ar/products/${arabicResults[0].slug}`);
+});
+
+test("local autocomplete filtering preserves matching, order, limit, and no-results behavior", () => {
+  const results = [
+    { id: "1", slug: "5m-measuring-tape", name: "5M Measuring Tape", categoryName: "Tools", sku: "TAPE-5", imageUrl: null, imageAlt: null },
+    { id: "2", slug: "adivasi-oil", name: "Adivasi Oil", categoryName: "Personal Care", sku: "OIL-1", imageUrl: null, imageAlt: null },
+    { id: "3", slug: "7m-measuring-tape", name: "7M Measuring Tape", categoryName: "Tools", sku: "TAPE-7", imageUrl: null, imageAlt: null },
+  ];
+
+  assert.deepEqual(filterAutocompleteResults(results, "TAPE", 1).map((result) => result.id), ["1"]);
+  assert.deepEqual(filterAutocompleteResults(results, "oil").map((result) => result.id), ["2"]);
+  assert.deepEqual(filterAutocompleteResults(results, "missing"), []);
 });

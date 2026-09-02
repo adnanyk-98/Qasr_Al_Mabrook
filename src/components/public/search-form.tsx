@@ -5,16 +5,7 @@ import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 
 import { localePath, type Locale } from "@/lib/locales";
-
-type AutocompleteResult = {
-  id: string;
-  slug: string;
-  name: string;
-  categoryName: string | null;
-  sku: string | null;
-  imageUrl: string | null;
-  imageAlt: string | null;
-};
+import { filterAutocompleteResults, type AutocompleteResult } from "@/lib/public-search";
 
 type SearchLabels = {
   eyebrow: string;
@@ -32,12 +23,33 @@ function highlightMatch(value: string, query: string) {
   return <>{value.slice(0, index)}<mark className="rounded-sm bg-[var(--brand-accent)]/30 px-0.5 text-inherit">{value.slice(index, index + query.length)}</mark>{value.slice(index + query.length)}</>;
 }
 
+const searchIndexCache = new Map<Locale, Promise<AutocompleteResult[]>>();
+
+function getSearchIndex(locale: Locale) {
+  const cached = searchIndexCache.get(locale);
+  if (cached) return cached;
+
+  const request = fetch(`/api/${locale}/search-index`, { cache: "no-store" })
+    .then(async (response) => {
+      if (!response.ok) throw new Error("Search index request failed");
+      const payload = await response.json() as { results?: AutocompleteResult[] };
+      return payload.results ?? [];
+    })
+    .catch((error) => {
+      searchIndexCache.delete(locale);
+      throw error;
+    });
+  searchIndexCache.set(locale, request);
+  return request;
+}
+
 export function SearchForm({ locale, defaultValue = "", labels }: { locale: Locale; defaultValue?: string; labels: SearchLabels }) {
   const [query, setQuery] = useState(defaultValue);
   const [results, setResults] = useState<AutocompleteResult[]>([]);
   const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [activeIndex, setActiveIndex] = useState(-1);
   const [open, setOpen] = useState(false);
+  const [searchIndex, setSearchIndex] = useState<{ locale: Locale; results: AutocompleteResult[] } | null>(null);
   const inputId = useId();
   const listId = `${inputId}-results`;
   const requestRef = useRef(0);
@@ -45,18 +57,37 @@ export function SearchForm({ locale, defaultValue = "", labels }: { locale: Loca
   const trimmedQuery = query.trim();
 
   useEffect(() => {
-    if (!trimmedQuery) {
+    if (trimmedQuery.length < 2) {
+      requestRef.current += 1;
       return;
     }
 
     const requestId = ++requestRef.current;
+    const localIndex = searchIndex?.locale === locale ? searchIndex.results : null;
+    if (localIndex) {
+      queueMicrotask(() => {
+        if (requestId !== requestRef.current) return;
+        setResults(filterAutocompleteResults(localIndex, trimmedQuery));
+        setStatus("ready");
+        setActiveIndex(-1);
+      });
+      return;
+    }
+
     const timer = window.setTimeout(async () => {
       try {
-        const response = await fetch(`/api/${locale}/search?q=${encodeURIComponent(trimmedQuery)}`, { cache: "no-store" });
-        if (!response.ok) throw new Error("Search request failed");
-        const payload = await response.json() as { results?: AutocompleteResult[] };
+        let nextResults: AutocompleteResult[];
+        try {
+          const index = await getSearchIndex(locale);
+          nextResults = filterAutocompleteResults(index, trimmedQuery);
+        } catch {
+          const response = await fetch(`/api/${locale}/search?q=${encodeURIComponent(trimmedQuery)}`, { cache: "no-store" });
+          if (!response.ok) throw new Error("Search request failed");
+          const payload = await response.json() as { results?: AutocompleteResult[] };
+          nextResults = payload.results ?? [];
+        }
         if (requestId !== requestRef.current) return;
-        setResults(payload.results ?? []);
+        setResults(nextResults);
         setStatus("ready");
         setActiveIndex(-1);
       } catch {
@@ -68,7 +99,7 @@ export function SearchForm({ locale, defaultValue = "", labels }: { locale: Loca
     }, 250);
 
     return () => window.clearTimeout(timer);
-  }, [locale, trimmedQuery]);
+  }, [locale, searchIndex, trimmedQuery]);
 
   useEffect(() => {
     function handlePointerDown(event: PointerEvent) {
@@ -109,10 +140,19 @@ export function SearchForm({ locale, defaultValue = "", labels }: { locale: Loca
       setStatus("idle");
       setOpen(false);
       setActiveIndex(-1);
+    } else if (value.trim().length < 2) {
+      setResults([]);
+      setStatus("idle");
+      setOpen(false);
+      setActiveIndex(-1);
     } else {
       setStatus("loading");
       setOpen(true);
     }
+  }
+
+  function prefetchSearchIndex() {
+    void getSearchIndex(locale).then((results) => setSearchIndex({ locale, results })).catch(() => undefined);
   }
 
   const showPanel = open && Boolean(trimmedQuery);
@@ -126,7 +166,7 @@ export function SearchForm({ locale, defaultValue = "", labels }: { locale: Loca
             name="q"
             value={query}
             onChange={(event) => handleQueryChange(event.target.value)}
-            onFocus={() => { if (trimmedQuery) setOpen(true); }}
+            onFocus={() => { prefetchSearchIndex(); if (trimmedQuery) setOpen(true); }}
             onKeyDown={handleKeyDown}
             placeholder={labels.placeholder}
             aria-label={labels.label}
@@ -136,47 +176,46 @@ export function SearchForm({ locale, defaultValue = "", labels }: { locale: Loca
             role="combobox"
             className="h-10 w-full rounded-full border border-[var(--brand-border)] bg-white px-4 text-sm text-[var(--foreground)] outline-none transition focus:border-[var(--brand-primary)] focus:ring-2 focus:ring-[var(--brand-primary)]/20"
           />
+          {showPanel ? (
+            <div id={listId} role="listbox" aria-label={labels.label} className="absolute start-auto right-0 top-full z-50 mt-2 w-full max-w-[calc(100vw-2rem)] max-h-[min(70vh,28rem)] overflow-y-auto rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-white p-2 shadow-[var(--shadow-md)] lg:w-[26rem]">
+              {status === "loading" ? <p className="px-3 py-4 text-sm text-[var(--text-muted)]" role="status">{labels.loading}</p> : null}
+              {status === "error" ? <p className="px-3 py-4 text-sm text-[var(--text-muted)]" role="status">{labels.error}</p> : null}
+              {status === "ready" && results.length === 0 ? (
+                <>
+                  <p className="px-3 py-4 text-sm text-[var(--text-muted)]" role="status">{labels.noResults}</p>
+                  <Link href={`${localePath(locale, "/search")}?q=${encodeURIComponent(trimmedQuery)}`} onClick={closePanel} className="block border-t border-[var(--brand-border)] px-3 py-3 text-center text-sm font-semibold text-[var(--brand-primary)] hover:bg-[var(--brand-surface-alt)]">{labels.viewAll}</Link>
+                </>
+              ) : null}
+              {status === "ready" && results.length > 0 ? (
+                <>
+                  {results.map((result, index) => (
+                    <Link
+                      key={result.id}
+                      href={localePath(locale, `/products/${result.slug}`)}
+                      role="option"
+                      aria-selected={index === activeIndex}
+                      onMouseEnter={() => setActiveIndex(index)}
+                      onClick={closePanel}
+                      className={`flex items-center gap-3 rounded-[var(--radius-md)] px-2 py-2.5 transition-colors ${index === activeIndex ? "bg-[var(--brand-surface-alt)]" : "hover:bg-[var(--brand-surface-alt)]"}`}
+                    >
+                      <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-[var(--radius-sm)] bg-[var(--brand-surface-alt)]">
+                        {result.imageUrl ? <Image src={result.imageUrl} alt={result.imageAlt ?? result.name} fill sizes="48px" unoptimized className="object-contain" /> : null}
+                      </span>
+                      <span className="min-w-0 flex-1 text-start">
+                        <span className="block truncate text-sm font-semibold text-[var(--foreground)]">{highlightMatch(result.name, trimmedQuery)}</span>
+                        <span className="mt-0.5 block truncate text-xs text-[var(--text-muted)]">{result.categoryName ?? ""}{result.categoryName && result.sku ? " · " : ""}{result.sku ?? ""}</span>
+                      </span>
+                      <span aria-hidden="true" className="shrink-0 px-1 text-lg text-[var(--brand-primary)]">{locale === "ar" ? "←" : "→"}</span>
+                    </Link>
+                  ))}
+                  <Link href={`${localePath(locale, "/search")}?q=${encodeURIComponent(trimmedQuery)}`} onClick={closePanel} className="mt-1 block border-t border-[var(--brand-border)] px-3 py-3 text-center text-sm font-semibold text-[var(--brand-primary)] hover:bg-[var(--brand-surface-alt)]">{labels.viewAll}</Link>
+                </>
+              ) : null}
+            </div>
+          ) : null}
         </div>
         <button type="submit" className="shrink-0 rounded-full bg-[var(--brand-primary)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--brand-primary-dark)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2">{labels.eyebrow}</button>
       </form>
-
-      {showPanel ? (
-        <div id={listId} role="listbox" aria-label={labels.label} className="absolute inset-x-0 top-full z-50 mt-2 max-h-[min(70vh,28rem)] overflow-y-auto rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-white p-2 shadow-[var(--shadow-md)]">
-          {status === "loading" ? <p className="px-3 py-4 text-sm text-[var(--text-muted)]" role="status">{labels.loading}</p> : null}
-          {status === "error" ? <p className="px-3 py-4 text-sm text-[var(--text-muted)]" role="status">{labels.error}</p> : null}
-          {status === "ready" && results.length === 0 ? (
-            <>
-              <p className="px-3 py-4 text-sm text-[var(--text-muted)]" role="status">{labels.noResults}</p>
-              <Link href={`${localePath(locale, "/search")}?q=${encodeURIComponent(trimmedQuery)}`} onClick={closePanel} className="block border-t border-[var(--brand-border)] px-3 py-3 text-center text-sm font-semibold text-[var(--brand-primary)] hover:bg-[var(--brand-surface-alt)]">{labels.viewAll}</Link>
-            </>
-          ) : null}
-          {status === "ready" && results.length > 0 ? (
-            <>
-              {results.map((result, index) => (
-                <Link
-                  key={result.id}
-                  href={localePath(locale, `/products/${result.slug}`)}
-                  role="option"
-                  aria-selected={index === activeIndex}
-                  onMouseEnter={() => setActiveIndex(index)}
-                  onClick={closePanel}
-                  className={`flex items-center gap-3 rounded-[var(--radius-md)] px-2 py-2.5 transition-colors ${index === activeIndex ? "bg-[var(--brand-surface-alt)]" : "hover:bg-[var(--brand-surface-alt)]"}`}
-                >
-                  <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-[var(--radius-sm)] bg-[var(--brand-surface-alt)]">
-                    {result.imageUrl ? <Image src={result.imageUrl} alt={result.imageAlt ?? result.name} fill sizes="48px" unoptimized className="object-contain" /> : null}
-                  </span>
-                  <span className="min-w-0 flex-1 text-start">
-                    <span className="block truncate text-sm font-semibold text-[var(--foreground)]">{highlightMatch(result.name, trimmedQuery)}</span>
-                    <span className="mt-0.5 block truncate text-xs text-[var(--text-muted)]">{result.categoryName ?? ""}{result.categoryName && result.sku ? " · " : ""}{result.sku ?? ""}</span>
-                  </span>
-                  <span aria-hidden="true" className="shrink-0 px-1 text-lg text-[var(--brand-primary)]">{locale === "ar" ? "←" : "→"}</span>
-                </Link>
-              ))}
-              <Link href={`${localePath(locale, "/search")}?q=${encodeURIComponent(trimmedQuery)}`} onClick={closePanel} className="mt-1 block border-t border-[var(--brand-border)] px-3 py-3 text-center text-sm font-semibold text-[var(--brand-primary)] hover:bg-[var(--brand-surface-alt)]">{labels.viewAll}</Link>
-            </>
-          ) : null}
-        </div>
-      ) : null}
     </div>
   );
 }

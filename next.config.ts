@@ -9,9 +9,18 @@ const securityHeaders = [
 	{ key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
 ];
 
+const mutableLocalAssetHeaders = [
+	{ key: "Cache-Control", value: "public, max-age=3600, must-revalidate" },
+];
+
 const nextConfig: NextConfig = {
 	async headers() {
-		return [{ source: "/(.*)", headers: securityHeaders }];
+		return [
+			{ source: "/(.*)", headers: securityHeaders },
+			{ source: "/brand/:path*", headers: mutableLocalAssetHeaders },
+			{ source: "/catalogue/:path*", headers: mutableLocalAssetHeaders },
+			{ source: "/store-locator/:path*", headers: mutableLocalAssetHeaders },
+		];
 	},
 };
 

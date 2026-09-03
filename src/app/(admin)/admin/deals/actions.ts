@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
+import { invalidateHomepagePublicCache } from "@/lib/public-cache";
 import {
   createHomepageDeal,
   deactivateHomepageDeal,
@@ -62,8 +63,10 @@ export async function upsertHomepageDealAction(formData: FormData) {
   }
 
   const input = { productId, discountPercent, isActive, sortOrder: position - 1 };
-  if (existingDeal) await updateHomepageDeal({ id: existingDeal.id, ...input });
-  else await createHomepageDeal(input);
+  const savedDeal = existingDeal
+    ? await updateHomepageDeal({ id: existingDeal.id, ...input })
+    : await createHomepageDeal(input);
+  if (savedDeal) await invalidateHomepagePublicCache();
 
   redirect("/admin/deals?saved=1");
 }
@@ -72,6 +75,7 @@ export async function deactivateHomepageDealAction(formData: FormData) {
   await authorizeAdminMutation();
   const dealId = String(formData.get("dealId") ?? "").trim();
   if (!idSchema.safeParse(dealId).success) redirectWithDealError("Invalid deal.");
-  await deactivateHomepageDeal(dealId);
+  const deactivatedDeal = await deactivateHomepageDeal(dealId);
+  if (deactivatedDeal) await invalidateHomepagePublicCache();
   redirect("/admin/deals?saved=1");
 }

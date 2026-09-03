@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentAdmin } from "@/server/services/admin-auth";
-import { deleteProductById } from "@/server/repositories/catalog-admin";
+import { deleteProductById, getProductById } from "@/server/repositories/catalog-admin";
+import { invalidateProductPublicCache } from "@/lib/public-cache";
 
 type DeleteRequestBody = {
   productId?: string;
@@ -20,9 +21,11 @@ export async function POST(request: Request) {
   const productId = String(body?.productId ?? "").trim();
   if (!productId) return NextResponse.json({ success: false, error: "productId required" }, { status: 400 });
 
+  const existing = await getProductById(productId);
   try {
     const deleted = await deleteProductById(productId);
     if (!deleted) return NextResponse.json({ success: false, error: "Product not found" }, { status: 404 });
+    await invalidateProductPublicCache(productId, existing?.slug);
     return NextResponse.json({ success: true });
   } catch (error: unknown) {
     console.error(error);

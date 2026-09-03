@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { createHomepageSection, getHomepageSectionById, updateHomepageSection } from "@/server/repositories/catalog-admin";
 import { getCurrentAdmin } from "@/server/services/admin-auth";
+import { invalidateHomepagePublicCache } from "@/lib/public-cache";
 
 export async function POST(request: Request) {
   const admin = await getCurrentAdmin();
@@ -45,13 +46,14 @@ export async function POST(request: Request) {
   if (providedMobileImageUrl) configurationJson.mobileImageUrl = providedMobileImageUrl;
 
   if (sectionId) {
-    await updateHomepageSection({
+    const updatedSection = await updateHomepageSection({
       id: sectionId,
       sectionType: sectionType || undefined,
       status: (status === "DRAFT" || status === "PUBLISHED" || status === "ARCHIVED") ? status : "DRAFT",
       sortOrder,
       configurationJson,
     });
+    if (updatedSection) await invalidateHomepagePublicCache();
     return NextResponse.redirect(new URL("/admin/homepage", request.url), 303);
   }
 
@@ -59,11 +61,12 @@ export async function POST(request: Request) {
     return NextResponse.redirect(new URL("/admin/homepage", request.url), 303);
   }
 
-  await createHomepageSection({
+  const createdSection = await createHomepageSection({
     sectionType,
     status,
     sortOrder,
     configurationJson,
   });
+  if (createdSection) await invalidateHomepagePublicCache();
   return NextResponse.redirect(new URL("/admin/homepage", request.url), 303);
 }

@@ -5,10 +5,29 @@ import { and, eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import { brandTranslations, brands, categories, productCategories, products } from "@/db/schema";
+import { PUBLIC_CACHE_REVALIDATE_SECONDS, publicCacheTags, withPublicCache } from "@/lib/public-cache";
 import { getPublishedBrands, listProductCategoriesForProduct } from "@/server/repositories/public-catalog";
 
 after(async () => {
   await (db as typeof db & { $client: { end: () => Promise<void> } }).$client.end();
+});
+
+test("public cache wrapper preserves production config and falls back in direct Node execution", async () => {
+  assert.equal(PUBLIC_CACHE_REVALIDATE_SECONDS, 300);
+  assert.equal(publicCacheTags.brands, "catalogue:brands");
+  assert.equal(publicCacheTags.products, "catalogue:products");
+  assert.equal(publicCacheTags.product("p-1"), "catalogue:product:p-1");
+  assert.equal(publicCacheTags.category("c-1"), "catalogue:category:c-1");
+  assert.equal(publicCacheTags.categorySlug("summer"), "catalogue:category-slug:summer");
+
+  let calls = 0;
+  const result = await withPublicCache(["wrapper-test", "en"], async () => {
+    calls += 1;
+    return { locale: "en", ok: true };
+  }, { revalidate: 600, tags: [publicCacheTags.brands] });
+
+  assert.deepEqual(result, { locale: "en", ok: true });
+  assert.equal(calls, 1);
 });
 
 test("public brands use the requested locale and English fallback", async (t) => {

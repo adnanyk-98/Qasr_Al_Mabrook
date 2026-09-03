@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
+import { invalidateBrandPublicCache } from "@/lib/public-cache";
 import { createBrand, getBrandById, updateBrand } from "@/server/repositories/catalog-admin";
 import { requireAdminSession } from "@/server/services/admin-auth";
 
@@ -40,9 +41,11 @@ export async function upsertBrandAction(formData: FormData) {
   if (!name || !slug || (enabled && !logoUrl)) redirect("/admin/brands");
 
   if (brandId) {
-    await updateBrand({ id: brandId, name, slug, logoUrl, sortOrder, enabled });
+     const updatedBrand = await updateBrand({ id: brandId, name, slug, logoUrl, sortOrder, enabled });
+     if (updatedBrand) await invalidateBrandPublicCache();
   } else {
-    await createBrand({ name, slug, logoUrl, sortOrder, enabled });
+     const createdBrand = await createBrand({ name, slug, logoUrl, sortOrder, enabled });
+     if (createdBrand) await invalidateBrandPublicCache();
   }
 
   redirect("/admin/brands");
@@ -56,5 +59,6 @@ export async function deleteBrandAction(formData: FormData) {
   const { deleteBrandById } = await import("@/server/repositories/catalog-admin");
   const result = await deleteBrandById(brandId);
   if (!result.ok) redirect(`/admin/brands?error=${encodeURIComponent(result.reason)}`);
+    await invalidateBrandPublicCache();
   redirect("/admin/brands");
 }

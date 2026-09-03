@@ -1,8 +1,8 @@
 import { aliasedTable } from "drizzle-orm";
 import { and, asc, desc, eq, exists, ilike, inArray, or, sql } from "drizzle-orm";
-
 import { db } from "@/db";
 import { type Locale } from "@/lib/locales";
+import { PUBLIC_CACHE_REVALIDATE_SECONDS, publicCacheTags, withPublicCache } from "@/lib/public-cache";
 import {
   attributeTranslations,
   attributeValueTranslations,
@@ -29,7 +29,7 @@ import {
   brands,
 } from "@/db/schema";
 
-export async function getPublishedBrands(locale: Locale) {
+async function getPublishedBrandsUncached(locale: Locale) {
   const publishedBrands = await db
     .select({ id: brands.id, baseName: brands.name, logoUrl: brands.logoUrl, sortOrder: brands.sortOrder })
     .from(brands)
@@ -47,7 +47,11 @@ export async function getPublishedBrands(locale: Locale) {
   });
 }
 
-export async function listPublishedHomepageSections() {
+export function getPublishedBrands(locale: Locale) {
+  return withPublicCache(["public-brands", locale], () => getPublishedBrandsUncached(locale), { revalidate: PUBLIC_CACHE_REVALIDATE_SECONDS, tags: [publicCacheTags.brands] });
+}
+
+async function listPublishedHomepageSectionsUncached() {
   return db
     .select()
     .from(homepageSections)
@@ -55,7 +59,11 @@ export async function listPublishedHomepageSections() {
     .orderBy(asc(homepageSections.sortOrder), desc(homepageSections.createdAt));
 }
 
-export async function listPublishedHomepageDeals(locale: Locale, limit = 3) {
+export function listPublishedHomepageSections() {
+  return withPublicCache(["public-homepage-sections"], listPublishedHomepageSectionsUncached, { revalidate: PUBLIC_CACHE_REVALIDATE_SECONDS, tags: [publicCacheTags.homepage] });
+}
+
+async function listPublishedHomepageDealsUncached(locale: Locale, limit = 3) {
   const rows = await db
     .select({ deal: homepageDeals, product: products })
     .from(homepageDeals)
@@ -81,7 +89,11 @@ export async function listPublishedHomepageDeals(locale: Locale, limit = 3) {
   }));
 }
 
-export async function getPublishedStaticPage(locale: Locale, slug: string) {
+export function listPublishedHomepageDeals(locale: Locale, limit = 3) {
+  return withPublicCache(["public-homepage-deals", locale, String(limit)], () => listPublishedHomepageDealsUncached(locale, limit), { revalidate: PUBLIC_CACHE_REVALIDATE_SECONDS, tags: [publicCacheTags.homepage, publicCacheTags.products] });
+}
+
+async function getPublishedStaticPageUncached(locale: Locale, slug: string) {
   const page = await db.select().from(staticPages).where(and(eq(staticPages.slug, slug), eq(staticPages.status, "PUBLISHED"))).limit(1);
   const staticPage = page[0];
   if (!staticPage) return null;
@@ -97,6 +109,10 @@ export async function getPublishedStaticPage(locale: Locale, slug: string) {
     seoTitle: translation.seoTitle ?? null,
     seoDescription: translation.seoDescription ?? null,
   };
+}
+
+export function getPublishedStaticPage(locale: Locale, slug: string) {
+  return withPublicCache(["public-static-page", locale, slug], () => getPublishedStaticPageUncached(locale, slug), { revalidate: PUBLIC_CACHE_REVALIDATE_SECONDS, tags: [publicCacheTags.staticPage(slug, locale)] });
 }
 
 async function attachPrimaryImages<T extends { primaryImageId: string | null }>(items: T[], locale: Locale) {
@@ -168,7 +184,7 @@ async function localizeProductRows(rows: Array<{ product: typeof products.$infer
   return attachPrimaryImages(localized, locale);
 }
 
-export async function listPublishedCategories(locale: Locale) {
+async function listPublishedCategoriesUncached(locale: Locale) {
   const categoryRows = await db.select().from(categories).where(eq(categories.status, "PUBLISHED")).orderBy(asc(categories.sortOrder), asc(categories.slug));
   const categoryIds = categoryRows.map((category) => category.id);
   const translations = categoryIds.length
@@ -182,7 +198,11 @@ export async function listPublishedCategories(locale: Locale) {
   });
 }
 
-export async function getCategoryBySlug(locale: Locale, slug: string) {
+export function listPublishedCategories(locale: Locale) {
+  return withPublicCache(["public-categories", locale], () => listPublishedCategoriesUncached(locale), { revalidate: PUBLIC_CACHE_REVALIDATE_SECONDS, tags: [publicCacheTags.categories] });
+}
+
+async function getCategoryBySlugUncached(locale: Locale, slug: string) {
   const rows = await db
     .select({
       category: categories,
@@ -226,7 +246,11 @@ export async function getCategoryBySlug(locale: Locale, slug: string) {
   };
 }
 
-export async function listCategoryProducts(locale: Locale, categoryId: string) {
+export function getCategoryBySlug(locale: Locale, slug: string) {
+  return withPublicCache(["public-category", locale, slug], () => getCategoryBySlugUncached(locale, slug), { revalidate: PUBLIC_CACHE_REVALIDATE_SECONDS, tags: [publicCacheTags.categories, publicCacheTags.categorySlug(slug)] });
+}
+
+async function listCategoryProductsUncached(locale: Locale, categoryId: string) {
   const rows = await db
     .select({
       product: products,
@@ -241,7 +265,11 @@ export async function listCategoryProducts(locale: Locale, categoryId: string) {
   return localizeProductRows(rows, locale);
 }
 
-export async function listPublishedProducts(locale: Locale, options?: { categoryId?: string; search?: string; limit?: number }) {
+export function listCategoryProducts(locale: Locale, categoryId: string) {
+  return withPublicCache(["public-category-products", locale, categoryId], () => listCategoryProductsUncached(locale, categoryId), { revalidate: PUBLIC_CACHE_REVALIDATE_SECONDS, tags: [publicCacheTags.products, publicCacheTags.category(categoryId)] });
+}
+
+async function listPublishedProductsUncached(locale: Locale, options?: { categoryId?: string; search?: string; limit?: number }) {
   const categoryId = options?.categoryId;
   const search = options?.search?.trim();
 
@@ -286,7 +314,15 @@ export async function listPublishedProducts(locale: Locale, options?: { category
   return localizeProductRows(rows, locale);
 }
 
-export async function getProductBySlug(locale: Locale, slug: string) {
+export function listPublishedProducts(locale: Locale, options?: { categoryId?: string; search?: string; limit?: number }) {
+  const categoryId = options?.categoryId;
+  const search = options?.search?.trim();
+  if (categoryId || search) return listPublishedProductsUncached(locale, options);
+  const limit = options?.limit ?? 40;
+  return withPublicCache(["public-products", locale, String(limit)], () => listPublishedProductsUncached(locale, { limit }), { revalidate: PUBLIC_CACHE_REVALIDATE_SECONDS, tags: [publicCacheTags.products] });
+}
+
+async function getProductBySlugUncached(locale: Locale, slug: string) {
   const row = await db
     .select({
       product: products,
@@ -350,7 +386,11 @@ export async function getProductBySlug(locale: Locale, slug: string) {
   };
 }
 
-export async function listProductImagesForPublic(productId: string) {
+export function getProductBySlug(locale: Locale, slug: string) {
+  return withPublicCache(["public-product", locale, slug], () => getProductBySlugUncached(locale, slug), { revalidate: PUBLIC_CACHE_REVALIDATE_SECONDS, tags: [publicCacheTags.products, publicCacheTags.productSlug(slug)] });
+}
+
+async function listProductImagesForPublicUncached(productId: string) {
   return db
     .select()
     .from(productImages)
@@ -358,7 +398,11 @@ export async function listProductImagesForPublic(productId: string) {
     .orderBy(asc(productImages.sortOrder), desc(productImages.createdAt), asc(productImages.id));
 }
 
-export async function listProductVariantGroups(productId: string, locale: Locale) {
+export function listProductImagesForPublic(productId: string) {
+  return withPublicCache(["public-product-images", productId], () => listProductImagesForPublicUncached(productId), { revalidate: PUBLIC_CACHE_REVALIDATE_SECONDS, tags: [publicCacheTags.product(productId)] });
+}
+
+async function listProductVariantGroupsUncached(productId: string, locale: Locale) {
   const definitions = await db
     .select({
       definition: variantDefinitions,
@@ -385,7 +429,11 @@ export async function listProductVariantGroups(productId: string, locale: Locale
   });
 }
 
-export async function listVariantCombinationsForProduct(productId: string) {
+export function listProductVariantGroups(productId: string, locale: Locale) {
+  return withPublicCache(["public-product-variant-groups", productId, locale], () => listProductVariantGroupsUncached(productId, locale), { revalidate: PUBLIC_CACHE_REVALIDATE_SECONDS, tags: [publicCacheTags.product(productId)] });
+}
+
+async function listVariantCombinationsForProductUncached(productId: string) {
   return db
     .select()
     .from(variantCombinations)
@@ -393,7 +441,11 @@ export async function listVariantCombinationsForProduct(productId: string) {
     .orderBy(asc(variantCombinations.sku));
 }
 
-export async function listVariantCombinationValuesForProduct(productId: string, locale: Locale) {
+export function listVariantCombinationsForProduct(productId: string) {
+  return withPublicCache(["public-product-variants", productId], () => listVariantCombinationsForProductUncached(productId), { revalidate: PUBLIC_CACHE_REVALIDATE_SECONDS, tags: [publicCacheTags.product(productId)] });
+}
+
+async function listVariantCombinationValuesForProductUncached(productId: string, locale: Locale) {
   const rows = await db
     .select({
       combinationId: variantCombinations.id,
@@ -418,6 +470,10 @@ export async function listVariantCombinationValuesForProduct(productId: string, 
   }));
 }
 
+export function listVariantCombinationValuesForProduct(productId: string, locale: Locale) {
+  return withPublicCache(["public-product-variant-values", productId, locale], () => listVariantCombinationValuesForProductUncached(productId, locale), { revalidate: PUBLIC_CACHE_REVALIDATE_SECONDS, tags: [publicCacheTags.product(productId)] });
+}
+
 export function isRelatedProductEligible(product: { id: string; status: string; categoryIds: string[] }, currentProductId: string, categoryIds: Set<string>) {
   if (product.id === currentProductId) return false;
   if (product.status !== "PUBLISHED") return false;
@@ -425,7 +481,7 @@ export function isRelatedProductEligible(product: { id: string; status: string; 
   return product.categoryIds.some((categoryId) => categoryIds.has(categoryId));
 }
 
-export async function listRelatedProducts(locale: Locale, currentProductId: string, categoryIds: string[]) {
+async function listRelatedProductsUncached(locale: Locale, currentProductId: string, categoryIds: string[]) {
   if (categoryIds.length === 0) {
     return [];
   }
@@ -452,6 +508,11 @@ export async function listRelatedProducts(locale: Locale, currentProductId: stri
   });
 
   return localizeProductRows(eligible, locale);
+}
+
+export function listRelatedProducts(locale: Locale, currentProductId: string, categoryIds: string[]) {
+  const uniqueCategoryIds = [...new Set(categoryIds)].sort();
+  return withPublicCache(["public-related-products", locale, currentProductId, ...uniqueCategoryIds], () => listRelatedProductsUncached(locale, currentProductId, uniqueCategoryIds), { revalidate: PUBLIC_CACHE_REVALIDATE_SECONDS, tags: [publicCacheTags.products, publicCacheTags.product(currentProductId)] });
 }
 
 export async function searchPublishedProducts(locale: Locale, query: string) {
@@ -621,7 +682,7 @@ export async function listProductCategoriesForProduct(productId: string, locale:
   });
 }
 
-export async function listFilterableAttributes(locale: Locale) {
+async function listFilterableAttributesUncached(locale: Locale) {
   const attributeRows = await db
     .select({
       attribute: attributes,
@@ -666,6 +727,10 @@ export async function listFilterableAttributes(locale: Locale) {
     });
 
   return result.filter((attribute) => attribute.options.length > 0);
+}
+
+export function listFilterableAttributes(locale: Locale) {
+  return withPublicCache(["public-filterable-attributes", locale], () => listFilterableAttributesUncached(locale), { revalidate: PUBLIC_CACHE_REVALIDATE_SECONDS, tags: [publicCacheTags.categories, publicCacheTags.products] });
 }
 
 export async function listProductAttributeSelections(productId: string, locale: Locale) {
@@ -785,7 +850,7 @@ export async function listPublishedProductsPage(
   };
 }
 
-export async function listProductSpecifications(productId: string, locale: Locale) {
+async function listProductSpecificationsUncached(productId: string, locale: Locale) {
   const rows = await db
     .select({
       definition: specificationDefinitions,
@@ -804,4 +869,8 @@ export async function listProductSpecifications(productId: string, locale: Local
     name: translation?.name ?? definition.code,
     value: value.valueText ?? value.valueNumeric?.toString() ?? (value.valueBoolean !== null ? String(value.valueBoolean) : "—"),
   }));
+}
+
+export function listProductSpecifications(productId: string, locale: Locale) {
+  return withPublicCache(["public-product-specifications", productId, locale], () => listProductSpecificationsUncached(productId, locale), { revalidate: PUBLIC_CACHE_REVALIDATE_SECONDS, tags: [publicCacheTags.product(productId)] });
 }

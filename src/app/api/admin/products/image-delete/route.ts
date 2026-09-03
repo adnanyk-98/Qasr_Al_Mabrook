@@ -3,6 +3,7 @@ import { getCurrentAdmin } from "@/server/services/admin-auth";
 import { serverEnv } from "@/config/env";
 import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getProductImageById, deleteProductImageById, listProductImagesForProduct, setProductPrimaryImage, clearProductPrimaryImage } from "@/server/repositories/catalog-admin";
+import { invalidateProductPublicCache } from "@/lib/public-cache";
 
 export async function POST(request: Request) {
   const admin = await getCurrentAdmin();
@@ -50,13 +51,16 @@ export async function POST(request: Request) {
     const remaining = await listProductImagesForProduct(productId);
     if (remaining.length === 0) {
       await clearProductPrimaryImage(productId);
+        await invalidateProductPublicCache(productId);
       return NextResponse.json({ success: true, newPrimaryImageId: null });
     } else {
       const newPrimary = remaining[0];
       await setProductPrimaryImage(productId, newPrimary.id);
+        await invalidateProductPublicCache(productId);
       return NextResponse.json({ success: true, newPrimaryImageId: newPrimary.id });
     }
   }
 
+  await invalidateProductPublicCache(productId);
   return NextResponse.json({ success: true, newPrimaryImageId: null });
 }

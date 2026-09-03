@@ -32,6 +32,7 @@ import {
 import { getProductById, updateCategory, getCategoryById, setCategoryImage } from "@/server/repositories/catalog-admin";
 import { requireAdminSession } from "@/server/services/admin-auth";
 import { resolvePrimaryProductImageId } from "@/lib/product-image-primary";
+import { invalidateBrandPublicCache, invalidateCategoryPublicCache, invalidateHomepagePublicCache, invalidateProductPublicCache } from "@/lib/public-cache";
 
 const idSchema = z.string().uuid();
 const localeSchema = z.enum(["en", "ar"]);
@@ -83,7 +84,7 @@ export async function upsertCategoryAction(formData: FormData) {
       }
     }
 
-    await updateCategory({
+    const updatedCategory = await updateCategory({
       id: categoryId,
       slug,
       parentId,
@@ -100,6 +101,7 @@ export async function upsertCategoryAction(formData: FormData) {
         await setCategoryImage({ categoryId, objectKey, publicUrl: providedImageUrl, width, height });
       }
     }
+    if (updatedCategory) await invalidateCategoryPublicCache(updatedCategory.id, updatedCategory.slug);
   } else {
     const created = await createCategory({
       slug,
@@ -117,6 +119,7 @@ export async function upsertCategoryAction(formData: FormData) {
         await setCategoryImage({ categoryId: created.id, objectKey, publicUrl: providedImageUrl, width, height });
       }
     }
+    if (created) await invalidateCategoryPublicCache(created.id, created.slug);
   }
 
   redirect("/admin/categories");
@@ -134,9 +137,11 @@ export async function upsertBrandAction(formData: FormData) {
 
   if (brandId) {
     if (!idSchema.safeParse(brandId).success) redirect("/admin/brands");
-    await updateBrand({ id: brandId, name, slug, logoUrl, sortOrder, enabled });
+    const updatedBrand = await updateBrand({ id: brandId, name, slug, logoUrl, sortOrder, enabled });
+    if (updatedBrand) await invalidateBrandPublicCache();
   } else {
-    await createBrand({ name, slug, logoUrl, sortOrder, enabled });
+    const createdBrand = await createBrand({ name, slug, logoUrl, sortOrder, enabled });
+    if (createdBrand) await invalidateBrandPublicCache();
   }
 
   redirect("/admin/brands");
@@ -148,6 +153,7 @@ export async function deleteBrandAction(formData: FormData) {
   if (!idSchema.safeParse(brandId).success) redirect("/admin/brands");
   const result = await deleteBrandById(brandId);
   if (!result.ok) redirect(`/admin/brands?error=${encodeURIComponent(result.reason)}`);
+  await invalidateBrandPublicCache();
   redirect("/admin/brands");
 }
 
@@ -195,6 +201,7 @@ export async function upsertProductAction(formData: FormData) {
 
   const productId = String(formData.get("productId") ?? "");
   let createdOrUpdatedProductId = productId;
+  let productMutationSucceeded = false;
   if (productId) {
     // edit existing product without changing ARCHIVED status unintentionally
     const parsedStatus = statusSchema.parse(String(formData.get("status") ?? "DRAFT"));
@@ -206,13 +213,14 @@ export async function upsertProductAction(formData: FormData) {
       }
     }
 
-    await updateProduct({
+    const updatedProduct = await updateProduct({
       id: productId,
       slug,
       brandId: String(formData.get("brandId") ?? "") || null,
       status: statusToUse,
       defaultSku: String(formData.get("defaultSku") ?? "") || null,
     });
+      productMutationSucceeded = Boolean(updatedProduct);
     createdOrUpdatedProductId = productId;
   } else {
     const created = await createProduct({
@@ -222,6 +230,7 @@ export async function upsertProductAction(formData: FormData) {
       defaultSku: String(formData.get("defaultSku") ?? "") || null,
     });
     createdOrUpdatedProductId = created?.id ?? "";
+    productMutationSucceeded = Boolean(created);
   }
 
   // If client uploaded an image to R2, create a product_images row and mark it primary
@@ -257,6 +266,7 @@ export async function upsertProductAction(formData: FormData) {
             isPrimaryChecked: true,
           });
         }
+          if (updatedImage) await invalidateProductPublicCache(createdOrUpdatedProductId, slug);
         continue;
       }
 
@@ -277,12 +287,16 @@ export async function upsertProductAction(formData: FormData) {
           isPrimaryChecked: true,
         });
       }
+      if (img) await invalidateProductPublicCache(createdOrUpdatedProductId, slug);
     }
 
     if (primaryImageId) {
       await setProductPrimaryImage(createdOrUpdatedProductId, primaryImageId);
     }
+    await invalidateProductPublicCache(createdOrUpdatedProductId, slug);
   }
+
+    if (!imageUrls.length && createdOrUpdatedProductId && productMutationSucceeded) await invalidateProductPublicCache(createdOrUpdatedProductId, slug);
 
   redirect("/admin/products");
 }
@@ -294,7 +308,7 @@ export async function upsertProductTranslationAction(formData: FormData) {
     redirect("/admin/translations");
   }
 
-  await createProductTranslation({
+  const createdTranslation = await createProductTranslation({
     productId,
     locale: localeSchema.parse(String(formData.get("locale") ?? "en")),
     name: String(formData.get("name") ?? "").trim(),
@@ -303,6 +317,7 @@ export async function upsertProductTranslationAction(formData: FormData) {
     seoTitle: String(formData.get("seoTitle") ?? "") || null,
     seoDescription: String(formData.get("seoDescription") ?? "") || null,
   });
+  if (createdTranslation) await invalidateProductPublicCache(productId);
 
   redirect("/admin/translations");
 }
@@ -422,7 +437,11 @@ export async function upsertCategoryTranslationAction(formData: FormData) {
     seoTitle: String(formData.get("seoTitle") ?? "") || null,
     seoDescription: String(formData.get("seoDescription") ?? "") || null,
   };
-  await upsertCategoryTranslation(input);
+  const updatedTranslation = await upsertCategoryTranslation(input);
+  if (updatedTranslation) {
+    const category = await getCategoryById(categoryId);
+    if (category) await invalidateCategoryPublicCache(category.id, category.slug);
+  }
 
   redirect("/admin/translations");
 }
@@ -476,13 +495,14 @@ export async function upsertHomepageSectionAction(formData: FormData) {
   }
 
   if (sectionId) {
-    await updateHomepageSection({
+    const updatedSection = await updateHomepageSection({
       id: sectionId,
       sectionType: sectionType || undefined,
       status: statusSchema.safeParse(status).success ? (status as "DRAFT" | "PUBLISHED" | "ARCHIVED") : "DRAFT",
       sortOrder,
       configurationJson,
     });
+    if (updatedSection) await invalidateHomepagePublicCache();
     redirect("/admin/homepage");
   }
 
@@ -490,12 +510,13 @@ export async function upsertHomepageSectionAction(formData: FormData) {
     redirect("/admin/homepage");
   }
 
-  await createHomepageSection({
+  const createdSection = await createHomepageSection({
     sectionType,
     status,
     sortOrder,
     configurationJson,
   });
+  if (createdSection) await invalidateHomepagePublicCache();
 
   redirect("/admin/homepage");
 }
@@ -509,10 +530,11 @@ export async function setHomepageSectionStatusAction(formData: FormData) {
     redirect("/admin/homepage");
   }
 
-  await updateHomepageSection({
+  const updatedSection = await updateHomepageSection({
     id: sectionId,
     status: status as "DRAFT" | "PUBLISHED" | "ARCHIVED",
   });
+  if (updatedSection) await invalidateHomepagePublicCache();
 
   redirect("/admin/homepage");
 }
@@ -545,11 +567,15 @@ export async function upsertProductCategoryAction(formData: FormData) {
     redirect("/admin/products");
   }
 
-  await createProductCategory({
+  const createdRelation = await createProductCategory({
     productId,
     categoryId,
     isPrimary: String(formData.get("isPrimary") ?? "") === "on",
   });
+  if (createdRelation) {
+    await invalidateProductPublicCache(productId);
+    await invalidateCategoryPublicCache(categoryId);
+  }
 
   redirect("/admin/products");
 }

@@ -140,8 +140,9 @@ export function HeroCarousel({
       const nextActive = ((active - 1) % banners.length + banners.length) % banners.length + 1;
       isRepositioningRef.current = true;
       if (slider) {
+        const width = container?.getBoundingClientRect().width ?? 0;
         slider.style.transition = "none";
-        slider.style.transform = `translateX(${direction * nextActive * 100}%)`;
+        slider.style.transform = `translateX(${direction * nextActive * width}px)`;
       }
       setActive(nextActive);
       requestAnimationFrame(() => {
@@ -170,14 +171,16 @@ export function HeroCarousel({
       if (event.propertyName !== 'transform') return;
       if (active === 0) {
         isRepositioningRef.current = true;
+        const width = container.getBoundingClientRect().width;
         slider.style.transition = 'none';
-        slider.style.transform = `translateX(${direction * banners.length * 100}%)`;
+        slider.style.transform = `translateX(${direction * banners.length * width}px)`;
         setActive(banners.length);
         requestAnimationFrame(() => { isRepositioningRef.current = false; });
       } else if (active === infiniteTrack.length - 1) {
         isRepositioningRef.current = true;
+        const width = container.getBoundingClientRect().width;
         slider.style.transition = 'none';
-        slider.style.transform = `translateX(${direction * 100}%)`;
+        slider.style.transform = `translateX(${direction * width}px)`;
         setActive(1);
         requestAnimationFrame(() => { isRepositioningRef.current = false; });
       }
@@ -209,13 +212,17 @@ export function HeroCarousel({
     const setWidth = () => {
       if (!rootRef.current) return;
       const el = rootRef.current.querySelector('.relative.w-full.overflow-hidden') as HTMLElement | null;
+      const slider = el?.querySelector('.w-full.flex') as HTMLElement | null;
       const rect = el ? el.getBoundingClientRect() : rootRef.current.getBoundingClientRect();
       containerWidthRef.current = Math.max(0, rect.width || 0);
+      if (!isDraggingRef.current && !isRepositioningRef.current && slider) {
+        slider.style.transform = `translateX(${direction * active * containerWidthRef.current}px)`;
+      }
     };
     setWidth();
     window.addEventListener('resize', setWidth);
     return () => window.removeEventListener('resize', setWidth);
-  }, []);
+  }, [active, direction]);
 
   // Pointer / touch handlers for swipe gestures
   useEffect(() => {
@@ -421,7 +428,7 @@ export function HeroCarousel({
       <div className="relative w-full h-full max-w-full overflow-hidden">
         <div
           className="w-full flex transition-transform duration-500 ease-out"
-          style={{ transform: `translateX(${direction * active * 100}%)` }}
+          style={{ transform: "translateX(0px)" }}
         >
           {infiniteTrack.map((banner, index) => {
             const isClone = index === 0 || index === infiniteTrack.length - 1;

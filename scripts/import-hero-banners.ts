@@ -6,12 +6,9 @@ import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client
 
 import dotenv from 'dotenv';
 
-// Load environment from .env.local for script runs
 dotenv.config({ path: path.join(process.cwd(), '.env.local') });
 
-import { serverEnv } from '../src/config/env';
 import { generateR2PublicUrl } from '../src/lib/catalogue-import';
-import { readOriginalProductImageMetadata } from '../src/lib/catalogue-import';
 import { listHomepageSections, updateHomepageSection, createHomepageSection } from '../src/server/repositories/catalog-admin';
 
 async function readImage(p: string) {
@@ -70,7 +67,7 @@ async function main() {
   ];
 
   // Inspect files
-  const inspected: any[] = [];
+  const inspected: Array<{ name: string; desktop: { file: string; width: number | null; height: number | null; size: number }; mobile: { file: string; width: number | null; height: number | null; size: number } }> = [];
   for (const m of mapping) {
     const dPath = path.join(root, m.desktop);
     const mPath = path.join(mobileDir, m.mobile);
@@ -104,7 +101,7 @@ async function main() {
   for (const s of sections) {
     if ((s.sectionType || '').toLowerCase() === 'hero') {
       // collect imageUrl if present
-      const cfg = s.configurationJson as any;
+      const cfg = s.configurationJson as Record<string, unknown>;
       if (cfg?.imageUrl && typeof cfg.imageUrl === 'string' && cfg.imageUrl.startsWith(process.env.R2_PUBLIC_BASE_URL || '')) {
         const key = objectKeyFromUrl(process.env.R2_PUBLIC_BASE_URL ?? '', cfg.imageUrl);
         if (key) toDeleteKeys.add(key);
@@ -125,7 +122,7 @@ async function main() {
   }
 
   // Upload new assets
-  const uploaded: any[] = [];
+  const uploaded: Array<{ name: string; desktop: { publicUrl: string; key: string }; mobile: { publicUrl: string; key: string } }> = [];
   for (const item of inspected) {
     const dBuf = await fs.readFile(item.desktop.file);
     const mBuf = await fs.readFile(item.mobile.file);
@@ -138,12 +135,12 @@ async function main() {
   // Create three homepage sections with desktop+mobile urls
   let order = 1;
   for (const u of uploaded) {
-    const cfg = {
+    const cfg: Record<string, unknown> = {
       desktopImageUrl: u.desktop.publicUrl,
       mobileImageUrl: u.mobile.publicUrl,
       imageAlt: u.name,
       enabled: true,
-    } as any;
+    };
     const created = await createHomepageSection({ sectionType: 'hero', status: 'PUBLISHED', sortOrder: String(order), configurationJson: cfg });
     console.log('Created hero section', created.id, 'order', order);
     order++;

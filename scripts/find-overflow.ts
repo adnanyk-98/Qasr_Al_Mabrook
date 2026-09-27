@@ -1,4 +1,6 @@
-require('dotenv').config({ path: '.env.local' });
+import { config } from 'dotenv';
+
+config({ path: '.env.local' });
 import { chromium } from 'playwright';
 
 (async () => {
@@ -12,7 +14,7 @@ import { chromium } from 'playwright';
     await page.goto(url, { waitUntil: 'networkidle' });
     const overflows = await page.evaluate(() => {
       const winW = window.innerWidth;
-      const nodes: any[] = [];
+      const nodes: Array<{ selector: string; width: number; tag: string }> = [];
       const all = Array.from(document.querySelectorAll('*')) as Element[];
       for (const el of all) {
         const r = (el as HTMLElement).getBoundingClientRect?.();

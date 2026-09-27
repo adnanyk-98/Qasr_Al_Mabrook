@@ -6,7 +6,7 @@ import ClientCategoryList from "@/components/admin/category-list";
 import ClientAdminPagination from "@/components/admin/admin-pagination";
 import AdminPageSizeSelect from "@/components/admin/admin-page-size-select";
 import { CategoryImageField } from "@/components/admin/category-image-field";
-import { upsertCategoryAction } from "@/server/services/admin-catalog";
+import { upsertCategoryAction } from "./actions";
 import { requireAdminSession } from "@/server/services/admin-auth";
 
 type PageProps = {

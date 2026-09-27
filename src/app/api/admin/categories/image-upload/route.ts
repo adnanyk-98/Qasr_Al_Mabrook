@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { serverEnv } from "@/config/env";
-import { generateR2PublicUrl, generateR2ObjectKey, readOriginalProductImageMetadata } from "@/lib/catalogue-import";
+import { generateR2PublicUrl, generateR2ObjectKey, PUBLIC_MEDIA_CACHE_CONTROL, readOriginalProductImageMetadata } from "@/lib/catalogue-import";
 import { validateSquareImageUpload } from "@/lib/image-media";
 import { getCurrentAdmin } from "@/server/services/admin-auth";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
@@ -38,7 +38,7 @@ export async function POST(request: Request) {
   const originalName = rawFile.name || "image";
   const key = generateR2ObjectKey(`category-${slug}`, originalName);
 
-  await s3.send(new PutObjectCommand({ Bucket: bucket, Key: key, Body: buffer, ContentType: rawFile.type || "application/octet-stream" }));
+  await s3.send(new PutObjectCommand({ Bucket: bucket, Key: key, Body: buffer, ContentType: rawFile.type || "application/octet-stream", CacheControl: PUBLIC_MEDIA_CACHE_CONTROL }));
 
   const publicUrl = generateR2PublicUrl(publicBase, key);
   return NextResponse.json({ success: true, publicUrl, objectKey: key, width: validation.width, height: validation.height });

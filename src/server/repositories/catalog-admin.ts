@@ -351,19 +351,49 @@ export async function listProductTranslationsForProduct(productId: string) {
 }
 
 export async function createProductTranslation(input: { productId: string; locale: "en" | "ar"; name: string; shortDescription?: string | null; description?: string | null; seoTitle?: string | null; seoDescription?: string | null }) {
-  const rows = await db
-    .insert(productTranslations)
-    .values({
-      productId: input.productId,
-      locale: input.locale,
-      name: input.name,
-      shortDescription: input.shortDescription ?? null,
-      description: input.description ?? null,
-      seoTitle: input.seoTitle ?? null,
-      seoDescription: input.seoDescription ?? null,
-    })
-    .returning();
+  return db.transaction(async (transaction) => {
+    const lockKey = `product-translation:${input.productId}:${input.locale}`;
+    await transaction.execute(sql`select pg_advisory_xact_lock(hashtextextended(${lockKey}, 0))`);
+    const existing = await transaction
+      .select({ id: productTranslations.id })
+      .from(productTranslations)
+      .where(and(eq(productTranslations.productId, input.productId), eq(productTranslations.locale, input.locale)))
+      .limit(1);
+    if (existing[0]) return null;
 
+    const rows = await transaction
+      .insert(productTranslations)
+      .values({
+        productId: input.productId,
+        locale: input.locale,
+        name: input.name,
+        shortDescription: input.shortDescription ?? null,
+        description: input.description ?? null,
+        seoTitle: input.seoTitle ?? null,
+        seoDescription: input.seoDescription ?? null,
+      })
+      .returning();
+
+    return rows[0] ?? null;
+  });
+}
+
+export async function getProductTranslationById(id: string) {
+  const rows = await db.select().from(productTranslations).where(eq(productTranslations.id, id)).limit(1);
+  return rows[0] ?? null;
+}
+
+export async function updateProductTranslationById(id: string, input: { name: string; shortDescription?: string | null; description?: string | null }) {
+  const rows = await db
+    .update(productTranslations)
+    .set({ name: input.name, shortDescription: input.shortDescription ?? null, description: input.description ?? null, updatedAt: new Date() })
+    .where(eq(productTranslations.id, id))
+    .returning();
+  return rows[0] ?? null;
+}
+
+export async function deleteProductTranslationById(id: string) {
+  const rows = await db.delete(productTranslations).where(eq(productTranslations.id, id)).returning();
   return rows[0] ?? null;
 }
 
@@ -597,13 +627,42 @@ export async function listCategoryTranslations() {
   return db.select().from(categoryTranslations).orderBy(desc(categoryTranslations.createdAt));
 }
 
-export async function createCategoryTranslation(input: { categoryId: string; locale: "en" | "ar"; name: string; description?: string | null; seoTitle?: string | null; seoDescription?: string | null }) {
+export async function getCategoryTranslationById(id: string) {
+  const rows = await db.select().from(categoryTranslations).where(eq(categoryTranslations.id, id)).limit(1);
+  return rows[0] ?? null;
+}
+
+export async function getCategoryTranslationForLocale(categoryId: string, locale: "en" | "ar") {
+  const rows = await db
+    .select()
+    .from(categoryTranslations)
+    .where(and(eq(categoryTranslations.categoryId, categoryId), eq(categoryTranslations.locale, locale)))
+    .limit(1);
+  return rows[0] ?? null;
+}
+
+export async function updateCategoryTranslationById(id: string, input: { name: string; shortDescription?: string | null; description?: string | null }) {
+  const rows = await db
+    .update(categoryTranslations)
+    .set({ name: input.name, shortDescription: input.shortDescription ?? null, description: input.description ?? null, updatedAt: new Date() })
+    .where(eq(categoryTranslations.id, id))
+    .returning();
+  return rows[0] ?? null;
+}
+
+export async function deleteCategoryTranslationById(id: string) {
+  const rows = await db.delete(categoryTranslations).where(eq(categoryTranslations.id, id)).returning();
+  return rows[0] ?? null;
+}
+
+export async function createCategoryTranslation(input: { categoryId: string; locale: "en" | "ar"; name: string; shortDescription?: string | null; description?: string | null; seoTitle?: string | null; seoDescription?: string | null }) {
   const rows = await db
     .insert(categoryTranslations)
     .values({
       categoryId: input.categoryId,
       locale: input.locale,
       name: input.name,
+      shortDescription: input.shortDescription ?? null,
       description: input.description ?? null,
       seoTitle: input.seoTitle ?? null,
       seoDescription: input.seoDescription ?? null,
@@ -613,11 +672,12 @@ export async function createCategoryTranslation(input: { categoryId: string; loc
   return rows[0] ?? null;
 }
 
-export async function updateCategoryTranslation(input: { categoryId: string; locale: "en" | "ar"; name: string; description?: string | null; seoTitle?: string | null; seoDescription?: string | null }) {
+export async function updateCategoryTranslation(input: { categoryId: string; locale: "en" | "ar"; name: string; shortDescription?: string | null; description?: string | null; seoTitle?: string | null; seoDescription?: string | null }) {
   const rows = await db
     .update(categoryTranslations)
     .set({
       name: input.name,
+      shortDescription: input.shortDescription ?? null,
       description: input.description ?? null,
       seoTitle: input.seoTitle ?? null,
       seoDescription: input.seoDescription ?? null,
@@ -628,13 +688,14 @@ export async function updateCategoryTranslation(input: { categoryId: string; loc
   return rows[0] ?? null;
 }
 
-export async function upsertCategoryTranslation(input: { categoryId: string; locale: "en" | "ar"; name: string; description?: string | null; seoTitle?: string | null; seoDescription?: string | null }) {
+export async function upsertCategoryTranslation(input: { categoryId: string; locale: "en" | "ar"; name: string; shortDescription?: string | null; description?: string | null; seoTitle?: string | null; seoDescription?: string | null }) {
   const rows = await db
     .insert(categoryTranslations)
     .values({
       categoryId: input.categoryId,
       locale: input.locale,
       name: input.name,
+      shortDescription: input.shortDescription ?? null,
       description: input.description ?? null,
       seoTitle: input.seoTitle ?? null,
       seoDescription: input.seoDescription ?? null,
@@ -643,6 +704,7 @@ export async function upsertCategoryTranslation(input: { categoryId: string; loc
       target: [categoryTranslations.categoryId, categoryTranslations.locale],
       set: {
         name: input.name,
+        shortDescription: input.shortDescription ?? null,
         description: input.description ?? null,
         seoTitle: input.seoTitle ?? null,
         seoDescription: input.seoDescription ?? null,

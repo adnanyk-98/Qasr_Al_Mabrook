@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { serverEnv } from "@/config/env";
-import { generateR2PublicUrl, readOriginalProductImageMetadata } from "@/lib/catalogue-import";
+import { generateR2PublicUrl, PUBLIC_MEDIA_CACHE_CONTROL, readOriginalProductImageMetadata, versionR2Filename } from "@/lib/catalogue-import";
 import { validateHeroImageUpload } from "@/lib/hero-media";
 import { getCurrentAdmin } from "@/server/services/admin-auth";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
@@ -66,7 +66,7 @@ export async function POST(request: Request) {
   const safeSlug = slugify(role === "mobile" ? "hero-mobile" : "hero-desktop");
   const originalName = rawFile.name || "hero";
   const safeFilename = originalName.trim().replace(/\s+/g, "-").replace(/[^a-zA-Z0-9.\-_]/g, "");
-  const key = `hero/${safeSlug}/${safeFilename}`;
+  const key = `hero/${safeSlug}/${versionR2Filename(safeFilename)}`;
 
   await s3.send(
     new PutObjectCommand({
@@ -74,6 +74,7 @@ export async function POST(request: Request) {
       Key: key,
       Body: buffer,
       ContentType: rawFile.type || "application/octet-stream",
+      CacheControl: PUBLIC_MEDIA_CACHE_CONTROL,
     }),
   );
 

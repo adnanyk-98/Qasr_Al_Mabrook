@@ -1,4 +1,6 @@
-require('dotenv').config({ path: '.env.local' });
+import { config } from 'dotenv';
+
+config({ path: '.env.local' });
 
 async function run() {
   const { db } = await import('../src/db');
@@ -6,7 +8,7 @@ async function run() {
   const { products, productImages } = await import('../src/db/schema');
 
   const prods = await db.select().from(products).where(eq(products.status, 'PUBLISHED'));
-  const report: any[] = [];
+  const report: Array<{ id: string; slug: string; images: number; primaryCount: number; relativeUrls: string[] }> = [];
   for (const p of prods) {
     const imgs = await db.select().from(productImages).where(eq(productImages.productId, p.id));
     const primaryCount = imgs.filter((i) => i.isPrimary).length;

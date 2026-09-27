@@ -5,7 +5,6 @@ import { siteConfig } from "@/config/site";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/layout";
 import { LocaleSwitcher } from "@/components/public/locale-switcher";
-import { SearchForm } from "@/components/public/search-form";
 import { localePath, type Locale } from "@/lib/locales";
 import { getTranslations } from "next-intl/server";
 import { TrackedLink } from "@/components/analytics/tracked-link";
@@ -13,7 +12,6 @@ import { TrackedLink } from "@/components/analytics/tracked-link";
 export async function Header({ locale = "en", path = "/", showLocaleSwitcher = true }: { locale?: Locale; path?: string; showLocaleSwitcher?: boolean }) {
   const t = await getTranslations({ locale, namespace: "common" });
   const header = await getTranslations({ locale, namespace: "header" });
-  const search = await getTranslations({ locale, namespace: "search" });
   const navItems = [
     { label: t("home"), href: localePath(locale, "/") },
     { label: t("products"), href: localePath(locale, "/products") },
@@ -47,7 +45,6 @@ export async function Header({ locale = "en", path = "/", showLocaleSwitcher = t
         </nav>
 
         <div className="flex items-center gap-3">
-          <div className="hidden lg:block"><SearchForm locale={locale} defaultValue={path.includes("search") ? undefined : undefined} labels={{ eyebrow: search("eyebrow"), placeholder: search("placeholder"), label: search("label"), viewAll: search("viewAll"), loading: search("loading"), noResults: search("noResults"), error: search("error") }} /></div>
           {showLocaleSwitcher ? <LocaleSwitcher locale={locale} path={path} /> : null}
           <TrackedLink event="product_request_quote" params={{ locale, source: "header" }} href={localePath(locale, "/request-quote")} className="hidden sm:inline-flex">
             <Button variant="primary" size="sm">{t("requestQuote")}</Button>
@@ -57,7 +54,6 @@ export async function Header({ locale = "en", path = "/", showLocaleSwitcher = t
               <span aria-hidden="true">&#9776;</span>
             </summary>
             <nav aria-label={header("mainNavigation")} className="absolute left-0 right-0 top-full z-50 min-w-52 space-y-1 rounded-b-[var(--radius-md)] border-t border-[var(--brand-border)] bg-white p-2 shadow-[var(--shadow-md)]">
-              <div className="border-b border-[var(--brand-border)] p-2 pb-3"><SearchForm locale={locale} labels={{ eyebrow: search("eyebrow"), placeholder: search("placeholder"), label: search("label"), viewAll: search("viewAll"), loading: search("loading"), noResults: search("noResults"), error: search("error") }} /></div>
               {navItems.map((item) => (
                 <Link key={item.href} href={item.href} className="block rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium hover:bg-[var(--brand-surface-alt)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)]">
                   {item.label}

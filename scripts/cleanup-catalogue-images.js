@@ -8,7 +8,7 @@ const { S3Client, HeadObjectCommand, PutObjectCommand } = require('@aws-sdk/clie
 let generateR2ObjectKey;
 try {
   ({ generateR2ObjectKey } = require('../src/lib/catalogue-import'));
-} catch (err) {
+} catch {
   ({ generateR2ObjectKey } = require('../src/lib/catalogue-import.ts'));
 }
 
@@ -67,7 +67,6 @@ async function main() {
     // Map local images (publicUrl contains '/catalogue/') and r2 images (publicUrl starts with R2 public base)
     const localImages = images.filter(i => i.public_url && i.public_url.includes('/catalogue/') && !i.public_url.startsWith('http'))
       .concat(images.filter(i => i.public_url && i.public_url.includes('/catalogue/') && !i.public_url.startsWith(r2PublicBase)));
-    const r2Images = images.filter(i => i.public_url && String(i.public_url).startsWith(r2PublicBase));
 
     if (localImages.length === 0) {
       console.log(`No local images to remove for ${slug}`);
@@ -88,7 +87,7 @@ async function main() {
       try {
         await s3.send(new HeadObjectCommand({ Bucket: r2Bucket, Key: objectKey }));
         exists = true;
-      } catch (e) {
+      } catch {
         exists = false;
       }
 
@@ -107,7 +106,7 @@ async function main() {
             }
           }
         }
-        try { walk(publicCatalogue); } catch (e) { /* ignore */ }
+        try { walk(publicCatalogue); } catch { /* ignore */ }
 
         if (candidates.length > 0) {
           // upload first candidate
@@ -117,8 +116,8 @@ async function main() {
             await s3.send(new PutObjectCommand({ Bucket: r2Bucket, Key: objectKey, Body: body }));
             results.r2Uploads += 1;
             exists = true;
-          } catch (e) {
-            console.error(`Failed to upload ${filePath} to R2: ${e.message}`);
+          } catch (error) {
+            console.error(`Failed to upload ${filePath} to R2: ${error instanceof Error ? error.message : String(error)}`);
             continue; // skip deletion
           }
         } else {
@@ -154,7 +153,7 @@ async function main() {
       } else {
         // No R2 DB row exists; create one pointing to R2 public URL
         const sizes = { width: local.width, height: local.height };
-        const insert = await sql`INSERT INTO product_images (product_id, object_key, public_url, width, height, sort_order, is_primary, alt_text_en, alt_text_ar, created_at) VALUES (${productId}, ${objectKey}, ${expectedPublicUrl}, ${sizes.width}, ${sizes.height}, ${local.sort_order}, ${local.is_primary}, ${local.alt_text_en}, ${local.alt_text_ar}, now()) RETURNING id`;
+        await sql`INSERT INTO product_images (product_id, object_key, public_url, width, height, sort_order, is_primary, alt_text_en, alt_text_ar, created_at) VALUES (${productId}, ${objectKey}, ${expectedPublicUrl}, ${sizes.width}, ${sizes.height}, ${local.sort_order}, ${local.is_primary}, ${local.alt_text_en}, ${local.alt_text_ar}, now()) RETURNING id`;
         results.r2RowsRetained += 1;
         // delete local row
         await sql`DELETE FROM product_images WHERE id = ${local.id}`;
@@ -181,8 +180,8 @@ async function main() {
           results.filesRemoved += 1;
           console.log(`Removed local file: ${found}`);
         }
-      } catch (e) {
-        console.error('Error while removing local file: '+e.message);
+      } catch (error) {
+        console.error('Error while removing local file: ' + (error instanceof Error ? error.message : String(error)));
       }
     }
 
@@ -193,4 +192,4 @@ async function main() {
   console.log('RESULTS:'+JSON.stringify(results, null, 2));
 }
 
-main().catch(err => { console.error('ERROR:'+err.message); process.exit(1); });
+main().catch((error) => { console.error('ERROR:' + (error instanceof Error ? error.message : String(error))); process.exit(1); });

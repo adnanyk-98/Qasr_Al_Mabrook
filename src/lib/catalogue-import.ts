@@ -74,10 +74,19 @@ export function buildCatalogueImportPlan(report: DiscoveryReport): CatalogueImpo
   };
 }
 
-export function generateR2ObjectKey(productSlug: string, filename: string) {
+export function generateR2ObjectKey(productSlug: string, filename: string, version = crypto.randomUUID()) {
   const safeSlug = encodeURIComponent(productSlug.toLowerCase().trim().replace(/\s+/g, "-"));
-  const safeFilename = filename.trim().replace(/\s+/g, "-").replace(/[^a-zA-Z0-9.\-_%]/g, "");
+  const safeFilename = versionR2Filename(filename, version);
   return `catalogue/${safeSlug}/${safeFilename}`;
+}
+
+export const PUBLIC_MEDIA_CACHE_CONTROL = "public, max-age=31536000, immutable";
+
+export function versionR2Filename(filename: string, version = crypto.randomUUID()) {
+  const safeFilename = filename.trim().replace(/\s+/g, "-").replace(/[^a-zA-Z0-9.\-_%]/g, "") || "image";
+  const extensionIndex = safeFilename.lastIndexOf(".");
+  if (extensionIndex <= 0) return `${safeFilename}-${version}`;
+  return `${safeFilename.slice(0, extensionIndex)}-${version}${safeFilename.slice(extensionIndex)}`;
 }
 
 export function generateR2PublicUrl(r2PublicBaseUrl: string, objectKey: string) {

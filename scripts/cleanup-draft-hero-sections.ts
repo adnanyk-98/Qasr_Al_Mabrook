@@ -12,7 +12,7 @@ const preservedHeroIds = new Set([
 async function main() {
   const { db } = await import("@/db");
   const { homepageSections } = await import("@/db/schema");
-  const { asc, eq, inArray } = await import("drizzle-orm");
+  const { inArray } = await import("drizzle-orm");
 
   const allSections = await db.select().from(homepageSections);
   const heroRows = allSections
@@ -63,7 +63,7 @@ async function main() {
 
   if (!process.argv.includes("--apply")) {
     console.log("Dry run only. No database changes made.");
-    await (db as any).$client.end();
+    await (db as typeof db & { $client: { end: () => Promise<void> } }).$client.end();
     return;
   }
 
@@ -98,7 +98,7 @@ async function main() {
     deletedIds: draftIds,
     nonHeroSectionsUnchanged: true,
   }, null, 2));
-  await (db as any).$client.end();
+  await (db as typeof db & { $client: { end: () => Promise<void> } }).$client.end();
 }
 
 void main().catch((error) => {

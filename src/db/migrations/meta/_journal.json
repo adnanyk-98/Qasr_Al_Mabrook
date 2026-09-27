@@ -43,6 +43,13 @@
       "when": 1756761600000,
       "tag": "0005_admin_user_permissions",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790505600000,
+      "tag": "0006_category_translation_short_description",
+      "breakpoints": true
     }
   ]
 }

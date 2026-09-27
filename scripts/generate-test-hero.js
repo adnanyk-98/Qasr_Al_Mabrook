@@ -1,5 +1,5 @@
-const sharp = require('sharp');
-const fs = require('fs');
+import sharp from 'sharp';
+import fs from 'node:fs';
 (async () => {
   const out = 'tests/fixtures/hero-1920x1080.jpg';
   await fs.promises.mkdir('tests/fixtures', { recursive: true });

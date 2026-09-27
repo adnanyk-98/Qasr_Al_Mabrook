@@ -1,8 +1,10 @@
-require('dotenv').config({ path: '.env.local' });
-import { chromium, devices } from 'playwright';
+import 'dotenv/config';
+
+import { chromium, type Page } from 'playwright';
+
 async function fetchPublishedProductsAndCategories() {
   const { db } = await import('../src/db');
-  const { eq, asc } = await import('drizzle-orm');
+  const { eq } = await import('drizzle-orm');
   const { products, categories } = await import('../src/db/schema');
 
   const prods = await db.select().from(products).where(eq(products.status, 'PUBLISHED'));
@@ -11,24 +13,42 @@ async function fetchPublishedProductsAndCategories() {
   return { products: prods, categories: cats };
 }
 
-function isR2Url(url: string | null | undefined) {
-  if (!url) return false;
-  return url.startsWith('https://');
-}
+type CheckImage = { src: string; alt: string; naturalWidth: number };
+type CheckPageResult = {
+  path: string;
+  status: number | null;
+  consoleErrors: string[];
+  images: CheckImage[];
+  lang: string | null;
+  dir: string | null;
+  overflow: boolean;
+};
 
-async function checkPage(page: any, path: string) {
-  const res = { path, status: null as number | null, consoleErrors: [] as string[], images: [] as any[], lang: null as string | null, dir: null as string | null, overflow: false };
-  page.on('console', (msg: any) => {
-    if (msg.type() === 'error') res.consoleErrors.push(msg.text());
+type ReportItem = Record<string, unknown>;
+
+async function checkPage(page: Page, path: string): Promise<CheckPageResult> {
+  const res: CheckPageResult = {
+    path,
+    status: null,
+    consoleErrors: [],
+    images: [],
+    lang: null,
+    dir: null,
+    overflow: false,
+  };
+  page.on('console', (msg) => {
+    if (msg.type() === 'error') {
+      res.consoleErrors.push(msg.text());
+    }
   });
   const response = await page.goto(path, { waitUntil: 'networkidle' });
   res.status = response?.status() ?? null;
   res.lang = await page.evaluate(() => document.documentElement.lang || null);
   res.dir = await page.evaluate(() => document.documentElement.dir || null);
-  // collect image srcs and check broken via naturalWidth
-  const imgs = await page.$$eval('img', (els: any[]) => els.map((el: any) => ({ src: (el as HTMLImageElement).src, alt: (el as HTMLImageElement).alt, naturalWidth: (el as HTMLImageElement).naturalWidth })));
+  const imgs = await page.$$eval('img', (els: HTMLImageElement[]) =>
+    els.map((el) => ({ src: el.src, alt: el.alt, naturalWidth: el.naturalWidth })),
+  );
   res.images = imgs;
-  // overflow
   res.overflow = await page.evaluate(() => {
     const html = document.documentElement;
     return html.scrollWidth > window.innerWidth + 4;
@@ -57,20 +77,22 @@ async function checkPage(page: any, path: string) {
     '/ar/about-us',
   ];
 
-  // add product pages
   for (const p of products) {
     routes.push(`/en/products/${p.slug}`);
     routes.push(`/ar/products/${p.slug}`);
   }
-  // add category pages
   for (const c of categories) {
     routes.push(`/en/categories/${c.slug}`);
     routes.push(`/ar/categories/${c.slug}`);
   }
 
   const browser = await chromium.launch();
-  const report: any[] = [];
-  const viewports = [ { name: 'desktop', width: 1440, height: 900 }, { name: 'tablet', width: 768, height: 1024 }, { name: 'mobile', width: 390, height: 844 } ];
+  const report: ReportItem[] = [];
+  const viewports = [
+    { name: 'desktop', width: 1440, height: 900 },
+    { name: 'tablet', width: 768, height: 1024 },
+    { name: 'mobile', width: 390, height: 844 },
+  ] as const;
 
   for (const r of routes) {
     const full = host + r;
@@ -81,15 +103,14 @@ async function checkPage(page: any, path: string) {
         const res = await checkPage(page, full);
         report.push({ route: r, viewport: vp.name, ...res });
         console.log(`[${vp.name}] ${r} status=${res.status} images=${res.images.length} consoleErrors=${res.consoleErrors.length} lang=${res.lang} dir=${res.dir} overflow=${res.overflow}`);
-      } catch (e) {
-        console.error('Error checking', r, vp.name, e);
-        report.push({ route: r, viewport: vp.name, error: String(e) });
+      } catch (error) {
+        console.error('Error checking', r, vp.name, error);
+        report.push({ route: r, viewport: vp.name, error: String(error) });
       }
       await context.close();
     }
   }
 
-  // product gallery interactions on a subset (first 5)
   const page = await browser.newPage();
   for (const p of products.slice(0, 8)) {
     const url = `${host}/en/products/${p.slug}`;
@@ -100,7 +121,6 @@ async function checkPage(page: any, path: string) {
       const thumbImgs = page.locator('button > div.relative > img');
       const count = await thumbImgs.count();
       console.log(`product ${p.slug} gallery: main=${mainSrc} thumbs=${count}`);
-      // click second if exists
       if (count >= 2) {
         const src2 = await thumbImgs.nth(1).getAttribute('src');
         await thumbImgs.nth(1).click();
@@ -108,22 +128,30 @@ async function checkPage(page: any, path: string) {
         const newMain = await mainImg.getAttribute('src');
         console.log(`  clicked thumb 2 -> main now=${newMain} expected=${src2}`);
       }
-    } catch (e) {
-      console.error('gallery error for', p.slug, e);
+    } catch (error) {
+      console.error('gallery error for', p.slug, error);
     }
   }
 
   await browser.close();
-  // summary
-  const failures = report.filter((r) => (r.status && r.status >= 400) || (r.consoleErrors && r.consoleErrors.length > 0) || r.overflow);
+  const failures = report.filter((r) => {
+    const status = typeof r.status === 'number' ? Number(r.status) : null;
+    const consoleErrors = Array.isArray(r.consoleErrors) ? r.consoleErrors : [];
+    return (status !== null && status >= 400) || consoleErrors.length > 0 || Boolean(r.overflow);
+  });
   console.log('\n--- Audit Summary ---');
   console.log('routes checked:', routes.length, 'products:', products.length, 'categories:', categories.length);
   console.log('failures:', failures.length);
   failures.slice(0, 30).forEach((f) => console.log(JSON.stringify(f, null, 2)));
 
-  // save brief report to file
   const fs = await import('fs');
-  fs.writeFileSync('audit-report.json', JSON.stringify({ routes, products: products.map((p) => ({ id: p.id, slug: p.slug })), categories: categories.map((c) => ({ id: c.id, slug: c.slug })), report, failures }, null, 2));
+  fs.writeFileSync('audit-report.json', JSON.stringify({
+    routes,
+    products: products.map((p) => ({ id: p.id, slug: p.slug })),
+    categories: categories.map((c) => ({ id: c.id, slug: c.slug })),
+    report,
+    failures,
+  }, null, 2));
 
   console.log('Wrote audit-report.json');
 })();

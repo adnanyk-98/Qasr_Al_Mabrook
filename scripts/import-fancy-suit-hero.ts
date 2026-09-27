@@ -1,12 +1,10 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import sharp from "sharp";
 import mime from "mime";
 import { config } from "dotenv";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
 config({ path: ".env.local" });
-
 
 const desktopFile = "FANCY SUIT-Web Banner.jpg";
 const mobileFile = "FANCY SUIT-Web Banner-Mobile.jpg";
@@ -26,8 +24,7 @@ async function upload(buffer: Buffer, filename: string) {
 }
 
 async function main() {
-  const { serverEnv } = await import("@/config/env");
-  const { generateR2PublicUrl, readOriginalProductImageMetadata } = await import("@/lib/catalogue-import");
+  const { readOriginalProductImageMetadata } = await import("@/lib/catalogue-import");
   const { createHomepageSection, listHomepageSections, updateHomepageSection } = await import("@/server/repositories/catalog-admin");
   const root = path.join(process.cwd(), "catalogue", "Banner");
   const desktopBuffer = await fs.readFile(path.join(root, desktopFile));

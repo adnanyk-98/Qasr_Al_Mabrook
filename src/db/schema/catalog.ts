@@ -26,6 +26,7 @@ export const categoryTranslations = pgTable("category_translations", {
   categoryId: uuid("category_id").notNull().references(() => categories.id, { onDelete: "cascade" }),
   locale: localeEnum("locale").notNull(),
   name: varchar("name", { length: 255 }).notNull(),
+  shortDescription: text("short_description"),
   description: text("description"),
   seoTitle: varchar("seo_title", { length: 255 }),
   seoDescription: text("seo_description"),

@@ -232,8 +232,8 @@ export function HeroCarousel({
     const slider = container?.querySelector('.w-full.flex') as HTMLElement | null;
     if (!container || !slider) return;
 
-    const THRESHOLD = 60; // px
-    const START_MIN = 8; // px before beginning drag
+    const RELEASE_THRESHOLD = 60; // px required to advance to another slide
+    const DRAG_START_THRESHOLD = 8; // px before beginning visual drag
     // Ensure vertical page scrolling remains natural while allowing horizontal swipes
     container.style.touchAction = container.style.touchAction || 'pan-y';
 
@@ -261,7 +261,7 @@ export function HeroCarousel({
 
       // if not yet dragging, determine whether to start
       if (!isDraggingRef.current) {
-        if (Math.abs(dx) > THRESHOLD && Math.abs(dx) > Math.abs(dy)) {
+        if (Math.abs(dx) > DRAG_START_THRESHOLD && Math.abs(dx) > Math.abs(dy)) {
           isDraggingRef.current = true;
           hasDraggedRef.current = true;
           try {
@@ -274,7 +274,7 @@ export function HeroCarousel({
           // prevent page scroll once we have decided this is a horizontal drag
           e.preventDefault();
           if (autoplayTimerRef.current) window.clearInterval(autoplayTimerRef.current);
-        } else if (Math.abs(dy) > START_MIN && Math.abs(dy) > Math.abs(dx)) {
+        } else if (Math.abs(dy) > DRAG_START_THRESHOLD && Math.abs(dy) > Math.abs(dx)) {
           // vertical scroll — cancel gesture handling
           pointerIdRef.current = null;
           window.removeEventListener('pointermove', onPointerMove);
@@ -287,7 +287,7 @@ export function HeroCarousel({
 
       // dragging
       dragXRef.current = dx;
-      suppressClickRef.current = Math.abs(dx) > THRESHOLD;
+      suppressClickRef.current = Math.abs(dx) > RELEASE_THRESHOLD;
       // apply pixel transform while dragging
       const width = containerWidthRef.current || container.getBoundingClientRect().width;
       const base = direction * active * width;
@@ -326,7 +326,7 @@ export function HeroCarousel({
       const width = containerWidthRef.current || container.getBoundingClientRect().width;
       slider.style.transition = '';
       // decide change with infinite looping
-      if (Math.abs(dx) > THRESHOLD) {
+      if (Math.abs(dx) > RELEASE_THRESHOLD) {
         if (dx < 0) {
           setActive((c) => Math.min(c + 1, banners.length + 1));
         } else {

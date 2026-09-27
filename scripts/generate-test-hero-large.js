@@ -1,6 +1,6 @@
-const sharp = require('sharp');
-const fs = require('fs');
-const crypto = require('crypto');
+import sharp from 'sharp';
+import fs from 'node:fs';
+import crypto from 'node:crypto';
 (async () => {
   const out = 'tests/fixtures/hero-1920x1080-large.jpg';
   await fs.promises.mkdir('tests/fixtures', { recursive: true });

@@ -2,9 +2,11 @@ import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Input, Label, Select } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { listAttributeTranslations, listCategoryTranslations, listProductTranslations } from "@/server/repositories/catalog-admin";
-import { upsertAttributeTranslationAction, upsertCategoryTranslationAction, upsertProductTranslationAction } from "@/server/services/admin-catalog";
+import { upsertAttributeTranslationAction } from "./actions";
 import { requireAdminSession } from "@/server/services/admin-auth";
+import { siteConfig } from "@/config/site";
 import { listAttributes, listCategories, listProducts } from "@/server/repositories/catalog-admin";
+import { TranslationManager } from "./translation-manager";
 
 export default async function TranslationsPage() {
   await requireAdminSession();
@@ -23,78 +25,15 @@ export default async function TranslationsPage() {
           <h1 className="mt-1 text-3xl font-semibold text-[var(--foreground)]">Translations</h1>
         </div>
 
+        <TranslationManager
+          products={products.map(({ id, slug }) => ({ id, slug }))}
+          categories={categories.map(({ id, slug }) => ({ id, slug }))}
+          defaultLocale={siteConfig.defaultLocale}
+          productTranslations={productTranslations.map(({ id, productId, locale, name, shortDescription, description }) => ({ id, productId, locale, name, shortDescription, description }))}
+          categoryTranslations={categoryTranslations.map(({ id, categoryId, locale, name, shortDescription, description }) => ({ id, categoryId, locale, name, shortDescription, description }))}
+        />
+
         <div className="grid gap-6 xl:grid-cols-3">
-          <Card>
-            <CardHeader>
-              <h2 className="text-xl font-semibold text-[var(--foreground)]">Product translation</h2>
-            </CardHeader>
-            <CardBody>
-              <form action={upsertProductTranslationAction} className="space-y-4">
-                <div>
-                  <Label htmlFor="productId">Product</Label>
-                  <Select id="productId" name="productId" defaultValue="">
-                    <option value="">Select product</option>
-                    {products.map((product) => (
-                      <option key={product.id} value={product.id}>{product.slug}</option>
-                    ))}
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="locale">Locale</Label>
-                  <Select id="locale" name="locale" defaultValue="en">
-                    <option value="en">en</option>
-                    <option value="ar">ar</option>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="name">Name</Label>
-                  <Input id="name" name="name" placeholder="Product name" required />
-                </div>
-                <div>
-                  <Label htmlFor="shortDescription">Short description</Label>
-                  <Input id="shortDescription" name="shortDescription" placeholder="Short text" />
-                </div>
-                <div>
-                  <Label htmlFor="description">Description</Label>
-                  <Input id="description" name="description" placeholder="Long description" />
-                </div>
-                <Button type="submit" className="w-full">Save product translation</Button>
-              </form>
-            </CardBody>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <h2 className="text-xl font-semibold text-[var(--foreground)]">Category translation</h2>
-            </CardHeader>
-            <CardBody>
-              <form action={upsertCategoryTranslationAction} className="space-y-4">
-                <div>
-                  <Label htmlFor="categoryId">Category</Label>
-                  <Select id="categoryId" name="categoryId" defaultValue="">
-                    <option value="">Select category</option>
-                    {categories.map((category) => (
-                      <option key={category.id} value={category.id}>{category.slug}</option>
-                    ))}
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="locale">Locale</Label>
-                  <Select id="locale" name="locale" defaultValue="en">
-                    <option value="en">en</option>
-                    <option value="ar">ar</option>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="name">Name</Label>
-                  <Input id="name" name="name" placeholder="Category name" required />
-                </div>
-                <Input id="description" name="description" placeholder="Category description" />
-                <Button type="submit" className="w-full">Save category translation</Button>
-              </form>
-            </CardBody>
-          </Card>
-
           <Card>
             <CardHeader>
               <h2 className="text-xl font-semibold text-[var(--foreground)]">Attribute translation</h2>
@@ -128,24 +67,6 @@ export default async function TranslationsPage() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-3">
-          <Card>
-            <CardHeader>
-              <h2 className="text-xl font-semibold text-[var(--foreground)]">Product translations</h2>
-            </CardHeader>
-            <CardBody className="space-y-3">
-              {productTranslations.length === 0 ? <p className="text-sm text-[var(--text-muted)]">No product translations yet.</p> : productTranslations.map((entry) => <div key={entry.id} className="rounded-[var(--radius-md)] border border-[var(--brand-border)] p-3"><p className="font-medium text-[var(--foreground)]">{entry.name}</p><p className="text-xs uppercase tracking-[0.08em] text-[var(--text-muted)]">{entry.locale}</p></div>)}
-            </CardBody>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <h2 className="text-xl font-semibold text-[var(--foreground)]">Category translations</h2>
-            </CardHeader>
-            <CardBody className="space-y-3">
-              {categoryTranslations.length === 0 ? <p className="text-sm text-[var(--text-muted)]">No category translations yet.</p> : categoryTranslations.map((entry) => <div key={entry.id} className="rounded-[var(--radius-md)] border border-[var(--brand-border)] p-3"><p className="font-medium text-[var(--foreground)]">{entry.name}</p><p className="text-xs uppercase tracking-[0.08em] text-[var(--text-muted)]">{entry.locale}</p></div>)}
-            </CardBody>
-          </Card>
-
           <Card>
             <CardHeader>
               <h2 className="text-xl font-semibold text-[var(--foreground)]">Attribute translations</h2>

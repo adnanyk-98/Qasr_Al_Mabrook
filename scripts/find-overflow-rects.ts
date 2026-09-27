@@ -1,4 +1,6 @@
-require('dotenv').config({ path: '.env.local' });
+import { config } from 'dotenv';
+
+config({ path: '.env.local' });
 import { chromium } from 'playwright';
 
 (async () => {
@@ -12,7 +14,7 @@ import { chromium } from 'playwright';
     await page.goto(url, { waitUntil: 'networkidle' });
     const items = await page.evaluate(() => {
       const winW = window.innerWidth;
-      const out: any[] = [];
+      const out: Array<{ selector: string; left: number; right: number; width: number }> = [];
       const all = Array.from(document.querySelectorAll('*')) as Element[];
       for (const el of all) {
         const rect = (el as HTMLElement).getBoundingClientRect?.();

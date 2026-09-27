@@ -82,7 +82,6 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ loc
 
   return (
     <PublicShell locale={currentLocale} path="/">
-      <main>
         <Section className="bg-[var(--brand-surface)] !py-0">
           {heroSections.length > 0 ? (
             // Full-bleed hero: render outside the standard centered Container
@@ -207,7 +206,6 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ loc
           </Container>
         </Section>
         <TestimonialsSection locale={currentLocale} />
-      </main>
     </PublicShell>
   );
 }

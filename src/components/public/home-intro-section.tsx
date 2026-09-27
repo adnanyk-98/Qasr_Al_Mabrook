@@ -15,9 +15,9 @@ export async function HomeIntroSection({ locale }: { locale: Locale }) {
           </div>
 
           <div className="text-center lg:text-start">
-            <h2 id="homepage-intro-title" className="mx-auto max-w-2xl text-2xl font-semibold leading-tight text-[var(--foreground)] sm:text-3xl">
+            <h1 id="homepage-intro-title" className="mx-auto max-w-2xl text-2xl font-semibold leading-tight text-[var(--foreground)] sm:text-3xl">
               {t("introTitle")}
-            </h2>
+            </h1>
             <div className="mx-auto mt-5 flex items-center justify-center gap-3 lg:mx-0 lg:justify-start" aria-hidden="true">
               <span className="h-px w-16 bg-[var(--brand-primary)]/40 sm:w-24" />
               <span className="text-sm text-[var(--brand-primary)]">◆</span>

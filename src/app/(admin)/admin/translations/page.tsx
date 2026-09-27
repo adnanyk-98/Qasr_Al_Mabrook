@@ -1,6 +1,7 @@
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Input, Label, Select } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
+import { AdminBackButton } from "@/components/admin/admin-back-button";
 import { listAttributeTranslations, listCategoryTranslations, listProductTranslations } from "@/server/repositories/catalog-admin";
 import { upsertAttributeTranslationAction } from "./actions";
 import { requireAdminSession } from "@/server/services/admin-auth";
@@ -20,9 +21,12 @@ export default async function TranslationsPage() {
   return (
     <main className="min-h-screen bg-[var(--brand-surface)] p-6">
       <div className="mx-auto max-w-7xl space-y-6">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">Admin</p>
-          <h1 className="mt-1 text-3xl font-semibold text-[var(--foreground)]">Translations</h1>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">Admin</p>
+            <h1 className="mt-1 text-3xl font-semibold text-[var(--foreground)]">Translations</h1>
+          </div>
+          <AdminBackButton />
         </div>
 
         <TranslationManager

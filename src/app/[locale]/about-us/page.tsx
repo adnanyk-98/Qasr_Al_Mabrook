@@ -13,13 +13,18 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   
   const currentLocale = locale as Locale;
   const page = await getPublishedStaticPage(currentLocale, "about-us");
-  
-  return createPublicPageMetadata({
+  const alternatePage = await getPublishedStaticPage(currentLocale === "en" ? "ar" : "en", "about-us");
+
+  const metadata = createPublicPageMetadata({
     locale: currentLocale,
     path: "/about-us",
     title: page?.seoTitle ?? page?.title,
     description: page?.seoDescription,
+    hasAlternate: Boolean(page?.hasExactLocaleTranslation && alternatePage?.hasExactLocaleTranslation),
   });
+
+  if (!page?.hasExactLocaleTranslation) metadata.robots = "noindex, follow";
+  return metadata;
 }
 
 export default async function AboutPage({ params }: { params: Promise<{ locale: string }> }) {

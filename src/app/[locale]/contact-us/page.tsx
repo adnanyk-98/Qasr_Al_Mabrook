@@ -9,18 +9,25 @@ import { locales, type Locale } from "@/lib/locales";
 import { getTranslations } from "next-intl/server";
 import { createPublicPageMetadata } from "@/lib/seo";
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ error?: string; success?: string }> }): Promise<Metadata> {
   const { locale } = await params;
   if (!locales.includes(locale as Locale)) return {};
   
-  const t = await getTranslations({ locale: locale as Locale, namespace: "metadata" });
+  const [metadataT, enquiryT] = await Promise.all([
+    getTranslations({ locale: locale as Locale, namespace: "metadata" }),
+    getTranslations({ locale: locale as Locale, namespace: "enquiry" }),
+  ]);
   const currentLocale = locale as Locale;
-  
-  return createPublicPageMetadata({
+
+  const metadata = createPublicPageMetadata({
     locale: currentLocale,
     path: "/contact-us",
-    title: t("contactTitle"),
+    title: metadataT("contactTitle"),
+    description: enquiryT("contactDescription"),
   });
+  const query = await searchParams;
+  if (query.success || query.error) metadata.robots = "noindex, follow";
+  return metadata;
 }
 
 export default async function ContactPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ error?: string; success?: string }> }) {

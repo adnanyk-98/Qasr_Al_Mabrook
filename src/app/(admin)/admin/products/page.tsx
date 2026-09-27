@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { AdminBackButton } from "@/components/admin/admin-back-button";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Label, Select } from "@/components/ui/form";
 import {
@@ -51,11 +52,14 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   return (
     <main className="min-h-screen bg-[var(--brand-surface)] p-6">
       <div className="mx-auto max-w-7xl space-y-6">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">
-            Admin
-          </p>
-          <h1 className="mt-1 text-3xl font-semibold text-[var(--foreground)]">Products</h1>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">
+              Admin
+            </p>
+            <h1 className="mt-1 text-3xl font-semibold text-[var(--foreground)]">Products</h1>
+          </div>
+          <AdminBackButton />
         </div>
 
         <div className="grid gap-6 xl:grid-cols-2">

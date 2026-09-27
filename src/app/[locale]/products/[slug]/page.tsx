@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const images = await listProductImagesForPublic(product.id);
   const primaryImage = images.find((img) => img.isPrimary) ?? images[0];
 
-  return createProductMetadata({
+  const metadata = createProductMetadata({
     locale: currentLocale,
     path: `/products/${slug}`,
     productName: product.name,
@@ -47,8 +47,11 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     fullDescription: product.description,
     productImage: primaryImage?.publicUrl,
     productImageAlt: primaryImage ? (currentLocale === "ar" ? primaryImage.altTextAr ?? primaryImage.altTextEn : primaryImage.altTextEn ?? primaryImage.altTextAr) : undefined,
-    hasAlternate: Boolean(alternateProduct),
+    hasAlternate: Boolean(product.hasExactLocaleTranslation && alternateProduct?.hasExactLocaleTranslation),
   });
+
+  if (!product.hasExactLocaleTranslation) metadata.robots = "noindex, follow";
+  return metadata;
 }
 
 export default async function ProductDetailPage({ params, searchParams }: { params: Promise<{ locale: string; slug: string }>; searchParams: Promise<{ variant?: string }> }) {

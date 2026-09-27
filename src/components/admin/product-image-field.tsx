@@ -1,7 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import Cropper, { type Area } from "react-easy-crop";
+
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/form";
+import { generateCroppedImageFile, isSquareImageDimensions, loadImageFromUrl } from "@/lib/image-crop";
 import { reorderProductImages } from "@/lib/product-image-order";
 
 type ImageEntry = {
@@ -25,58 +29,186 @@ export function ProductImageField({ currentImages = [] }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [confirmTarget, setConfirmTarget] = useState<{ id: string; idx: number; objectKey: string } | null>(null);
+  const [cropCandidate, setCropCandidate] = useState<{ file: File; previewUrl: string; width: number; height: number } | null>(null);
+  const [isCropping, setIsCropping] = useState(false);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const cropCandidateRef = useRef<typeof cropCandidate>(null);
+  const pendingFilesRef = useRef<File[]>([]);
+  const isProcessingFilesRef = useRef(false);
+  const objectUrlsRef = useRef(new Set<string>());
+  const isMountedRef = useRef(false);
+
+  useEffect(() => {
+    const objectUrls = objectUrlsRef.current;
+    isMountedRef.current = true;
+
+    return () => {
+      isMountedRef.current = false;
+      pendingFilesRef.current = [];
+      cropCandidateRef.current = null;
+      for (const objectUrl of objectUrls) {
+        URL.revokeObjectURL(objectUrl);
+      }
+      objectUrls.clear();
+    };
+  }, []);
+
+  const revokeObjectUrl = (objectUrl: string) => {
+    if (objectUrlsRef.current.delete(objectUrl)) {
+      URL.revokeObjectURL(objectUrl);
+    }
+  };
+
+  const resetCropState = () => {
+    cropCandidateRef.current = null;
+    setCropCandidate(null);
+    setCrop({ x: 0, y: 0 });
+    setZoom(1);
+    setCroppedAreaPixels(null);
+  };
+
+  const uploadImageFile = async (file: File) => {
+    setUploading(true);
+    setError(null);
+
+    try {
+      const fd = new FormData();
+      fd.append("imageFile", file, file.name);
+      const slugInput = (document.querySelector('input[name="slug"]') as HTMLInputElement | null)?.value ?? "product";
+      fd.append("slug", slugInput);
+
+      const res = await fetch("/api/admin/products/image-upload", { method: "POST", body: fd });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.error || `Upload failed with ${res.status}`);
+      }
+
+      const body = await res.json();
+      const entry: ImageEntry = {
+        publicUrl: body.publicUrl,
+        objectKey: body.objectKey,
+        width: body.width ?? null,
+        height: body.height ?? null,
+      };
+      if (isMountedRef.current) {
+        setImages((prev) => [
+          ...prev,
+          { ...entry, isPrimary: prev.length === 0 && !prev.some((image) => image.isPrimary) },
+        ]);
+      }
+    } catch (error: unknown) {
+      if (isMountedRef.current) {
+        setError(error instanceof Error ? error.message : String(error));
+      }
+    } finally {
+      if (isMountedRef.current) setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
+  const processPendingFiles = async () => {
+    if (isProcessingFilesRef.current || cropCandidateRef.current) return;
+
+    isProcessingFilesRef.current = true;
+    try {
+      while (pendingFilesRef.current.length > 0 && isMountedRef.current) {
+        const file = pendingFilesRef.current.shift();
+        if (!file) continue;
+
+        let imageSource: string;
+        try {
+          imageSource = URL.createObjectURL(file);
+        } catch (createError) {
+          if (isMountedRef.current) {
+            setError(createError instanceof Error ? createError.message : "Unable to prepare the selected image.");
+          }
+          continue;
+        }
+        objectUrlsRef.current.add(imageSource);
+
+        try {
+          const image = await loadImageFromUrl(imageSource);
+          if (!isMountedRef.current) {
+            revokeObjectUrl(imageSource);
+            break;
+          }
+
+          if (isSquareImageDimensions(image.naturalWidth, image.naturalHeight)) {
+            revokeObjectUrl(imageSource);
+            await uploadImageFile(file);
+            continue;
+          }
+
+          const candidate = {
+            file,
+            previewUrl: imageSource,
+            width: image.naturalWidth,
+            height: image.naturalHeight,
+          };
+          cropCandidateRef.current = candidate;
+          setCropCandidate(candidate);
+          break;
+        } catch (loadError) {
+          revokeObjectUrl(imageSource);
+          if (isMountedRef.current) {
+            setError(loadError instanceof Error ? loadError.message : "Unable to read the selected image.");
+          }
+        }
+      }
+    } finally {
+      isProcessingFilesRef.current = false;
+    }
+  };
 
   const handleFiles = (files: FileList | null) => {
     if (!files || files.length === 0) return;
-    Array.from(files).forEach(async (file) => {
-      // client-side dimension check
-      const dataUrl = await new Promise<string | null>((res) => {
-        const r = new FileReader();
-        r.onload = () => res(typeof r.result === "string" ? r.result : null);
-        r.onerror = () => res(null);
-        r.readAsDataURL(file);
-      });
-      if (!dataUrl) {
-        setError("Failed to read file");
-        return;
-      }
-      const img = new Image();
-      img.onload = async () => {
-        if (img.width !== img.height) {
-          setError(`Image ${file.name} must be square (1:1).`);
-          return;
-        }
+    pendingFilesRef.current.push(...Array.from(files));
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    void processPendingFiles();
+  };
 
-        // upload to multipart endpoint
-        setUploading(true);
-        setError(null);
-        try {
-          const fd = new FormData();
-          fd.append("imageFile", file, file.name);
-          const slugInput = (document.querySelector('input[name="slug"]') as HTMLInputElement | null)?.value ?? "product";
-          fd.append("slug", slugInput);
-          const res = await fetch("/api/admin/products/image-upload", { method: "POST", body: fd });
-          if (!res.ok) {
-            const body = await res.json().catch(() => ({}));
-            throw new Error(body?.error || `Upload failed with ${res.status}`);
-          }
-          const body = await res.json();
-          const entry: ImageEntry = {
-            publicUrl: body.publicUrl,
-            objectKey: body.objectKey,
-            width: body.width ?? null,
-            height: body.height ?? null,
-            isPrimary: images.length === 0 && !images.some((i) => i.isPrimary),
-          };
-          setImages((prev) => [...prev, entry]);
-        } catch (error: unknown) {
-          setError(error instanceof Error ? error.message : String(error));
-        } finally {
-          setUploading(false);
-        }
-      };
-      img.src = dataUrl;
-    });
+  const onCropComplete = (_: unknown, croppedAreaPixelsValue: Area) => {
+    setCroppedAreaPixels(croppedAreaPixelsValue);
+  };
+
+  const confirmCrop = async () => {
+    const candidate = cropCandidateRef.current;
+    if (!candidate) return;
+    if (!croppedAreaPixels) {
+      setError("The crop is not ready yet. Please wait for the preview to finish loading.");
+      return;
+    }
+
+    isProcessingFilesRef.current = true;
+    setIsCropping(true);
+    let croppedFile: File | null = null;
+    try {
+      croppedFile = await generateCroppedImageFile(candidate.file, croppedAreaPixels, candidate.previewUrl);
+    } catch (cropError) {
+      if (isMountedRef.current) {
+        setError(cropError instanceof Error ? cropError.message : "Unable to crop the selected image.");
+      }
+    } finally {
+      revokeObjectUrl(candidate.previewUrl);
+      if (cropCandidateRef.current === candidate) resetCropState();
+      if (isMountedRef.current) setIsCropping(false);
+      isProcessingFilesRef.current = false;
+    }
+
+    if (croppedFile && isMountedRef.current) await uploadImageFile(croppedFile);
+    void processPendingFiles();
+  };
+
+  const cancelCrop = () => {
+    if (isCropping) return;
+    if (cropCandidateRef.current?.previewUrl) revokeObjectUrl(cropCandidateRef.current.previewUrl);
+    resetCropState();
+    void processPendingFiles();
   };
 
   const removeImageAt = (idx: number) => {
@@ -109,7 +241,86 @@ export function ProductImageField({ currentImages = [] }: Props) {
         <div className={`mb-2 p-2 rounded text-sm ${toast.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>{toast.message}</div>
       ) : null}
       <Label htmlFor="productImageFiles">Product images</Label>
-      <input id="productImageFiles" type="file" accept="image/*" multiple className="block w-full text-sm" onChange={(e) => handleFiles(e.target.files)} />
+      <div className="space-y-3">
+        <label className="inline-flex cursor-pointer items-center gap-2 rounded-[var(--radius-md)] bg-[var(--brand-primary)] px-4 py-2.5 text-sm font-medium text-white shadow-[var(--shadow-sm)] transition-colors hover:bg-[var(--brand-primary-dark)] focus-within:ring-2 focus-within:ring-[var(--brand-primary)] focus-within:ring-offset-2">
+          <span>Choose images</span>
+          <input
+            ref={fileInputRef}
+            id="productImageFiles"
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
+            multiple
+            className="sr-only"
+            onChange={(e) => handleFiles(e.target.files)}
+            aria-label="Choose product images"
+          />
+        </label>
+
+        <div className="rounded-[var(--radius-md)] border border-[var(--brand-border)] bg-[var(--brand-surface-alt)] p-3 text-sm">
+          <p className="text-xs font-medium uppercase tracking-[0.08em] text-[var(--text-muted)]">Selected images</p>
+          {images.length === 0 ? (
+            <p className="mt-2 text-[var(--text-muted)]">No images selected yet.</p>
+          ) : (
+            <ul className="mt-2 space-y-1">
+              {images.map((img, idx) => (
+                <li key={img.id ?? `${img.objectKey}-${idx}`} className="flex items-center gap-2 text-[var(--foreground)]">
+                  <span aria-hidden="true" className="text-emerald-600">✓</span>
+                  <span className="truncate">{img.objectKey.split("/").pop() || `image-${idx + 1}`}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+
+      {cropCandidate ? (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/45 p-4">
+          <div className="w-full max-w-2xl rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-white p-4 shadow-[var(--shadow-lg)]">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">Crop image</p>
+                <h3 className="text-lg font-semibold text-[var(--foreground)]">Adjust the square crop</h3>
+              </div>
+              <Button type="button" variant="outline" size="sm" onClick={cancelCrop} disabled={isCropping}>Cancel</Button>
+            </div>
+
+            <div className="relative h-[320px] w-full overflow-hidden rounded-[var(--radius-md)] border border-[var(--brand-border)] bg-[var(--brand-surface-alt)]">
+              <Cropper
+                image={cropCandidate.previewUrl}
+                crop={crop}
+                zoom={zoom}
+                aspect={1}
+                cropShape="rect"
+                showGrid={true}
+                onCropChange={setCrop}
+                onZoomChange={setZoom}
+                onCropComplete={onCropComplete}
+                objectFit="contain"
+              />
+            </div>
+
+            <div className="mt-4">
+              <label htmlFor="crop-zoom" className="mb-2 block text-sm font-medium text-[var(--foreground)]">Zoom</label>
+              <input
+                id="crop-zoom"
+                type="range"
+                min="1"
+                max="3"
+                step="0.01"
+                value={zoom}
+                onChange={(event) => setZoom(Number(event.target.value))}
+                className="w-full accent-[var(--brand-primary)]"
+                aria-label="Crop image zoom"
+              />
+            </div>
+
+            <div className="mt-4 flex justify-end gap-3">
+              <Button type="button" variant="outline" onClick={cancelCrop} disabled={isCropping}>Cancel</Button>
+              <Button type="button" onClick={() => { void confirmCrop(); }} disabled={isCropping}>Crop</Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       <div className="mt-3 space-y-2">
         {images.map((img, idx) => (

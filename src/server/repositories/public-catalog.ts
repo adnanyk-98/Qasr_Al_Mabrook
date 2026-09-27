@@ -108,6 +108,7 @@ async function getPublishedStaticPageUncached(locale: Locale, slug: string) {
     body: translation.body,
     seoTitle: translation.seoTitle ?? null,
     seoDescription: translation.seoDescription ?? null,
+    hasExactLocaleTranslation: translation.locale === locale,
   };
 }
 
@@ -220,6 +221,7 @@ async function getCategoryBySlugUncached(locale: Locale, slug: string) {
       description: rows[0].translation.description ?? null,
       seoTitle: rows[0].translation.seoTitle ?? null,
       seoDescription: rows[0].translation.seoDescription ?? null,
+      hasExactLocaleTranslation: true,
     };
   }
 
@@ -243,6 +245,7 @@ async function getCategoryBySlugUncached(locale: Locale, slug: string) {
     description: fallback[0].translation.description ?? null,
     seoTitle: fallback[0].translation.seoTitle ?? null,
     seoDescription: fallback[0].translation.seoDescription ?? null,
+    hasExactLocaleTranslation: false,
   };
 }
 
@@ -354,6 +357,7 @@ async function getProductBySlugUncached(locale: Locale, slug: string) {
       seoTitle: result.translation.seoTitle ?? null,
       seoDescription: result.translation.seoDescription ?? null,
       brandName,
+      hasExactLocaleTranslation: true,
     };
   }
 
@@ -383,6 +387,7 @@ async function getProductBySlugUncached(locale: Locale, slug: string) {
     seoTitle: fallbackResult.translation.seoTitle ?? null,
     seoDescription: fallbackResult.translation.seoDescription ?? null,
     brandName: fallbackResult.brand?.name ?? null,
+    hasExactLocaleTranslation: false,
   };
 }
 

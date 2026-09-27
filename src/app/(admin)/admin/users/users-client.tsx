@@ -6,6 +6,7 @@ import Link from "next/link";
 
 import { Input, Label, Select } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
+import { AdminBackButton } from "@/components/admin/admin-back-button";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { formatDateConsistent } from "@/lib/date-utils";
 import {
@@ -221,15 +222,18 @@ export function AdminUsersClient({
               User &amp; Role Management
             </h1>
           </div>
-          {canCreate && (
-            <Button
-              onClick={() => setShowCreateForm(!showCreateForm)}
-              variant="primary"
-              size="md"
-            >
-              {showCreateForm ? "Cancel" : "Add User"}
-            </Button>
-          )}
+          <div className="flex items-center gap-3">
+            <AdminBackButton />
+            {canCreate && (
+              <Button
+                onClick={() => setShowCreateForm(!showCreateForm)}
+                variant="primary"
+                size="md"
+              >
+                {showCreateForm ? "Cancel" : "Add User"}
+              </Button>
+            )}
+          </div>
         </div>
 
         {showCreateForm && canCreate && (

@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { AdminBackButton } from "@/components/admin/admin-back-button";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Input, Label, Select } from "@/components/ui/form";
 import { listCategoriesPaginated, getCategoryById } from "@/server/repositories/catalog-admin";
@@ -33,6 +34,7 @@ export default async function CategoriesPage({ searchParams }: PageProps) {
             <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">Admin</p>
             <h1 className="mt-1 text-3xl font-semibold text-[var(--foreground)]">Categories</h1>
           </div>
+          <AdminBackButton />
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[420px_minmax(0,1fr)]">

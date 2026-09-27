@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const currentLocale = locale as Locale;
   const alternateCategory = await getCategoryBySlug(currentLocale === "en" ? "ar" : "en", slug);
 
-  return createCategoryMetadata({
+  const metadata = createCategoryMetadata({
     locale: currentLocale,
     path: `/categories/${slug}`,
     categoryName: category.name,
@@ -29,8 +29,11 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     description: category.description,
     ogImage: category.imagePublicUrl,
     ogImageAlt: category.name,
-    hasAlternate: Boolean(alternateCategory),
+    hasAlternate: Boolean(category.hasExactLocaleTranslation && alternateCategory?.hasExactLocaleTranslation),
   });
+
+  if (!category.hasExactLocaleTranslation) metadata.robots = "noindex, follow";
+  return metadata;
 }
 
 export default async function CategoryDetailPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {

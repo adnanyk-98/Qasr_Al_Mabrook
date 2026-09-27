@@ -28,7 +28,7 @@ const serverEnvSchema = z.object({
 });
 
 const clientEnvSchema = z.object({
-  NEXT_PUBLIC_SITE_URL: z.string().url().default("http://localhost:3000"),
+  NEXT_PUBLIC_SITE_URL: z.string().url().default("https://www.qasralmabrook.com"),
 });
 
 function normalizeEmptyEnvValues(

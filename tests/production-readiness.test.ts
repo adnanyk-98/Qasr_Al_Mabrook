@@ -10,7 +10,7 @@ import { validateHeroImageUpload } from "@/lib/hero-media";
 
 const baseInput = {
   stage: "production",
-  siteUrl: "https://example.com",
+  siteUrl: "https://www.qasralmabrook.com",
   databaseUrl: "postgresql://app:secret@example.com/app",
   directDatabaseUrl: "postgresql://admin:secret@example.com/app",
   authSecret: "a".repeat(32),
@@ -38,6 +38,12 @@ test("rejects production localhost and incomplete service configuration", () => 
   assert.ok(result.errors.some((error) => error.key === "NEXT_PUBLIC_SITE_URL"));
   assert.ok(result.errors.some((error) => error.key === "DATABASE_URL"));
   assert.ok(result.errors.some((error) => error.key === "R2_BUCKET_NAME"));
+});
+
+test("rejects a noncanonical production host", () => {
+  const result = validateProductionReadiness({ ...baseInput, siteUrl: "https://qasralmabrook.com" });
+  assert.equal(result.ok, false);
+  assert.ok(result.errors.some((error) => error.key === "NEXT_PUBLIC_SITE_URL"));
 });
 
 test("allows local configuration with an explicit external-service warning", () => {

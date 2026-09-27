@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
+import { AdminBackButton } from "@/components/admin/admin-back-button";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { requireAdminSession } from "@/server/services/admin-auth";
 
@@ -25,6 +26,7 @@ export default async function AdminHomePage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
+            <AdminBackButton fallbackHref="/admin" />
             <span className="rounded-full bg-[var(--brand-primary-light)] px-3 py-1 text-sm font-medium text-[var(--brand-primary)]">
               {admin.role}
             </span>

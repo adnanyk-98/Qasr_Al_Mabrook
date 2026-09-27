@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { DealProductSelector } from "@/components/admin/deal-product-selector";
+import { AdminBackButton } from "@/components/admin/admin-back-button";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/form";
@@ -32,10 +33,13 @@ export default async function DealsPage({ searchParams }: PageProps) {
   return (
     <main className="min-h-screen bg-[var(--brand-surface)] p-6">
       <div className="mx-auto max-w-7xl space-y-6">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">Admin</p>
-          <h1 className="mt-1 text-3xl font-semibold text-[var(--foreground)]">Homepage Deals</h1>
-          <p className="mt-2 text-sm text-[var(--text-muted)]">Manage up to three active product deals shown on the homepage.</p>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">Admin</p>
+            <h1 className="mt-1 text-3xl font-semibold text-[var(--foreground)]">Homepage Deals</h1>
+            <p className="mt-2 text-sm text-[var(--text-muted)]">Manage up to three active product deals shown on the homepage.</p>
+          </div>
+          <AdminBackButton />
         </div>
 
         {formError ? <p className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700" role="alert">{formError}</p> : null}

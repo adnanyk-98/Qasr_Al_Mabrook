@@ -1,7 +1,7 @@
 import { type MetadataRoute } from "next";
 import { db } from "@/db";
-import { categories, categoryTranslations, productTranslations, products } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { categories, categoryTranslations, productTranslations, products, staticPageTranslations, staticPages } from "@/db/schema";
+import { and, eq } from "drizzle-orm";
 import { getBaseUrl } from "@/lib/seo";
 import { localePath, locales } from "@/lib/locales";
 import { reportServerError } from "@/lib/observability";
@@ -20,7 +20,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     for (const locale of locales) {
       sitemapEntries.push({
         url: `${baseUrl}${localePath(locale, "/")}`,
-        lastModified: new Date(),
         changeFrequency: "weekly",
         priority: 1.0,
       });
@@ -31,35 +30,46 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       sitemapEntries.push(
         {
           url: `${baseUrl}${localePath(locale, "/categories")}`,
-          lastModified: new Date(),
           changeFrequency: "weekly",
           priority: 0.9,
         },
         {
           url: `${baseUrl}${localePath(locale, "/products")}`,
-          lastModified: new Date(),
           changeFrequency: "weekly",
           priority: 0.9,
         },
         {
           url: `${baseUrl}${localePath(locale, "/store-locator")}`,
-          lastModified: new Date(),
           changeFrequency: "monthly",
           priority: 0.8,
         },
         {
-          url: `${baseUrl}${localePath(locale, "/about-us")}`,
-          lastModified: new Date(),
-          changeFrequency: "monthly",
-          priority: 0.6,
-        },
-        {
           url: `${baseUrl}${localePath(locale, "/contact-us")}`,
-          lastModified: new Date(),
           changeFrequency: "monthly",
           priority: 0.6,
         }
       );
+    }
+
+    const aboutPage = await db
+      .select({ id: staticPages.id, updatedAt: staticPages.updatedAt })
+      .from(staticPages)
+      .where(and(eq(staticPages.slug, "about-us"), eq(staticPages.status, "PUBLISHED")))
+      .limit(1);
+    if (aboutPage[0]) {
+      const aboutTranslations = await db
+        .select({ locale: staticPageTranslations.locale })
+        .from(staticPageTranslations)
+        .where(eq(staticPageTranslations.staticPageId, aboutPage[0].id));
+      const availableAboutLocales = new Set(aboutTranslations.map((translation) => translation.locale));
+      for (const locale of locales.filter((candidate) => availableAboutLocales.has(candidate))) {
+        sitemapEntries.push({
+          url: `${baseUrl}${localePath(locale, "/about-us")}`,
+          lastModified: aboutPage[0].updatedAt,
+          changeFrequency: "monthly",
+          priority: 0.6,
+        });
+      }
     }
 
     // Add published categories for each locale
@@ -81,8 +91,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           .filter((translation) => translation.categoryId === category.id)
           .map((translation) => translation.locale)
       );
-      if (availableLocales.has("en")) availableLocales.add("ar");
-
       for (const locale of locales.filter((candidate) => availableLocales.has(candidate))) {
         sitemapEntries.push({
           url: `${baseUrl}${localePath(locale, `/categories/${category.slug}`)}`,
@@ -112,8 +120,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           .filter((translation) => translation.productId === product.id)
           .map((translation) => translation.locale)
       );
-      if (availableLocales.has("en")) availableLocales.add("ar");
-
       for (const locale of locales.filter((candidate) => availableLocales.has(candidate))) {
         sitemapEntries.push({
           url: `${baseUrl}${localePath(locale, `/products/${product.slug}`)}`,
@@ -129,7 +135,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     for (const locale of locales) {
       sitemapEntries.push({
         url: `${baseUrl}${localePath(locale, "/")}`,
-        lastModified: new Date(),
         changeFrequency: "weekly",
         priority: 1.0,
       });

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PRODUCTION_SITE_URL } from "@/config/site";
 
 export const deploymentStages = ["local", "staging", "production"] as const;
 export type DeploymentStage = (typeof deploymentStages)[number];
@@ -125,6 +126,15 @@ export function validateProductionReadiness(
       errors.push({
         key: "NEXT_PUBLIC_SITE_URL",
         message: "Production site URL cannot point to localhost.",
+      });
+    }
+    if (
+      stage === "production" &&
+      (siteUrl.origin !== PRODUCTION_SITE_URL || siteUrl.pathname !== "/" || siteUrl.search || siteUrl.hash)
+    ) {
+      errors.push({
+        key: "NEXT_PUBLIC_SITE_URL",
+        message: `Production site URL must be ${PRODUCTION_SITE_URL}.`,
       });
     }
   }

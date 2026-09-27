@@ -1,12 +1,26 @@
 import assert from "node:assert/strict";
-import test from "node:test";
+import { after, test } from "node:test";
 
+import { eq } from "drizzle-orm";
+import { db } from "@/db";
+import { categories, categoryTranslations, productTranslations, products } from "@/db/schema";
+import { PRODUCTION_SITE_URL, resolveSiteUrl } from "@/config/site";
 import { getBaseUrl, buildCanonical, buildAlternates, createPublicPageMetadata, createProductMetadata, createProductStructuredData, createBreadcrumbStructuredData, shouldNoindexFilteredView } from "@/lib/seo";
 import { getAlternateLocale, localePath } from "@/lib/locales";
 import robots from "@/app/robots";
 import sitemap from "@/app/sitemap";
 
 const baseUrl = getBaseUrl();
+
+test("production SEO origin stays canonical if the build-time URL is misconfigured", () => {
+  assert.equal(resolveSiteUrl("production", "http://localhost:3000"), PRODUCTION_SITE_URL);
+  assert.equal(resolveSiteUrl("production", "https://preview.example.com"), PRODUCTION_SITE_URL);
+  assert.equal(resolveSiteUrl("development", "http://localhost:3000"), "http://localhost:3000");
+});
+
+after(async () => {
+  await (db as typeof db & { $client: { end: () => Promise<void> } }).$client.end();
+});
 
 test("English homepage metadata uses the configured site origin and locale alternates", () => {
   const metadata = createPublicPageMetadata({
@@ -132,6 +146,8 @@ test("sitemap contains public canonical URLs and excludes admin, API, and query 
   const urls = entries.map((entry) => entry.url);
 
   assert.ok(urls.every((url) => url.startsWith(baseUrl)));
+  assert.equal(new Set(urls).size, urls.length);
+  assert.ok(urls.every((url) => new URL(url).origin === new URL(baseUrl).origin));
   assert.ok(urls.some((url) => url === `${baseUrl}/en`));
   assert.ok(urls.some((url) => url === `${baseUrl}/ar`));
   assert.ok(urls.some((url) => url.includes("/en/products/")) || urls.some((url) => url.includes("/ar/products/")));
@@ -140,6 +156,28 @@ test("sitemap contains public canonical URLs and excludes admin, API, and query 
   assert.ok(!urls.some((url) => url.includes("/api")));
   assert.ok(!urls.some((url) => url.includes("/search")));
   assert.ok(!urls.some((url) => url.includes("?")));
+
+  const translatedCategories = await db
+    .select({ slug: categories.slug, locale: categoryTranslations.locale })
+    .from(categories)
+    .innerJoin(categoryTranslations, eq(categoryTranslations.categoryId, categories.id))
+    .where(eq(categories.status, "PUBLISHED"));
+  const translatedProducts = await db
+    .select({ slug: products.slug, locale: productTranslations.locale })
+    .from(products)
+    .innerJoin(productTranslations, eq(productTranslations.productId, products.id))
+    .where(eq(products.status, "PUBLISHED"));
+  const actualCategoryPaths = urls.filter((url) => /\/categories\/[^/]+$/.test(new URL(url).pathname)).sort();
+  const expectedCategoryPaths = translatedCategories
+    .map(({ slug, locale }) => `${baseUrl}/${locale}/categories/${slug}`)
+    .sort();
+  const actualProductPaths = urls.filter((url) => /\/products\/[^/]+$/.test(new URL(url).pathname)).sort();
+  const expectedProductPaths = translatedProducts
+    .map(({ slug, locale }) => `${baseUrl}/${locale}/products/${slug}`)
+    .sort();
+
+  assert.deepEqual(actualCategoryPaths, expectedCategoryPaths);
+  assert.deepEqual(actualProductPaths, expectedProductPaths);
 });
 
 test("filtered product listing views are flagged for noindex while clean listing pages remain indexable", () => {

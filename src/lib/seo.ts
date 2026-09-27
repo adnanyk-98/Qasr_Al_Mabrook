@@ -3,7 +3,6 @@
  */
 
 import { type Metadata } from "next";
-import { clientEnv } from "@/config/env";
 import { siteConfig } from "@/config/site";
 import { getAlternateLocale, localePath, type Locale } from "@/lib/locales";
 
@@ -11,7 +10,7 @@ import { getAlternateLocale, localePath, type Locale } from "@/lib/locales";
  * Get the base URL for SEO/metadata generation
  */
 export function getBaseUrl(): string {
-  return clientEnv.NEXT_PUBLIC_SITE_URL;
+  return siteConfig.url;
 }
 
 /**

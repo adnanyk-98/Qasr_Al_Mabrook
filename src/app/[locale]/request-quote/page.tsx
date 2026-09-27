@@ -14,14 +14,20 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   if (!locales.includes(locale as Locale)) return {};
   
-  const t = await getTranslations({ locale: locale as Locale, namespace: "metadata" });
+  const [metadataT, enquiryT] = await Promise.all([
+    getTranslations({ locale: locale as Locale, namespace: "metadata" }),
+    getTranslations({ locale: locale as Locale, namespace: "enquiry" }),
+  ]);
   const currentLocale = locale as Locale;
-  
-  return createPublicPageMetadata({
+
+  const metadata = createPublicPageMetadata({
     locale: currentLocale,
     path: "/request-quote",
-    title: t("requestQuoteTitle"),
+    title: metadataT("requestQuoteTitle"),
+    description: enquiryT("requestDescription"),
   });
+  metadata.robots = "noindex, follow";
+  return metadata;
 }
 
 export default async function RequestQuotePage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ source?: string; product?: string; variant?: string; success?: string; error?: string }> }) {

@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
+import { AdminBackButton } from "@/components/admin/admin-back-button";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Input, Label } from "@/components/ui/form";
 import { BrandLogoField } from "@/components/admin/brand-logo-field";
@@ -18,9 +19,12 @@ export default async function BrandsPage({ searchParams }: { searchParams: Promi
   return (
     <main className="min-h-screen bg-[var(--brand-surface)] p-6">
       <div className="mx-auto max-w-6xl space-y-6">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">Admin</p>
-          <h1 className="mt-1 text-3xl font-semibold text-[var(--foreground)]">Brands</h1>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">Admin</p>
+            <h1 className="mt-1 text-3xl font-semibold text-[var(--foreground)]">Brands</h1>
+          </div>
+          <AdminBackButton />
         </div>
 
         {params.error ? <p className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700" role="alert">{params.error}</p> : null}

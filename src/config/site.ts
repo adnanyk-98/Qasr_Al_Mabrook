@@ -1,9 +1,15 @@
 import { clientEnv } from "@/config/env";
 
+export const PRODUCTION_SITE_URL = "https://www.qasralmabrook.com";
+
+export function resolveSiteUrl(nodeEnv: string | undefined, configuredUrl: string): string {
+  return nodeEnv === "production" ? PRODUCTION_SITE_URL : configuredUrl;
+}
+
 export const siteConfig = {
   name: "Qasr Al Mabrook",
   domain: "qasralmabrook.com",
-  url: clientEnv.NEXT_PUBLIC_SITE_URL,
+  url: resolveSiteUrl(process.env.NODE_ENV, clientEnv.NEXT_PUBLIC_SITE_URL),
   contact: {
     address: "Al Ghuwair - Hay Al Gharb - Sharjah - United Arab Emirates",
     phone: "+971503093800",

@@ -15,14 +15,13 @@ import {
   createCategoryAttribute,
   upsertCategoryTranslation,
   createHomepageSection,
-  createProduct,
   getHomepageSectionById,
   updateHomepageSection,
-  updateProduct,
   createProductCategory,
   createProductImage,
   setProductPrimaryImage,
   createProductTranslation,
+  saveProductWithDefaultTranslation,
   createSpecificationDefinition,
   createSpecificationTranslation,
   createVariantCombination,
@@ -31,6 +30,7 @@ import {
 } from "@/server/repositories/catalog-admin";
 import { getProductById, updateCategory, getCategoryById, setCategoryImage } from "@/server/repositories/catalog-admin";
 import { requireAdminSession } from "@/server/services/admin-auth";
+import { siteConfig } from "@/config/site";
 import { resolvePrimaryProductImageId } from "@/lib/product-image-primary";
 import { invalidateBrandPublicCache, invalidateCategoryPublicCache, invalidateHomepagePublicCache, invalidateProductPublicCache } from "@/lib/public-cache";
 
@@ -195,48 +195,88 @@ export async function upsertAttributeValueAction(formData: FormData) {
   redirect("/admin/attributes");
 }
 
-export async function upsertProductAction(formData: FormData) {
+export type ProductActionState = {
+  status: "idle" | "error" | "success";
+  message?: string;
+  fieldErrors?: Record<string, string[]>;
+  productId?: string;
+};
+
+const productFormSchema = z.object({
+  productId: z.string().uuid().optional().or(z.literal("")),
+  name: z.string().trim().min(1, "Product name is required.").max(255, "Product name must be 255 characters or fewer."),
+  shortDescription: z.string().trim().min(1, "Short description is required.").max(10000, "Short description must be 10,000 characters or fewer."),
+  description: z.string().trim().min(1, "Long description is required.").max(50000, "Long description must be 50,000 characters or fewer."),
+  slug: z.string().trim().max(255, "Slug must be 255 characters or fewer.").optional().default(""),
+  brandId: z.string().uuid().optional().or(z.literal("")),
+  defaultSku: z.string().trim().max(255, "SKU must be 255 characters or fewer.").optional().default(""),
+  status: statusSchema,
+  categoryId: z.string().uuid().optional().or(z.literal("")),
+  isPrimaryCategory: z.boolean(),
+});
+
+export async function upsertProductAction(formData: FormData): Promise<ProductActionState> {
   await authorizeAdminMutation();
-  const slug = slugify(String(formData.get("slug") ?? "")) || slugify(String(formData.get("name") ?? ""));
+  const parsed = productFormSchema.safeParse({
+    productId: String(formData.get("productId") ?? ""),
+    name: String(formData.get("name") ?? ""),
+    shortDescription: String(formData.get("shortDescription") ?? ""),
+    description: String(formData.get("description") ?? ""),
+    slug: String(formData.get("slug") ?? ""),
+    brandId: String(formData.get("brandId") ?? ""),
+    defaultSku: String(formData.get("defaultSku") ?? ""),
+    status: String(formData.get("status") ?? "DRAFT"),
+    categoryId: String(formData.get("categoryId") ?? ""),
+    isPrimaryCategory: String(formData.get("isPrimaryCategory") ?? "") === "on",
+  });
+  if (!parsed.success) {
+    return {
+      status: "error",
+      message: "Please correct the highlighted product fields.",
+      fieldErrors: parsed.error.flatten().fieldErrors as Record<string, string[]>,
+    };
+  }
 
-  const productId = String(formData.get("productId") ?? "");
-  let createdOrUpdatedProductId = productId;
-  let productMutationSucceeded = false;
-  if (productId) {
-    // edit existing product without changing ARCHIVED status unintentionally
-    const parsedStatus = statusSchema.parse(String(formData.get("status") ?? "DRAFT"));
-    let statusToUse = parsedStatus;
-    if (parsedStatus === "DRAFT") {
-      const existing = await getProductById(productId);
-      if (existing?.status === "ARCHIVED") {
-        statusToUse = "ARCHIVED";
-      }
-    }
+  const values = parsed.data;
+  const productId = values.productId || undefined;
+  const slug = slugify(values.slug) || slugify(values.name);
+  const existingProduct = productId ? await getProductById(productId) : null;
+  if (productId && !existingProduct) {
+    return { status: "error", message: "The product being edited no longer exists. Refresh the page and try again." };
+  }
 
-    const updatedProduct = await updateProduct({
+  let statusToUse = values.status;
+  if (statusToUse === "DRAFT" && existingProduct?.status === "ARCHIVED") statusToUse = "ARCHIVED";
+
+  let saved;
+  try {
+    saved = await saveProductWithDefaultTranslation({
       id: productId,
       slug,
-      brandId: String(formData.get("brandId") ?? "") || null,
+      brandId: values.brandId || null,
       status: statusToUse,
-      defaultSku: String(formData.get("defaultSku") ?? "") || null,
+      defaultSku: values.defaultSku || null,
+      locale: siteConfig.defaultLocale,
+      name: values.name,
+      shortDescription: values.shortDescription,
+      description: values.description,
+      categoryId: values.categoryId || null,
+      isPrimaryCategory: values.isPrimaryCategory,
     });
-      productMutationSucceeded = Boolean(updatedProduct);
-    createdOrUpdatedProductId = productId;
-  } else {
-    const created = await createProduct({
-      slug,
-      brandId: String(formData.get("brandId") ?? "") || null,
-      status: statusSchema.parse(String(formData.get("status") ?? "DRAFT")),
-      defaultSku: String(formData.get("defaultSku") ?? "") || null,
-    });
-    createdOrUpdatedProductId = created?.id ?? "";
-    productMutationSucceeded = Boolean(created);
+  } catch (error) {
+    console.error("Failed to save product and default translation", { productId, slug, error });
+    return { status: "error", message: "Could not save the product. No product translation was committed; please try again." };
   }
+  if (!saved) return { status: "error", message: "The product could not be saved. Refresh the page and try again." };
+
+  const createdOrUpdatedProductId = saved.product.id;
 
   // If client uploaded an image to R2, create a product_images row and mark it primary
   // Support multiple uploaded images. Client includes repeated fields: imageUrl, objectKey, width, height
   const imageUrls = formData.getAll("imageUrl").map((v) => String(v ?? "").trim()).filter(Boolean);
-  if (imageUrls.length && createdOrUpdatedProductId) {
+  let imageSaveWarning: string | null = null;
+  try {
+    if (imageUrls.length && createdOrUpdatedProductId) {
     const objectKeys = formData.getAll("objectKey").map((v) => String(v ?? "").trim());
     const widths = formData.getAll("width").map((v) => Number(v ?? 0));
     const heights = formData.getAll("height").map((v) => Number(v ?? 0));
@@ -293,12 +333,24 @@ export async function upsertProductAction(formData: FormData) {
     if (primaryImageId) {
       await setProductPrimaryImage(createdOrUpdatedProductId, primaryImageId);
     }
-    await invalidateProductPublicCache(createdOrUpdatedProductId, slug);
+      await invalidateProductPublicCache(createdOrUpdatedProductId, slug);
+    }
+  } catch (error) {
+    console.error("Product and default translation saved, but image associations failed", { productId: createdOrUpdatedProductId, slug, error });
+    imageSaveWarning = " The product was saved, but its image association could not be completed.";
   }
 
-    if (!imageUrls.length && createdOrUpdatedProductId && productMutationSucceeded) await invalidateProductPublicCache(createdOrUpdatedProductId, slug);
+  try {
+    await invalidateProductPublicCache(createdOrUpdatedProductId, slug);
+  } catch (error) {
+    console.error("Product saved but public cache invalidation failed", { productId: createdOrUpdatedProductId, slug, error });
+  }
 
-  redirect("/admin/products");
+  return {
+    status: "success",
+    message: `${productId ? "Product updated." : "Product created with its default translation."}${imageSaveWarning ?? ""}`,
+    productId: createdOrUpdatedProductId,
+  };
 }
 
 export async function upsertProductTranslationAction(formData: FormData) {

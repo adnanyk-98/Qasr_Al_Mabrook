@@ -1,21 +1,23 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
-import { Input, Label, Select } from "@/components/ui/form";
+import { Label, Select } from "@/components/ui/form";
 import {
   getProductById,
   listBrands,
   listCategories,
+  listProductCategoriesForProduct,
   listProductImagesForProduct,
   listProductTranslationsForProduct,
 } from "@/server/repositories/catalog-admin";
-import { ProductImageField } from "@/components/admin/product-image-field";
 import { requireAdminSession } from "@/server/services/admin-auth";
-import { upsertProductAction, upsertProductCategoryAction } from "@/server/services/admin-catalog";
+import { upsertProductCategoryAction } from "./actions";
+import { ProductForm } from "./product-form";
 import Link from "next/link";
 import ClientProductList from "@/components/admin/product-list";
 import ClientAdminPagination from "@/components/admin/admin-pagination";
 import AdminPageSizeSelect from "@/components/admin/admin-page-size-select";
 import { listProductsPaginated } from "@/server/repositories/catalog-admin";
+import { siteConfig } from "@/config/site";
 
 type PageProps = {
   searchParams: Promise<{ edit?: string; page?: string; pageSize?: string; search?: string }>;
@@ -40,12 +42,11 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   const editingImages = editingProduct
     ? await listProductImagesForProduct(editingProduct.id)
     : [];
-
-  const defaultProductName =
-    editingTranslations.find((translation) => translation.locale === "en")?.name ??
-    editingTranslations[0]?.name ??
-    editingProduct?.slug ??
-    "";
+  const editingCategories = editingProduct
+    ? await listProductCategoriesForProduct(editingProduct.id)
+    : [];
+  const defaultTranslation = editingTranslations.find((translation) => translation.locale === siteConfig.defaultLocale) ?? null;
+  const primaryCategory = editingCategories.find((category) => category.isPrimary) ?? editingCategories[0] ?? null;
 
   return (
     <main className="min-h-screen bg-[var(--brand-surface)] p-6">
@@ -63,70 +64,17 @@ export default async function ProductsPage({ searchParams }: PageProps) {
               <h2 className="text-xl font-semibold text-[var(--foreground)]">Create product</h2>
             </CardHeader>
             <CardBody>
-              <form action={upsertProductAction} className="space-y-4">
-                <div>
-                  <Label htmlFor="name">Name</Label>
-                  <Input
-                    id="name"
-                    name="name"
-                    placeholder="Product name"
-                    required
-                    defaultValue={defaultProductName}
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="productId">Product ID (for edit)</Label>
-                  <Input
-                    id="productId"
-                    name="productId"
-                    placeholder="paste product id to edit"
-                    defaultValue={editingProduct?.id ?? ""}
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="slug">Slug</Label>
-                  <Input
-                    id="slug"
-                    name="slug"
-                    placeholder="product-slug"
-                    defaultValue={editingProduct?.slug ?? ""}
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="brandId">Brand</Label>
-                  <Select id="brandId" name="brandId" defaultValue="">
-                    <option value="">No brand</option>
-                    {brands.map((brand) => (
-                      <option key={brand.id} value={brand.id}>
-                        {brand.slug}
-                      </option>
-                    ))}
-                  </Select>
-                </div>
-
-                <div>
-                  <Label htmlFor="defaultSku">Default SKU</Label>
-                  <Input id="defaultSku" name="defaultSku" placeholder="QMB-001" />
-                </div>
-
-                <div>
-                  <Label htmlFor="status">Status</Label>
-                  <Select id="status" name="status" defaultValue="DRAFT">
-                    <option value="DRAFT">DRAFT</option>
-                    <option value="PUBLISHED">PUBLISHED</option>
-                    <option value="ARCHIVED">ARCHIVED</option>
-                  </Select>
-                </div>
-
-                <ProductImageField key={editingProduct?.id ?? "new"} currentImages={editingImages.map((img) => ({ id: img.id, publicUrl: img.publicUrl, objectKey: img.objectKey, width: img.width, height: img.height, isPrimary: img.isPrimary }))} />
-
-                <Button type="submit" className="w-full">
-                  Save product
-                </Button>
-              </form>
+              <ProductForm
+                key={editingProduct?.id ?? "new-product"}
+                product={editingProduct}
+                translation={defaultTranslation}
+                images={editingImages.map((img) => ({ id: img.id, publicUrl: img.publicUrl, objectKey: img.objectKey, width: img.width, height: img.height, isPrimary: img.isPrimary }))}
+                categories={categories.map(({ id, slug }) => ({ id, slug }))}
+                brands={brands.map(({ id, slug }) => ({ id, slug }))}
+                primaryCategoryId={primaryCategory?.categoryId ?? ""}
+                primaryCategory={Boolean(primaryCategory)}
+                defaultLocale={siteConfig.defaultLocale}
+              />
             </CardBody>
           </Card>
 
@@ -195,7 +143,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
                       </ul>
                     )}
                     <p className="mt-2 text-xs text-[var(--text-muted)]">
-                      Use the {" "}
+                      Manage additional locales from the {" "}
                       <Link href="/admin/translations" className="text-[var(--brand-primary)]">
                         Translations
                       </Link>{" "}

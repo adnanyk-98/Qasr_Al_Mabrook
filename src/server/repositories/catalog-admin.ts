@@ -268,6 +268,80 @@ export async function createProduct(input: { slug: string; brandId?: string | nu
   return rows[0] ?? null;
 }
 
+export async function saveProductWithDefaultTranslation(input: {
+  id?: string;
+  slug: string;
+  brandId?: string | null;
+  status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
+  defaultSku?: string | null;
+  locale: "en" | "ar";
+  name: string;
+  shortDescription: string;
+  description: string;
+  categoryId?: string | null;
+  isPrimaryCategory?: boolean;
+}) {
+  return db.transaction(async (transaction) => {
+    const productRows = input.id
+      ? await transaction
+          .update(products)
+          .set({ slug: input.slug, brandId: input.brandId ?? null, status: input.status, defaultSku: input.defaultSku ?? null })
+          .where(eq(products.id, input.id))
+          .returning()
+      : await transaction
+          .insert(products)
+          .values({ slug: input.slug, brandId: input.brandId ?? null, status: input.status, defaultSku: input.defaultSku ?? null })
+          .returning();
+    const product = productRows[0];
+    if (!product) return null;
+
+    const lockKey = `product-translation:${product.id}:${input.locale}`;
+    await transaction.execute(sql`select pg_advisory_xact_lock(hashtextextended(${lockKey}, 0))`);
+    const translations = await transaction
+      .select({ id: productTranslations.id })
+      .from(productTranslations)
+      .where(and(eq(productTranslations.productId, product.id), eq(productTranslations.locale, input.locale)))
+      .orderBy(asc(productTranslations.createdAt), asc(productTranslations.id))
+      .limit(1);
+    const translation = translations[0]
+      ? (await transaction
+          .update(productTranslations)
+          .set({ name: input.name, shortDescription: input.shortDescription, description: input.description, updatedAt: new Date() })
+          .where(eq(productTranslations.id, translations[0].id))
+          .returning())[0]
+      : (await transaction
+          .insert(productTranslations)
+          .values({ productId: product.id, locale: input.locale, name: input.name, shortDescription: input.shortDescription, description: input.description })
+          .returning())[0];
+    if (!translation) throw new Error("Product default translation could not be saved.");
+
+    if (input.categoryId) {
+      const existingCategoryLink = await transaction
+        .select({ productId: productCategories.productId })
+        .from(productCategories)
+        .where(and(eq(productCategories.productId, product.id), eq(productCategories.categoryId, input.categoryId)))
+        .limit(1);
+      if (input.isPrimaryCategory) {
+        await transaction.update(productCategories).set({ isPrimary: false }).where(eq(productCategories.productId, product.id));
+      }
+      if (existingCategoryLink[0]) {
+        await transaction
+          .update(productCategories)
+          .set({ isPrimary: input.isPrimaryCategory ?? false })
+          .where(and(eq(productCategories.productId, product.id), eq(productCategories.categoryId, input.categoryId)));
+      } else {
+        await transaction.insert(productCategories).values({
+          productId: product.id,
+          categoryId: input.categoryId,
+          isPrimary: input.isPrimaryCategory ?? false,
+        });
+      }
+    }
+
+    return { product, translation };
+  });
+}
+
 export async function listProductTranslations() {
   return db.select().from(productTranslations).orderBy(desc(productTranslations.createdAt));
 }
@@ -411,6 +485,14 @@ export async function updateProductImage(input: { id: string; productId: string;
 
 export async function listProductImagesForProduct(productId: string) {
   return db.select().from(productImages).where(eq(productImages.productId, productId)).orderBy(asc(productImages.sortOrder), asc(productImages.createdAt), asc(productImages.id));
+}
+
+export async function listProductCategoriesForProduct(productId: string) {
+  return db
+    .select({ categoryId: productCategories.categoryId, isPrimary: productCategories.isPrimary })
+    .from(productCategories)
+    .where(eq(productCategories.productId, productId))
+    .orderBy(desc(productCategories.isPrimary), asc(productCategories.categoryId));
 }
 
 export async function getProductImageById(id: string) {

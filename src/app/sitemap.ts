@@ -2,6 +2,7 @@ import { type MetadataRoute } from "next";
 import { db } from "@/db";
 import { categories, categoryTranslations, productTranslations, products, staticPageTranslations, staticPages } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
+import { blogArticles } from "@/lib/blog";
 import { getBaseUrl } from "@/lib/seo";
 import { localePath, locales } from "@/lib/locales";
 import { reportServerError } from "@/lib/observability";
@@ -47,8 +48,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           url: `${baseUrl}${localePath(locale, "/contact-us")}`,
           changeFrequency: "monthly",
           priority: 0.6,
+        },
+        {
+          url: `${baseUrl}${localePath(locale, "/blog")}`,
+          changeFrequency: "weekly",
+          priority: 0.8,
         }
       );
+    }
+
+    for (const article of blogArticles) {
+      for (const locale of locales) {
+        sitemapEntries.push({
+          url: `${baseUrl}${localePath(locale, `/blog/${article.slug}`)}`,
+          lastModified: new Date(article.updatedAt),
+          changeFrequency: "monthly",
+          priority: 0.7,
+        });
+      }
     }
 
     const aboutPage = await db

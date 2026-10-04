@@ -36,6 +36,7 @@ export async function Footer({ locale = "en" }: { locale?: Locale }) {
           <ul className="space-y-3 text-sm text-[var(--text-muted)]">
             <li><Link href={localePath(locale, "/")} className="hover:text-[var(--brand-primary)]">{common("home")}</Link></li>
             <li><Link href={localePath(locale, "/products")} className="hover:text-[var(--brand-primary)]">{common("products")}</Link></li>
+            <li><Link href={localePath(locale, "/blog")} className="hover:text-[var(--brand-primary)]">{common("blog")}</Link></li>
             <li><Link href={localePath(locale, "/store-locator")} className="hover:text-[var(--brand-primary)]">{common("storeLocator")}</Link></li>
           </ul>
         </div>

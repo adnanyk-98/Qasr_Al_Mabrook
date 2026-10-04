@@ -3,6 +3,7 @@
     "home": "Home",
     "catalogue": "Catalogue",
     "products": "Products",
+    "blog": "Blog",
     "categories": "Categories",
     "search": "Search",
     "contact": "Contact",
@@ -201,6 +202,8 @@
     "categoriesDescription": "Browse products by category.",
     "searchTitle": "Search products",
     "searchDescription": "Search the Qasr Al Mabrook product catalogue.",
+    "blogTitle": "Qasr Al Mabrook Blog",
+    "blogDescription": "Explore practical catalogue guidance, product discovery tips, and shopping insights for everyday buying decisions.",
     "requestQuoteTitle": "Request a quote",
     "contactTitle": "Contact us"
   }

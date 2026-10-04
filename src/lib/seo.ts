@@ -81,9 +81,18 @@ export function createPublicPageMetadata(options: CreateMetadataOptions): Metada
   // Canonical URL
   const canonical = buildCanonical(locale, path);
 
+  const resolveSeoImageUrl = (imagePath?: string | null): string | null => {
+    if (!imagePath) return null;
+    if (/^https?:\/\//i.test(imagePath)) return imagePath;
+    if (imagePath.startsWith("/")) return `${getBaseUrl()}${imagePath}`;
+    return `${getBaseUrl()}/${imagePath}`;
+  };
+
+  const resolvedOgImage = resolveSeoImageUrl(ogImage) ?? `${getBaseUrl()}${siteConfig.brand.logoColorPng}`;
+
   // Build metadata object
   const openGraphImage = {
-    url: ogImage || `${getBaseUrl()}${siteConfig.brand.logoColorPng}`,
+    url: resolvedOgImage,
     alt: ogImageAlt || finalTitle,
     ...(ogImage ? { width: ogImageWidth, height: ogImageHeight } : {}),
   };
@@ -108,7 +117,7 @@ export function createPublicPageMetadata(options: CreateMetadataOptions): Metada
       card: "summary_large_image",
       title: finalTitle,
       description: finalDescription,
-      images: [ogImage || `${getBaseUrl()}${siteConfig.brand.logoColorPng}`],
+      images: [resolvedOgImage],
     },
   };
 
@@ -239,6 +248,45 @@ export function createWebSiteStructuredData(): string {
   });
 }
 
+export interface BlogPostingStructuredDataOptions {
+  title: string;
+  description?: string | null;
+  image?: string | null;
+  url: string;
+  datePublished: string;
+  dateModified?: string | null;
+  locale: Locale;
+}
+
+export function createBlogPostingStructuredData(options: BlogPostingStructuredDataOptions): string {
+  const { title, description, image, url, datePublished, dateModified, locale } = options;
+
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: title,
+    url,
+    datePublished,
+    dateModified: dateModified || datePublished,
+    inLanguage: locale === "ar" ? "ar" : "en",
+    publisher: {
+      "@type": "Organization",
+      name: siteConfig.name,
+      logo: `${getBaseUrl()}${siteConfig.brand.logoColorSvg}`,
+    },
+    author: {
+      "@type": "Organization",
+      name: siteConfig.name,
+    },
+    mainEntityOfPage: url,
+  } as Record<string, unknown>;
+
+  if (description) schema.description = description;
+  if (image) schema.image = `${getBaseUrl()}${image}`;
+
+  return serializeJsonLd(schema);
+}
+
 /**
  * Create JSON-LD structured data for BreadcrumbList
  */
@@ -275,5 +323,9 @@ export function shouldNoindexFilteredView(searchParams: Record<string, string | 
   // If there are any filter parameters present, noindex
   const hasAnyParams = Object.keys(searchParams).length > 0;
   return hasAnyParams;
+}
+
+function serializeJsonLd(schema: object): string {
+  return JSON.stringify(schema).replace(/</g, "\\u003c");
 }
 

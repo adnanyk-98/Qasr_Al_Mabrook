@@ -3,6 +3,7 @@
     "home": "الرئيسية",
     "catalogue": "الكتالوج",
     "products": "المنتجات",
+    "blog": "المدونة",
     "categories": "الفئات",
     "search": "بحث",
     "contact": "تواصل معنا",
@@ -201,6 +202,8 @@
     "categoriesDescription": "تصفح المنتجات حسب الفئة.",
     "searchTitle": "ابحث عن المنتجات",
     "searchDescription": "ابحث في كتالوج منتجات قصر المبارك.",
+    "blogTitle": "مدونة قصر المبارك",
+    "blogDescription": "استكشف إرشادات عملية للكتالوج ونصائح لاكتشاف المنتجات وتوجيهات التسوق للقرارات اليومية.",
     "requestQuoteTitle": "طلب عرض سعر",
     "contactTitle": "تواصل معنا"
   }

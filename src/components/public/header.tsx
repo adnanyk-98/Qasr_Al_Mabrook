@@ -15,6 +15,7 @@ export async function Header({ locale = "en", path = "/", showLocaleSwitcher = t
   const navItems = [
     { label: t("home"), href: localePath(locale, "/") },
     { label: t("products"), href: localePath(locale, "/products") },
+    { label: t("blog"), href: localePath(locale, "/blog") },
     { label: t("storeLocator"), href: localePath(locale, "/store-locator") },
   ];
 

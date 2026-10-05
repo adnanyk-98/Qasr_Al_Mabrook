@@ -14,7 +14,7 @@ import { GoogleMapEmbed } from "@/components/public/google-map-embed";
 import { AnalyticsTracker } from "@/components/analytics/analytics-tracker";
 import { TrackedLink } from "@/components/analytics/tracked-link";
 
-const storePhotos = Array.from({ length: 8 }, (_, index) => ({
+const storePhotos = Array.from({ length: 16 }, (_, index) => ({
   src: `/store-locator/In-Store-Images-${String(index + 1).padStart(2, "0")}.jpg`,
 }));
 

@@ -57,7 +57,7 @@ export default async function BlogPage({ params }: { params: Promise<{ locale: s
                   <span>{currentLocale === "ar" ? "قصر المبارك" : "Qasr Al Mabrook"}</span>
                 </div>
 
-                <h2 className="text-2xl font-semibold text-[var(--foreground)]">{article.title}</h2>
+                <h2 className="text-2xl font-semibold text-[var(--foreground)]" style={{ fontSize: "calc(var(--font-size-h2) * 0.875)" }}>{article.title}</h2>
                 <p className="mt-4 flex-1 text-base leading-7 text-[var(--text-muted)]">{article.excerpt}</p>
 
                 <div className="mt-6 flex flex-wrap gap-2 text-xs font-medium uppercase tracking-[0.08em] text-[var(--text-muted)]">

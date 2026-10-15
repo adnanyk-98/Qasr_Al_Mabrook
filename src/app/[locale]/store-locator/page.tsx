@@ -7,6 +7,7 @@ import { listPublishedHomepageSections } from "@/server/repositories/public-cata
 import { createPublicPageMetadata } from "@/lib/seo";
 import { locales, type Locale } from "@/lib/locales";
 import { readLocalizedConfigString } from "@/lib/homepage-content";
+import { buildTelephoneHref, formatPublicPhoneNumber } from "@/lib/phone-display";
 import { getTranslations } from "next-intl/server";
 import { PublicShell } from "@/components/public/public-shell";
 import { siteConfig } from "@/config/site";
@@ -43,6 +44,8 @@ export default async function StoreLocatorPage({ params }: { params: Promise<{ l
     mobile: readLocalizedConfigString(superMarketSection.configurationJson, "mobileImageUrl", currentLocale) ?? null,
     alt: readLocalizedConfigString(superMarketSection.configurationJson, "imageAlt", currentLocale) ?? t("title"),
   } : null;
+  const phoneHref = buildTelephoneHref(siteConfig.contact.phone);
+  const displayedPhoneNumber = formatPublicPhoneNumber(siteConfig.contact.phone);
   const photos = storePhotos.map((photo) => ({ ...photo, alt: t("imageAlt") }));
 
   return (
@@ -92,9 +95,11 @@ export default async function StoreLocatorPage({ params }: { params: Promise<{ l
                 <div className="min-w-0">
                   <span className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">{t("callUs")}</span>
                   <span className="mt-2 block text-base font-semibold text-[var(--foreground)]">{t("phone")}</span>
-                  <TrackedLink event="phone_click" params={{ locale: currentLocale, source: "/store-locator" }} href={`tel:${siteConfig.contact.phone}`} className="mt-1 block text-sm text-[var(--text-muted)] transition-colors hover:text-[var(--brand-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2">
-                    {siteConfig.contact.phone}
-                  </TrackedLink>
+                  {phoneHref ? (
+                    <TrackedLink event="phone_click" params={{ locale: currentLocale, source: "/store-locator" }} href={phoneHref} dir="ltr" className="mt-1 block text-sm text-[var(--text-muted)] transition-colors hover:text-[var(--brand-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2">
+                      <bdi dir="ltr">{displayedPhoneNumber}</bdi>
+                    </TrackedLink>
+                  ) : <bdi dir="ltr" className="mt-1 block text-sm text-[var(--text-muted)]">{displayedPhoneNumber}</bdi>}
                 </div>
               </div>
 

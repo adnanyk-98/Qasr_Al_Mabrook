@@ -4,6 +4,7 @@ import Link from "next/link";
 import { siteConfig } from "@/config/site";
 import { Container } from "@/components/ui/layout";
 import { localePath, type Locale } from "@/lib/locales";
+import { buildTelephoneHref, formatPublicPhoneNumber } from "@/lib/phone-display";
 import { getTranslations } from "next-intl/server";
 import { TrackedLink } from "@/components/analytics/tracked-link";
 
@@ -11,6 +12,8 @@ export async function Footer({ locale = "en" }: { locale?: Locale }) {
   const common = await getTranslations({ locale, namespace: "common" });
   const header = await getTranslations({ locale, namespace: "header" });
   const t = await getTranslations({ locale, namespace: "footer" });
+  const phoneHref = buildTelephoneHref(siteConfig.contact.phone);
+  const displayedPhoneNumber = formatPublicPhoneNumber(siteConfig.contact.phone);
 
   return (
     <footer className="border-t border-[var(--brand-border)] bg-[var(--brand-header-background)] backdrop-blur-sm">
@@ -52,7 +55,11 @@ export async function Footer({ locale = "en" }: { locale?: Locale }) {
             </li>
             <li>
               <span className="block font-medium text-[var(--foreground)]">{t("phone")}</span>
-              <TrackedLink event="phone_click" params={{ locale, source: "footer" }} href={`tel:${siteConfig.contact.phone}`} className="hover:text-[var(--brand-primary)]">{siteConfig.contact.phone}</TrackedLink>
+              {phoneHref ? (
+                <TrackedLink event="phone_click" params={{ locale, source: "footer" }} href={phoneHref} dir="ltr" className="hover:text-[var(--brand-primary)]">
+                  <bdi dir="ltr">{displayedPhoneNumber}</bdi>
+                </TrackedLink>
+              ) : <bdi dir="ltr">{displayedPhoneNumber}</bdi>}
             </li>
           </ul>
         </div>

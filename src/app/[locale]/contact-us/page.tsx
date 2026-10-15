@@ -6,6 +6,7 @@ import { PublicShell } from "@/components/public/public-shell";
 import { Container, Section } from "@/components/ui/layout";
 import { getPublicContactSettings } from "@/server/repositories/enquiries";
 import { locales, type Locale } from "@/lib/locales";
+import { buildTelephoneHref, formatPublicPhoneNumber } from "@/lib/phone-display";
 import { getTranslations } from "next-intl/server";
 import { createPublicPageMetadata } from "@/lib/seo";
 
@@ -38,6 +39,8 @@ export default async function ContactPage({ params, searchParams }: { params: Pr
   const currentLocale = locale as Locale;
   const t = await getTranslations({ locale: currentLocale, namespace: "enquiry" });
   const settings = await getPublicContactSettings();
+  const phoneHref = settings.business_phone ? buildTelephoneHref(settings.business_phone) : null;
+  const displayedPhoneNumber = settings.business_phone ? formatPublicPhoneNumber(settings.business_phone) : null;
 
   return (
     <PublicShell locale={currentLocale} path="/contact-us">
@@ -48,7 +51,20 @@ export default async function ContactPage({ params, searchParams }: { params: Pr
             <h1 className="text-4xl font-semibold text-[var(--foreground)]">{t("contactTitle")}</h1>
             <p className="text-base leading-7 text-[var(--text-muted)]">{t("contactDescription")}</p>
             <div className="space-y-2 text-sm text-[var(--text-muted)]">
-              {settings.business_phone ? <p>{t("phoneContact")}: {settings.business_phone}</p> : null}
+              {displayedPhoneNumber ? (
+                <p>
+                  {t("phoneContact")}:{" "}
+                  {phoneHref ? (
+                    <a
+                      dir="ltr"
+                      href={phoneHref}
+                      className="inline-block text-[var(--text-muted)] hover:text-[var(--brand-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2"
+                    >
+                      <bdi dir="ltr">{displayedPhoneNumber}</bdi>
+                    </a>
+                  ) : <bdi dir="ltr">{displayedPhoneNumber}</bdi>}
+                </p>
+              ) : null}
               {settings.business_email ? <p>{t("emailContact")}: {settings.business_email}</p> : null}
             </div>
           </div>

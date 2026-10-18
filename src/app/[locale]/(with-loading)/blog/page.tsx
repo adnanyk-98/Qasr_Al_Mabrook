@@ -9,12 +9,19 @@ import { getBlogArticles, resolveBlogHref } from "@/lib/blog";
 import { locales, type Locale } from "@/lib/locales";
 import { createPublicPageMetadata } from "@/lib/seo";
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
   const { locale } = await params;
   if (!locales.includes(locale as Locale)) return {};
 
   const currentLocale = locale as Locale;
-  const metadataT = await getTranslations({ locale: currentLocale, namespace: "metadata" });
+  const metadataT = await getTranslations({
+    locale: currentLocale,
+    namespace: "metadata",
+  });
 
   return createPublicPageMetadata({
     locale: currentLocale,
@@ -24,13 +31,20 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   });
 }
 
-export default async function BlogPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function BlogPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
   const { locale } = await params;
   if (!locales.includes(locale as Locale)) notFound();
 
   const currentLocale = locale as Locale;
   const commonT = await getTranslations({ locale: currentLocale, namespace: "common" });
-  const metadataT = await getTranslations({ locale: currentLocale, namespace: "metadata" });
+  const metadataT = await getTranslations({
+    locale: currentLocale,
+    namespace: "metadata",
+  });
   const articles = getBlogArticles(currentLocale);
 
   return (
@@ -51,22 +65,62 @@ export default async function BlogPage({ params }: { params: Promise<{ locale: s
 
           <div className="grid gap-6 lg:grid-cols-3">
             {articles.map((article) => (
-              <article key={article.slug} className="group flex h-full flex-col rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 shadow-[var(--shadow-sm)] transition-shadow hover:shadow-[var(--shadow-md)]">
+              <article
+                key={article.slug}
+                className="group flex h-full flex-col rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 shadow-[var(--shadow-sm)] transition-shadow hover:shadow-[var(--shadow-md)]"
+              >
                 <div className="mb-5 flex items-center justify-between gap-3 text-xs font-medium uppercase tracking-[0.12em] text-[var(--text-muted)]">
-                  <span>{new Intl.DateTimeFormat(currentLocale === "ar" ? "ar-SA" : "en-US", { dateStyle: "medium" }).format(new Date(article.publishedAt))}</span>
-                  <span>{currentLocale === "ar" ? "قصر المبارك" : "Qasr Al Mabrook"}</span>
+                  <span>
+                    {new Intl.DateTimeFormat(
+                      currentLocale === "ar" ? "ar-SA" : "en-US",
+                      { dateStyle: "medium" },
+                    ).format(new Date(article.publishedAt))}
+                  </span>
+                  <span>
+                    {currentLocale === "ar" ? "قصر المبارك" : "Qasr Al Mabrook"}
+                  </span>
                 </div>
 
-                <h2 className="text-2xl font-semibold text-[var(--foreground)]" style={{ fontSize: "calc(var(--font-size-h2) * 0.875)" }}>{article.title}</h2>
-                <p className="mt-4 flex-1 text-base leading-7 text-[var(--text-muted)]">{article.excerpt}</p>
+                <h2
+                  className="text-2xl font-semibold text-[var(--foreground)]"
+                  style={{ fontSize: "calc(var(--font-size-h2) * 0.875)" }}
+                >
+                  {article.title}
+                </h2>
+                <p className="mt-4 flex-1 text-base leading-7 text-[var(--text-muted)]">
+                  {article.excerpt}
+                </p>
 
                 <div className="mt-6 flex flex-wrap gap-2 text-xs font-medium uppercase tracking-[0.08em] text-[var(--text-muted)]">
-                  {article.slug.includes("measuring") ? <span>{currentLocale === "ar" ? "أشرطة القياس" : "Measuring Tape"}</span> : null}
-                  {article.slug.includes("pajama") ? <span>{currentLocale === "ar" ? "البيجاما" : "Pajama"}</span> : null}
-                  {article.slug.includes("cloth") ? <span>{currentLocale === "ar" ? "قطع القماش" : "Cloth Piece"}</span> : null}
-                  {article.slug.includes("fancy") ? <span>{currentLocale === "ar" ? "بدلات فاخرة" : "Fancy Suit"}</span> : null}
-                  {article.slug.includes("adivasi") ? <span>{currentLocale === "ar" ? "زيت أديفاسي" : "Adivasi Oil"}</span> : null}
-                  {article.slug.includes("guide") && !article.slug.includes("measuring") && !article.slug.includes("pajama") && !article.slug.includes("cloth") && !article.slug.includes("fancy") && !article.slug.includes("adivasi") ? <span>{currentLocale === "ar" ? "دليل التسوق" : "Shopping guide"}</span> : null}
+                  {article.slug.includes("measuring") ? (
+                    <span>
+                      {currentLocale === "ar" ? "أشرطة القياس" : "Measuring Tape"}
+                    </span>
+                  ) : null}
+                  {article.slug.includes("pajama") ? (
+                    <span>{currentLocale === "ar" ? "البيجاما" : "Pajama"}</span>
+                  ) : null}
+                  {article.slug.includes("cloth") ? (
+                    <span>{currentLocale === "ar" ? "قطع القماش" : "Cloth Piece"}</span>
+                  ) : null}
+                  {article.slug.includes("fancy") ? (
+                    <span>{currentLocale === "ar" ? "بدلات فاخرة" : "Fancy Suit"}</span>
+                  ) : null}
+                  {article.slug.includes("adivasi") ? (
+                    <span>
+                      {currentLocale === "ar" ? "زيت أديفاسي" : "Adivasi Oil"}
+                    </span>
+                  ) : null}
+                  {article.slug.includes("guide") &&
+                  !article.slug.includes("measuring") &&
+                  !article.slug.includes("pajama") &&
+                  !article.slug.includes("cloth") &&
+                  !article.slug.includes("fancy") &&
+                  !article.slug.includes("adivasi") ? (
+                    <span>
+                      {currentLocale === "ar" ? "دليل التسوق" : "Shopping guide"}
+                    </span>
+                  ) : null}
                 </div>
 
                 <div className="mt-6">

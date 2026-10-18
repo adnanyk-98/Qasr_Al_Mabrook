@@ -13,7 +13,12 @@ export default async function LocaleLoading() {
   return (
     <div className="min-h-screen bg-[var(--brand-surface)] text-[var(--foreground)]">
       <Header locale={locale} path="/" />
-      <PublicLoadingShell locale={locale} pageLabel={t("page")} takingLongerLabel={t("takingLonger")} retryLabel={t("retry")} />
+      <PublicLoadingShell
+        locale={locale}
+        pageLabel={t("page")}
+        takingLongerLabel={t("takingLonger")}
+        retryLabel={t("retry")}
+      />
       <Footer locale={locale} />
     </div>
   );

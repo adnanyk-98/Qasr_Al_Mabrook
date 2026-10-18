@@ -32,7 +32,11 @@ test("invalid phone values are not converted into telephone links", () => {
   ];
 
   for (const phone of invalidNumbers) {
-    assert.equal(buildTelephoneHref(phone), null, `expected ${JSON.stringify(phone)} to be rejected`);
+    assert.equal(
+      buildTelephoneHref(phone),
+      null,
+      `expected ${JSON.stringify(phone)} to be rejected`,
+    );
     assert.equal(formatPublicPhoneNumber(phone), phone);
   }
 });

@@ -9,13 +9,17 @@ import { locales, type Locale } from "@/lib/locales";
 import { getTranslations } from "next-intl/server";
 import { createPublicPageMetadata } from "@/lib/seo";
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
   const { locale } = await params;
   if (!locales.includes(locale as Locale)) return {};
-  
+
   const t = await getTranslations({ locale: locale as Locale, namespace: "metadata" });
   const currentLocale = locale as Locale;
-  
+
   return createPublicPageMetadata({
     locale: currentLocale,
     path: "/categories",
@@ -24,7 +28,11 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   });
 }
 
-export default async function CategoriesPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function CategoriesPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
   const { locale } = await params;
 
   if (!locales.includes(locale as Locale)) {
@@ -49,7 +57,17 @@ export default async function CategoriesPage({ params }: { params: Promise<{ loc
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-              {categories.map((category) => <CategoryCard key={category.id} locale={currentLocale} categoryId={category.id} slug={category.slug} name={category.name} description={category.description} imageUrl={category.imagePublicUrl} />)}
+            {categories.map((category) => (
+              <CategoryCard
+                key={category.id}
+                locale={currentLocale}
+                categoryId={category.id}
+                slug={category.slug}
+                name={category.name}
+                description={category.description}
+                imageUrl={category.imagePublicUrl}
+              />
+            ))}
           </div>
         </Container>
       </Section>

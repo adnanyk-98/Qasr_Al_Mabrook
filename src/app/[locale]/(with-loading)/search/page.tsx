@@ -11,29 +11,40 @@ import { locales, type Locale } from "@/lib/locales";
 import { getTranslations } from "next-intl/server";
 import { createPublicPageMetadata } from "@/lib/seo";
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }>; searchParams: Promise<{ q?: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ q?: string }>;
+}): Promise<Metadata> {
   const { locale } = await params;
-  
+
   if (!locales.includes(locale as Locale)) return {};
-  
+
   const t = await getTranslations({ locale: locale as Locale, namespace: "metadata" });
   const currentLocale = locale as Locale;
-  
+
   const metadata = createPublicPageMetadata({
     locale: currentLocale,
     path: "/search",
     title: t("searchTitle"),
     description: t("searchDescription"),
   });
-  
+
   // Search results are noindexed to prevent index bloat
   // Each unique search query would create a duplicate page
   metadata.robots = "noindex, follow";
-  
+
   return metadata;
 }
 
-export default async function SearchPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ q?: string }> }) {
+export default async function SearchPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ q?: string }>;
+}) {
   const { locale } = await params;
   const query = await searchParams;
 
@@ -47,7 +58,10 @@ export default async function SearchPage({ params, searchParams }: { params: Pro
   const results = await searchPublishedProducts(currentLocale, searchTerm);
 
   return (
-    <PublicShell locale={currentLocale} path={`/search${searchTerm ? `?q=${encodeURIComponent(searchTerm)}` : ""}`}>
+    <PublicShell
+      locale={currentLocale}
+      path={`/search${searchTerm ? `?q=${encodeURIComponent(searchTerm)}` : ""}`}
+    >
       <Section>
         <Container className="space-y-8">
           <div className="space-y-4">
@@ -58,14 +72,29 @@ export default async function SearchPage({ params, searchParams }: { params: Pro
               {searchTerm ? searchTerm : t("title")}
             </h1>
             <div className="max-w-xl">
-              <SearchForm locale={currentLocale} defaultValue={searchTerm} labels={{ eyebrow: t("eyebrow"), placeholder: t("placeholder"), label: t("label"), viewAll: t("viewAll"), loading: t("loading"), noResults: t("noResults"), error: t("error") }} />
+              <SearchForm
+                locale={currentLocale}
+                defaultValue={searchTerm}
+                labels={{
+                  eyebrow: t("eyebrow"),
+                  placeholder: t("placeholder"),
+                  label: t("label"),
+                  viewAll: t("viewAll"),
+                  loading: t("loading"),
+                  noResults: t("noResults"),
+                  error: t("error"),
+                }}
+              />
             </div>
           </div>
 
           {searchTerm === "" ? (
             <EmptyState title={t("emptyTitle")} description={t("emptyDescription")} />
           ) : results.length === 0 ? (
-            <EmptyState title={t("noResultsTitle")} description={t("noResultsDescription")} />
+            <EmptyState
+              title={t("noResultsTitle")}
+              description={t("noResultsDescription")}
+            />
           ) : (
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
               {results.map((product) => (

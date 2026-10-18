@@ -1,4 +1,5 @@
-const INTERNATIONAL_PHONE_PATTERN = /^(?:\+|00)\s*(?:\d+|\(\d+\))(?:[ .-]?(?:\d+|\(\d+\)))*$/;
+const INTERNATIONAL_PHONE_PATTERN =
+  /^(?:\+|00)\s*(?:\d+|\(\d+\))(?:[ .-]?(?:\d+|\(\d+\)))*$/;
 
 function normalizeInternationalPhoneNumber(phone: string): string | null {
   const trimmed = phone.trim();

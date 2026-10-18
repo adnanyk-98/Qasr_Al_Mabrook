@@ -8,6 +8,8 @@ import { claimHomepageContactPopupSession } from "@/lib/homepage-contact";
 import type { Locale } from "@/lib/locales";
 
 let hasShownInThisDocument = false;
+const actionClassName =
+  "flex min-h-[3.25rem] w-full items-center rounded-xl border border-[var(--brand-border)] bg-white px-4 py-3 text-start font-semibold text-[var(--foreground)] transition-colors hover:bg-[var(--brand-surface)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-primary)] motion-reduce:transition-none";
 
 type HomepageContactDialogProps = {
   locale: Locale;
@@ -61,9 +63,9 @@ function ActionContents({
   children: React.ReactNode;
 }) {
   return (
-    <span className="flex items-center gap-3">
+    <span className="flex min-w-0 items-center gap-3">
       <ContactIcon type={type} />
-      <span>{children}</span>
+      <span className="min-w-0 break-words">{children}</span>
     </span>
   );
 }
@@ -130,7 +132,7 @@ export function HomepageContactDialog({
       ref={dialogRef}
       aria-labelledby="homepage-contact-title"
       aria-describedby="homepage-contact-description"
-      className="fixed inset-0 m-auto max-h-[calc(100vh-2rem)] supports-[height:100dvh]:max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-lg overflow-y-auto rounded-3xl border border-[var(--brand-border)] bg-white p-0 text-[var(--foreground)] shadow-2xl backdrop:bg-black/55"
+      className="fixed inset-0 m-auto max-h-[calc(100vh-2rem)] supports-[height:100dvh]:max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[26rem] overflow-y-auto rounded-3xl border border-[var(--brand-border)] bg-white p-0 text-[var(--foreground)] shadow-2xl backdrop:bg-black/55"
       onClick={(event) => {
         if (event.target === event.currentTarget) closeDialog();
       }}
@@ -165,23 +167,18 @@ export function HomepageContactDialog({
           </button>
         </div>
 
-        <div className="mt-6 grid gap-3">
+        <div className="mx-auto mt-6 grid w-[90%] max-w-[22rem] gap-3">
           {phoneHref ? (
             <TrackedLink
               event="phone_click"
               params={{ locale, source: "homepage-contact-popup" }}
               href={phoneHref}
-              dir="ltr"
-              className="flex min-h-12 w-full items-center rounded-xl bg-[var(--brand-primary)] px-4 py-3 text-start font-semibold text-white transition-colors hover:bg-[var(--brand-primary-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-primary)] motion-reduce:transition-none"
+              className={actionClassName}
             >
               <ActionContents type="phone">{t("callUs")}</ActionContents>
             </TrackedLink>
           ) : (
-            <button
-              type="button"
-              disabled
-              className="flex min-h-12 w-full items-center rounded-xl bg-[var(--brand-primary)] px-4 py-3 text-start font-semibold text-white opacity-60"
-            >
+            <button type="button" disabled className={`${actionClassName} opacity-60`}>
               <ActionContents type="phone">{t("callUs")}</ActionContents>
             </button>
           )}
@@ -193,7 +190,7 @@ export function HomepageContactDialog({
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex min-h-12 w-full items-center rounded-xl border border-[var(--brand-border)] bg-white px-4 py-3 text-start font-semibold text-[var(--foreground)] transition-colors hover:bg-[var(--brand-surface)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-primary)] motion-reduce:transition-none"
+              className={actionClassName}
             >
               <ActionContents type="chat">{t("chatOnWhatsApp")}</ActionContents>
             </TrackedLink>
@@ -203,7 +200,7 @@ export function HomepageContactDialog({
                 type="button"
                 disabled
                 aria-describedby="homepage-whatsapp-unavailable"
-                className="flex min-h-12 w-full items-center rounded-xl border border-[var(--brand-border)] bg-white px-4 py-3 text-start font-semibold text-[var(--foreground)] opacity-60"
+                className={`${actionClassName} opacity-60`}
               >
                 <ActionContents type="chat">{t("chatOnWhatsApp")}</ActionContents>
               </button>
@@ -222,7 +219,7 @@ export function HomepageContactDialog({
             href={mapsUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex min-h-12 w-full items-center rounded-xl border border-[var(--brand-border)] bg-white px-4 py-3 text-start font-semibold text-[var(--foreground)] transition-colors hover:bg-[var(--brand-surface)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-primary)] motion-reduce:transition-none"
+            className={actionClassName}
           >
             <ActionContents type="map">{t("findOurShop")}</ActionContents>
           </TrackedLink>

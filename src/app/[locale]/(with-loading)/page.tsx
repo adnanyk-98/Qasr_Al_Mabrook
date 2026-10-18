@@ -23,6 +23,11 @@ import {
 import { localePath, locales, type Locale } from "@/lib/locales";
 import { readLocalizedConfigString } from "@/lib/homepage-content";
 import { getTranslations } from "next-intl/server";
+import { getPublicContactSettings } from "@/server/repositories/enquiries";
+import { siteConfig } from "@/config/site";
+import { buildTelephoneHref } from "@/lib/phone-display";
+import { buildWhatsAppUrl } from "@/lib/homepage-contact";
+import { HomepageContactDialog } from "@/components/public/homepage-contact-dialog";
 
 import enMessages from "@/i18n/messages/en.json";
 import arMessages from "@/i18n/messages/ar.json";
@@ -139,13 +144,15 @@ export default async function LocaleHomePage({
     locale: currentLocale,
     namespace: "highlights",
   });
-  const [sections, categories, featuredProducts, brands, deals] = await Promise.all([
-    listPublishedHomepageSections(),
-    listPublishedCategories(currentLocale),
-    listPublishedProducts(currentLocale, { limit: 6 }),
-    getPublishedBrands(currentLocale),
-    listPublishedHomepageDeals(currentLocale),
-  ]);
+  const [sections, categories, featuredProducts, brands, deals, contactSettings] =
+    await Promise.all([
+      listPublishedHomepageSections(),
+      listPublishedCategories(currentLocale),
+      listPublishedProducts(currentLocale, { limit: 6 }),
+      getPublishedBrands(currentLocale),
+      listPublishedHomepageDeals(currentLocale),
+      getPublicContactSettings(),
+    ]);
   const heroSections = sections.filter(
     (section) => section.sectionType.toUpperCase() === "HERO",
   );
@@ -187,6 +194,12 @@ export default async function LocaleHomePage({
 
   return (
     <PublicShell locale={currentLocale} path="/">
+      <HomepageContactDialog
+        locale={currentLocale}
+        phoneHref={buildTelephoneHref(siteConfig.contact.phone)}
+        whatsappUrl={buildWhatsAppUrl(contactSettings.whatsapp_number)}
+        mapsUrl={siteConfig.contact.mapsUrl}
+      />
       <Section className="bg-[var(--brand-surface)] !py-0">
         {heroSections.length > 0 ? (
           // Full-bleed hero: render outside the standard centered Container

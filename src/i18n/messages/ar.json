@@ -91,7 +91,17 @@
     "dealFormalDiscount": "خصم يصل إلى 20٪",
     "dealCasualDiscount": "خصم يصل إلى 15٪",
     "dealHardwareDiscount": "خصم يصل إلى 25٪",
-    "dealDiscount": "خصم يصل إلى {percent}٪"
+    "dealDiscount": "خصم يصل إلى {percent}٪",
+    "contactPopup": {
+      "eyebrow": "نسعد بخدمتكم",
+      "title": "مرحبًا بكم في قصر المبارك",
+      "description": "كيف تفضلون التواصل معنا؟",
+      "callUs": "اتصل بنا",
+      "chatOnWhatsApp": "تواصل عبر واتساب",
+      "findOurShop": "اعثر على متجرنا",
+      "close": "إغلاق خيارات التواصل",
+      "whatsAppUnavailable": "التواصل عبر واتساب غير متاح حاليًا."
+    }
   },
   "highlights": {
     "eyebrow": "ما يميزنا",

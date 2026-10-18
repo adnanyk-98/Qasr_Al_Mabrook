@@ -91,7 +91,17 @@
     "dealFormalDiscount": "Up to 20% off",
     "dealCasualDiscount": "Up to 15% off",
     "dealHardwareDiscount": "Up to 25% off",
-    "dealDiscount": "Up to {percent}% off"
+    "dealDiscount": "Up to {percent}% off",
+    "contactPopup": {
+      "eyebrow": "We're here to help",
+      "title": "Welcome to Qasr Al Mabrook",
+      "description": "How would you like to connect with us?",
+      "callUs": "Call Us",
+      "chatOnWhatsApp": "Chat on WhatsApp",
+      "findOurShop": "Find Our Shop",
+      "close": "Close contact options",
+      "whatsAppUnavailable": "WhatsApp contact is not currently available."
+    }
   },
   "highlights": {
     "eyebrow": "Our difference",

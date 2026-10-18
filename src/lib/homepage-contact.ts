@@ -21,13 +21,11 @@ export function claimHomepageContactPopupSession(
   }
 }
 
-export function buildWhatsAppUrl(number: string | null | undefined): string | null {
-  if (!number) return null;
-
+export function buildWhatsAppUrl(number: string): string | null {
   const telephoneHref = buildTelephoneHref(number);
-  const digits = telephoneHref
-    ? telephoneHref.slice("tel:+".length)
-    : number.replace(/\D/g, "");
+  if (!telephoneHref) return null;
+
+  const digits = telephoneHref.slice("tel:+".length);
   if (digits.length < 8 || digits.length > 15 || digits.startsWith("0")) {
     return null;
   }

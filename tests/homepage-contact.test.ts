@@ -11,20 +11,26 @@ import { buildTelephoneHref } from "@/lib/phone-display";
 import arMessages from "@/i18n/messages/ar.json";
 import enMessages from "@/i18n/messages/en.json";
 
-test("contact popup uses verified telephone and Google Maps configuration", () => {
-  assert.equal(buildTelephoneHref(siteConfig.contact.phone), "tel:+971503093800");
+test("contact popup uses the configured mobile number for calls and WhatsApp", () => {
+  const phoneHref = buildTelephoneHref(siteConfig.contact.phone);
+  const whatsappUrl = buildWhatsAppUrl(siteConfig.contact.phone);
+
+  assert.equal(phoneHref, "tel:+971503093800");
+  assert.equal(whatsappUrl, "https://wa.me/971503093800?text=Hi!");
+  const whatsapp = new URL(whatsappUrl ?? "");
+  assert.equal(whatsapp.hostname, "wa.me");
+  assert.equal(whatsapp.pathname, `/${phoneHref?.slice("tel:+".length)}`);
+  assert.equal(whatsapp.searchParams.get("text"), "Hi!");
   assert.equal(siteConfig.contact.mapsUrl, "https://maps.app.goo.gl/AGAHaCeodMY7gPAY9");
 });
 
-test("WhatsApp URL uses the configured international number and exactly Hi!", () => {
+test("WhatsApp URL normalizes an international number and pre-fills exactly Hi!", () => {
   const url = buildWhatsAppUrl("+971 50 309 3800");
   assert.equal(url, "https://wa.me/971503093800?text=Hi!");
   assert.equal(new URL(url!).searchParams.get("text"), "Hi!");
 });
 
-test("WhatsApp is unavailable rather than guessed when no configured number exists", () => {
-  assert.equal(buildWhatsAppUrl(""), null);
-  assert.equal(buildWhatsAppUrl(undefined), null);
+test("WhatsApp remains unavailable for an invalid number", () => {
   assert.equal(buildWhatsAppUrl("050 309 3800"), null);
 });
 

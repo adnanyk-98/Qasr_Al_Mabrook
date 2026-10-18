@@ -23,7 +23,6 @@ import {
 import { localePath, locales, type Locale } from "@/lib/locales";
 import { readLocalizedConfigString } from "@/lib/homepage-content";
 import { getTranslations } from "next-intl/server";
-import { getPublicContactSettings } from "@/server/repositories/enquiries";
 import { siteConfig } from "@/config/site";
 import { buildTelephoneHref } from "@/lib/phone-display";
 import { buildWhatsAppUrl } from "@/lib/homepage-contact";
@@ -144,15 +143,13 @@ export default async function LocaleHomePage({
     locale: currentLocale,
     namespace: "highlights",
   });
-  const [sections, categories, featuredProducts, brands, deals, contactSettings] =
-    await Promise.all([
-      listPublishedHomepageSections(),
-      listPublishedCategories(currentLocale),
-      listPublishedProducts(currentLocale, { limit: 6 }),
-      getPublishedBrands(currentLocale),
-      listPublishedHomepageDeals(currentLocale),
-      getPublicContactSettings(),
-    ]);
+  const [sections, categories, featuredProducts, brands, deals] = await Promise.all([
+    listPublishedHomepageSections(),
+    listPublishedCategories(currentLocale),
+    listPublishedProducts(currentLocale, { limit: 6 }),
+    getPublishedBrands(currentLocale),
+    listPublishedHomepageDeals(currentLocale),
+  ]);
   const heroSections = sections.filter(
     (section) => section.sectionType.toUpperCase() === "HERO",
   );
@@ -197,7 +194,7 @@ export default async function LocaleHomePage({
       <HomepageContactDialog
         locale={currentLocale}
         phoneHref={buildTelephoneHref(siteConfig.contact.phone)}
-        whatsappUrl={buildWhatsAppUrl(contactSettings.whatsapp_number)}
+        whatsappUrl={buildWhatsAppUrl(siteConfig.contact.phone)}
         mapsUrl={siteConfig.contact.mapsUrl}
       />
       <Section className="bg-[var(--brand-surface)] !py-0">

@@ -130,13 +130,13 @@ export function HomepageContactDialog({
       ref={dialogRef}
       aria-labelledby="homepage-contact-title"
       aria-describedby="homepage-contact-description"
-      className="fixed inset-x-0 bottom-0 m-0 max-h-[min(90dvh,40rem)] w-full max-w-none overflow-y-auto rounded-t-3xl border border-[var(--brand-border)] bg-white p-0 text-[var(--foreground)] shadow-2xl backdrop:bg-black/55 md:inset-0 md:m-auto md:max-h-[min(90dvh,40rem)] md:max-w-lg md:rounded-3xl"
+      className="fixed inset-0 m-auto max-h-[calc(100vh-2rem)] supports-[height:100dvh]:max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-lg overflow-y-auto rounded-3xl border border-[var(--brand-border)] bg-white p-0 text-[var(--foreground)] shadow-2xl backdrop:bg-black/55"
       onClick={(event) => {
         if (event.target === event.currentTarget) closeDialog();
       }}
       onClose={restorePageScroll}
     >
-      <div className="px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-5 sm:px-7 sm:pt-7">
+      <div className="px-[max(1.25rem,env(safe-area-inset-left),env(safe-area-inset-right))] pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-[max(1.25rem,env(safe-area-inset-top))] sm:px-[max(1.75rem,env(safe-area-inset-left),env(safe-area-inset-right))] sm:pt-[max(1.75rem,env(safe-area-inset-top))]">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0 space-y-2">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">

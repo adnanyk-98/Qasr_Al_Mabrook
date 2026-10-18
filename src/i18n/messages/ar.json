@@ -21,6 +21,10 @@
     "english": "الإنجليزية",
     "arabic": "العربية"
   },
+  "notFound": {
+    "title": "الصفحة غير موجودة",
+    "description": "الصفحة المطلوبة غير متاحة."
+  },
   "header": {
     "mainNavigation": "التنقل الرئيسي",
     "openMenu": "فتح قائمة التنقل",

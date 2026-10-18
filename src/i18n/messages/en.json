@@ -21,6 +21,10 @@
     "english": "English",
     "arabic": "Arabic"
   },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The requested page is not available."
+  },
   "header": {
     "mainNavigation": "Main navigation",
     "openMenu": "Open navigation menu",

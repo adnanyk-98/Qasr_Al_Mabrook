@@ -13,6 +13,21 @@ export function getBaseUrl(): string {
   return siteConfig.url;
 }
 
+export function createFaqStructuredData(faqs: Array<{ question: string; answer: string }>): string {
+  return serializeJsonLd({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map(({ question, answer }) => ({
+      "@type": "Question",
+      name: question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: answer,
+      },
+    })),
+  });
+}
+
 /**
  * Build a canonical URL for a given path and locale
  */
@@ -59,6 +74,67 @@ export interface CreateMetadataOptions {
   hasAlternate?: boolean; // Whether alternate locale version exists
 }
 
+export function normalizeSeoText(value?: string | null): string | null {
+  if (!value) return null;
+  const normalized = value.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  return normalized.length > 0 ? normalized : null;
+}
+
+export function truncateSeoText(value: string, maxLength = 155): string {
+  const characters = Array.from(value);
+  if (characters.length <= maxLength) return value;
+
+  const shortened = characters.slice(0, maxLength - 1).join("");
+  const lastSpace = shortened.lastIndexOf(" ");
+  const readable = lastSpace >= Math.floor(maxLength * 0.65) ? shortened.slice(0, lastSpace) : shortened.trimEnd();
+  return `${readable}…`;
+}
+
+export function buildCategorySeoTitle(categoryName?: string | null): string {
+  const name = normalizeSeoText(categoryName) || "Products";
+  return `${name} | Qasr Al Mabrook`;
+}
+
+export function buildCategorySeoDescription(
+  categoryName?: string | null,
+  description?: string | null,
+  productNames: string[] = [],
+  locale: Locale = "en",
+): string {
+  const name = normalizeSeoText(categoryName) || "Products";
+  const cleanDescription = normalizeSeoText(description);
+  const exampleProducts = productNames.map(normalizeSeoText).filter((productName): productName is string => Boolean(productName)).slice(0, 2);
+  const productText = exampleProducts.length
+    ? locale === "ar"
+      ? `ومنها ${exampleProducts.join(" و")}.`
+      : `Including ${exampleProducts.join(" and ")}.`
+    : "";
+  const descriptionText = cleanDescription ? `${cleanDescription} ` : "";
+  const base = locale === "ar"
+    ? `تصفح منتجات ${name} في كتالوج قصر المبارك. ${productText} ${descriptionText}`
+    : `Browse ${name} products at Qasr Al Mabrook. ${productText} ${descriptionText}`;
+  return truncateSeoText(normalizeSeoText(base) ?? base);
+}
+
+export function buildProductSeoTitle(productName?: string | null, categoryName?: string | null): string {
+  const name = normalizeSeoText(productName) || "Product";
+  const category = normalizeSeoText(categoryName);
+  const includesCategory = category && name.toLocaleLowerCase().includes(category.toLocaleLowerCase());
+  return category && !includesCategory ? `${name} | ${category} | Qasr Al Mabrook` : `${name} | Qasr Al Mabrook`;
+}
+
+export function buildProductSeoDescription(productName?: string | null, shortDescription?: string | null, categoryName?: string | null): string {
+  const cleanName = normalizeSeoText(productName) || "Product";
+  const cleanShortDescription = normalizeSeoText(shortDescription);
+  if (cleanShortDescription) return truncateSeoText(cleanShortDescription);
+  const category = normalizeSeoText(categoryName);
+  if (category) {
+    return truncateSeoText(`Explore ${cleanName} in the ${category} collection at Qasr Al Mabrook.`);
+  }
+
+  return truncateSeoText(`Explore ${cleanName} at Qasr Al Mabrook and browse the selection available in our catalogue.`);
+}
+
 export function createPublicPageMetadata(options: CreateMetadataOptions): Metadata {
   const {
     locale,
@@ -67,16 +143,16 @@ export function createPublicPageMetadata(options: CreateMetadataOptions): Metada
     description,
     ogImage,
     ogImageAlt,
-    ogImageWidth = 1200,
-    ogImageHeight = 630,
+    ogImageWidth,
+    ogImageHeight,
     hasAlternate = true,
   } = options;
 
-  // Fallback title
-  const finalTitle = title || siteConfig.name;
+  const finalTitle = normalizeSeoText(title) || siteConfig.name;
 
-  // Fallback description
-  const finalDescription = description || "Qasr Al Mabrook catalogue and enquiry platform.";
+  const finalDescription =
+    normalizeSeoText(description) ||
+    "Browse the Qasr Al Mabrook catalogue for clothing, essentials, fabrics, footwear, and everyday products. Explore categories and request a quote for what you need.";
 
   // Canonical URL
   const canonical = buildCanonical(locale, path);
@@ -94,7 +170,7 @@ export function createPublicPageMetadata(options: CreateMetadataOptions): Metada
   const openGraphImage = {
     url: resolvedOgImage,
     alt: ogImageAlt || finalTitle,
-    ...(ogImage ? { width: ogImageWidth, height: ogImageHeight } : {}),
+    ...(ogImage && ogImageWidth && ogImageHeight ? { width: ogImageWidth, height: ogImageHeight } : {}),
   };
 
   const metadata: Metadata = {
@@ -130,6 +206,7 @@ export function createPublicPageMetadata(options: CreateMetadataOptions): Metada
  */
 export interface CreateProductMetadataOptions extends CreateMetadataOptions {
   productName?: string;
+  categoryName?: string | null;
   seoTitle?: string | null;
   seoDescription?: string | null;
   shortDescription?: string | null;
@@ -139,18 +216,18 @@ export interface CreateProductMetadataOptions extends CreateMetadataOptions {
 }
 
 export function createProductMetadata(options: CreateProductMetadataOptions): Metadata {
-  const { seoTitle, seoDescription, productName, shortDescription, fullDescription, productImage, productImageAlt, ...rest } = options;
+  const { productName, categoryName, seoTitle, shortDescription, fullDescription, productImage, productImageAlt, ...rest } = options;
 
-  // Title fallback chain: seoTitle -> productName -> site default
-  const title = seoTitle || productName || siteConfig.name;
-
-  // Description fallback chain: seoDescription -> shortDescription -> fullDescription -> site default
-  const description = seoDescription || shortDescription || fullDescription;
+  const title = normalizeSeoText(seoTitle) || buildProductSeoTitle(productName, categoryName);
+  const description =
+    normalizeSeoText(fullDescription) ||
+    normalizeSeoText(shortDescription) ||
+    buildProductSeoDescription(productName, shortDescription, categoryName);
 
   return createPublicPageMetadata({
     ...rest,
     title,
-    description,
+    description: truncateSeoText(description),
     ogImage: productImage || undefined,
     ogImageAlt: productImageAlt || productName || undefined,
   });
@@ -164,16 +241,14 @@ export interface CreateCategoryMetadataOptions extends CreateMetadataOptions {
   seoTitle?: string | null;
   seoDescription?: string | null;
   description?: string | null;
+  productNames?: string[];
 }
 
 export function createCategoryMetadata(options: CreateCategoryMetadataOptions): Metadata {
-  const { seoTitle, seoDescription, categoryName, description: categoryDescription, ...rest } = options;
+  const { categoryName, description: categoryDescription, productNames = [], ...rest } = options;
 
-  // Title fallback chain
-  const title = seoTitle || categoryName || siteConfig.name;
-
-  // Description fallback chain
-  const description = seoDescription || categoryDescription;
+  const title = buildCategorySeoTitle(categoryName);
+  const description = buildCategorySeoDescription(categoryName, categoryDescription, productNames, rest.locale);
 
   return createPublicPageMetadata({
     ...rest,
@@ -219,12 +294,12 @@ export function createProductStructuredData(options: ProductStructuredDataOption
     value: id,
   };
 
-  return JSON.stringify(schema);
+  return serializeJsonLd(schema);
 }
 
 /**
  * Create JSON-LD structured data for Organization
- * Used on homepage and as global schema
+ * Used on localized homepages only
  */
 export function createOrganizationStructuredData(): string {
   const schema = {
@@ -233,13 +308,21 @@ export function createOrganizationStructuredData(): string {
     name: siteConfig.name,
     url: getBaseUrl(),
     logo: `${getBaseUrl()}${siteConfig.brand.logoColorSvg}`,
+    telephone: siteConfig.contact.phone,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: siteConfig.contact.address,
+      addressLocality: "Sharjah",
+      addressRegion: "Sharjah",
+      addressCountry: "AE",
+    },
   };
 
-  return JSON.stringify(schema);
+  return serializeJsonLd(schema);
 }
 
 export function createWebSiteStructuredData(): string {
-  return JSON.stringify({
+  return serializeJsonLd({
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: siteConfig.name,
@@ -312,7 +395,7 @@ export function createBreadcrumbStructuredData(locale: Locale, items: Breadcrumb
     })),
   };
 
-  return JSON.stringify(schema);
+  return serializeJsonLd(schema);
 }
 
 /**
@@ -325,7 +408,10 @@ export function shouldNoindexFilteredView(searchParams: Record<string, string | 
   return hasAnyParams;
 }
 
+export function shouldNoindexStateQuery(searchParams: Record<string, string | string[] | undefined>): boolean {
+  return ["success", "error"].some((key) => Object.prototype.hasOwnProperty.call(searchParams, key));
+}
+
 function serializeJsonLd(schema: object): string {
   return JSON.stringify(schema).replace(/</g, "\\u003c");
 }
-

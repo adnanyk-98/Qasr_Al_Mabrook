@@ -1,11 +1,42 @@
 import { type MetadataRoute } from "next";
 import { db } from "@/db";
-import { categories, categoryTranslations, productTranslations, products, staticPageTranslations, staticPages } from "@/db/schema";
-import { and, eq } from "drizzle-orm";
+import { categories, categoryTranslations, productTranslations, products } from "@/db/schema";
+import { siteSettings } from "@/db/schema/settings";
+import { eq } from "drizzle-orm";
 import { blogArticles } from "@/lib/blog";
 import { getBaseUrl } from "@/lib/seo";
-import { localePath, locales } from "@/lib/locales";
+import { localePath, locales, type Locale } from "@/lib/locales";
 import { reportServerError } from "@/lib/observability";
+
+function addLocalizedEntries(
+  entries: MetadataRoute.Sitemap,
+  baseUrl: string,
+  path: string,
+  availableLocales: readonly Locale[],
+  options: { lastModified?: Date | string; changeFrequency?: MetadataRoute.Sitemap[number]["changeFrequency"]; priority?: number } = {},
+) {
+  const languages = Object.fromEntries(
+    availableLocales.map((locale) => [locale, `${baseUrl}${localePath(locale, path)}`]),
+  );
+  if (availableLocales.includes("en")) languages["x-default"] = languages.en;
+
+  for (const locale of availableLocales) {
+    entries.push({
+      url: `${baseUrl}${localePath(locale, path)}`,
+      ...(options.lastModified ? { lastModified: options.lastModified } : {}),
+      ...(options.changeFrequency ? { changeFrequency: options.changeFrequency } : {}),
+      ...(options.priority !== undefined ? { priority: options.priority } : {}),
+      alternates: { languages },
+    });
+  }
+}
+
+function latestDate(values: Array<Date | string | null | undefined>): Date | undefined {
+  const timestamps = values
+    .map((value) => value instanceof Date ? value.getTime() : value ? new Date(value).getTime() : Number.NaN)
+    .filter(Number.isFinite);
+  return timestamps.length ? new Date(Math.max(...timestamps)) : undefined;
+}
 
 /**
  * Generate XML sitemap for search engines
@@ -17,78 +48,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const sitemapEntries: MetadataRoute.Sitemap = [];
 
   try {
-    // Add homepages for each locale
-    for (const locale of locales) {
-      sitemapEntries.push({
-        url: `${baseUrl}${localePath(locale, "/")}`,
-        changeFrequency: "weekly",
-        priority: 1.0,
-      });
-    }
-
-    // Add static catalogue pages
-    for (const locale of locales) {
-      sitemapEntries.push(
-        {
-          url: `${baseUrl}${localePath(locale, "/categories")}`,
-          changeFrequency: "weekly",
-          priority: 0.9,
-        },
-        {
-          url: `${baseUrl}${localePath(locale, "/products")}`,
-          changeFrequency: "weekly",
-          priority: 0.9,
-        },
-        {
-          url: `${baseUrl}${localePath(locale, "/store-locator")}`,
-          changeFrequency: "monthly",
-          priority: 0.8,
-        },
-        {
-          url: `${baseUrl}${localePath(locale, "/contact-us")}`,
-          changeFrequency: "monthly",
-          priority: 0.6,
-        },
-        {
-          url: `${baseUrl}${localePath(locale, "/blog")}`,
-          changeFrequency: "weekly",
-          priority: 0.8,
-        }
-      );
-    }
-
-    for (const article of blogArticles) {
-      for (const locale of locales) {
-        sitemapEntries.push({
-          url: `${baseUrl}${localePath(locale, `/blog/${article.slug}`)}`,
-          lastModified: new Date(article.updatedAt),
-          changeFrequency: "monthly",
-          priority: 0.7,
-        });
-      }
-    }
-
-    const aboutPage = await db
-      .select({ id: staticPages.id, updatedAt: staticPages.updatedAt })
-      .from(staticPages)
-      .where(and(eq(staticPages.slug, "about-us"), eq(staticPages.status, "PUBLISHED")))
-      .limit(1);
-    if (aboutPage[0]) {
-      const aboutTranslations = await db
-        .select({ locale: staticPageTranslations.locale })
-        .from(staticPageTranslations)
-        .where(eq(staticPageTranslations.staticPageId, aboutPage[0].id));
-      const availableAboutLocales = new Set(aboutTranslations.map((translation) => translation.locale));
-      for (const locale of locales.filter((candidate) => availableAboutLocales.has(candidate))) {
-        sitemapEntries.push({
-          url: `${baseUrl}${localePath(locale, "/about-us")}`,
-          lastModified: aboutPage[0].updatedAt,
-          changeFrequency: "monthly",
-          priority: 0.6,
-        });
-      }
-    }
-
     // Add published categories for each locale
     const publishedCategories = await db
       .select({
@@ -108,14 +67,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           .filter((translation) => translation.categoryId === category.id)
           .map((translation) => translation.locale)
       );
-      for (const locale of locales.filter((candidate) => availableLocales.has(candidate))) {
-        sitemapEntries.push({
-          url: `${baseUrl}${localePath(locale, `/categories/${category.slug}`)}`,
-          lastModified: category.updatedAt,
-          changeFrequency: "weekly",
-          priority: 0.8,
-        });
-      }
+      addLocalizedEntries(
+        sitemapEntries,
+        baseUrl,
+        `/categories/${category.slug}`,
+        locales.filter((candidate) => availableLocales.has(candidate)),
+        { lastModified: category.updatedAt, changeFrequency: "weekly", priority: 0.8 },
+      );
     }
 
     // Add published products for each locale
@@ -137,25 +95,43 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           .filter((translation) => translation.productId === product.id)
           .map((translation) => translation.locale)
       );
-      for (const locale of locales.filter((candidate) => availableLocales.has(candidate))) {
-        sitemapEntries.push({
-          url: `${baseUrl}${localePath(locale, `/products/${product.slug}`)}`,
-          lastModified: product.updatedAt,
-          changeFrequency: "weekly",
-          priority: 0.7,
-        });
-      }
+      addLocalizedEntries(
+        sitemapEntries,
+        baseUrl,
+        `/products/${product.slug}`,
+        locales.filter((candidate) => availableLocales.has(candidate)),
+        { lastModified: product.updatedAt, changeFrequency: "weekly", priority: 0.7 },
+      );
+    }
+
+    const contactSettingRows = await db
+      .select({ updatedAt: siteSettings.updatedAt })
+      .from(siteSettings)
+      .where(eq(siteSettings.key, "business_phone"));
+    const blogLastModified = latestDate(blogArticles.map((article) => article.updatedAt));
+    const categoriesLastModified = latestDate(publishedCategories.map((category) => category.updatedAt));
+    const productsLastModified = latestDate(publishedProducts.map((product) => product.updatedAt));
+    const homepageLastModified = latestDate([
+      ...publishedCategories.map((category) => category.updatedAt),
+      ...publishedProducts.map((product) => product.updatedAt),
+    ]);
+
+    addLocalizedEntries(sitemapEntries, baseUrl, "/", locales, { lastModified: homepageLastModified, changeFrequency: "weekly", priority: 1.0 });
+    addLocalizedEntries(sitemapEntries, baseUrl, "/categories", locales, { lastModified: categoriesLastModified, changeFrequency: "weekly", priority: 0.9 });
+    addLocalizedEntries(sitemapEntries, baseUrl, "/products", locales, { lastModified: productsLastModified, changeFrequency: "weekly", priority: 0.9 });
+    addLocalizedEntries(sitemapEntries, baseUrl, "/store-locator", locales, { lastModified: contactSettingRows[0]?.updatedAt, changeFrequency: "monthly", priority: 0.8 });
+    addLocalizedEntries(sitemapEntries, baseUrl, "/blog", locales, { lastModified: blogLastModified, changeFrequency: "weekly", priority: 0.8 });
+
+    for (const article of blogArticles) {
+      addLocalizedEntries(sitemapEntries, baseUrl, `/blog/${article.slug}`, locales, {
+        lastModified: new Date(article.updatedAt),
+        changeFrequency: "monthly",
+        priority: 0.7,
+      });
     }
   } catch (error) {
     reportServerError("sitemap", error);
-    // Return minimal sitemap on error to avoid breaking the application
-    for (const locale of locales) {
-      sitemapEntries.push({
-        url: `${baseUrl}${localePath(locale, "/")}`,
-        changeFrequency: "weekly",
-        priority: 1.0,
-      });
-    }
+    addLocalizedEntries(sitemapEntries, baseUrl, "/", locales, { changeFrequency: "weekly", priority: 1.0 });
   }
 
   return sitemapEntries;

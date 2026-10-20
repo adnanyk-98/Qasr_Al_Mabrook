@@ -1,4 +1,5 @@
-import { boolean, integer, numeric, pgEnum, pgTable, text, timestamp, uniqueIndex, uuid, varchar } from "drizzle-orm/pg-core";
+import { boolean, integer, jsonb, numeric, pgEnum, pgTable, text, timestamp, uniqueIndex, uuid, varchar } from "drizzle-orm/pg-core";
+import type { ProductFaq } from "@/lib/product-content";
 
 export const entityStatusEnum = pgEnum("entity_status", ["DRAFT", "PUBLISHED", "ARCHIVED"]);
 export const localeEnum = pgEnum("locale", ["en", "ar"]);
@@ -122,6 +123,8 @@ export const productTranslations = pgTable("product_translations", {
   name: varchar("name", { length: 255 }).notNull(),
   shortDescription: text("short_description"),
   description: text("description"),
+  applications: text("applications"),
+  faqs: jsonb("faqs").$type<ProductFaq[]>().notNull().default([]),
   seoTitle: varchar("seo_title", { length: 255 }),
   seoDescription: text("seo_description"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

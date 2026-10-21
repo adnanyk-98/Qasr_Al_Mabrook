@@ -1,5 +1,5 @@
 import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
-import { blogArticles } from "@/lib/blog";
+import { blogArticles, type BlogArticle } from "@/lib/blog";
 import { getBlogCategoryIds } from "@/lib/blog-category-links";
 
 export const PUBLIC_CACHE_REVALIDATE_SECONDS = 300;
@@ -58,10 +58,11 @@ export function revalidateBlogCategoryLinksAfterMutation<T>(
   mutationResult: T | null | undefined,
   categoryId: string | undefined,
   revalidate: (path: string) => void = revalidatePath,
+  articles: readonly BlogArticle[] = blogArticles,
 ) {
   if (!mutationResult || !categoryId) return;
 
-  for (const article of blogArticles) {
+  for (const article of articles) {
     for (const locale of ["en", "ar"] as const) {
       if (getBlogCategoryIds(article.body[locale]).includes(categoryId)) {
         revalidate(`/${locale}/blog/${article.slug}`);

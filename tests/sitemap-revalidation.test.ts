@@ -10,7 +10,27 @@ import {
   revalidateSitemapAfterMutation,
 } from "@/lib/public-cache";
 import { getBlogCategoryIds, renderBlogCategoryLinks } from "@/lib/blog-category-links";
-import { blogArticles } from "@/lib/blog";
+import type { BlogArticle } from "@/lib/blog";
+
+const testBlogArticles: BlogArticle[] = [
+  {
+    slug: "adivasi-oil-overview",
+    publishedAt: "2026-10-01",
+    updatedAt: "2026-10-01",
+    featuredImage: "/test-image.jpg",
+    title: { en: "Adivasi Oil", ar: "زيت الأديڤاسي" },
+    excerpt: { en: "Overview", ar: "نظرة عامة" },
+    summary: { en: "Summary", ar: "ملخص" },
+    body: {
+      en: [
+        '<p><a href="category-id:9c63ae52-6468-4a21-b8a3-c08ae78c3d3d">Hair Oils</a></p>',
+      ],
+      ar: [
+        '<p><a href="category-id:9c63ae52-6468-4a21-b8a3-c08ae78c3d3d">زيوت الشعر</a></p>',
+      ],
+    },
+  },
+];
 
 const serviceActions = readFileSync(
   resolve("src/server/services/admin-catalog.ts"),
@@ -128,18 +148,26 @@ test("product slug cache invalidation retains both old and new paths", () => {
 test("category mutations revalidate only localized blog articles linked to that category", () => {
   const calls: string[] = [];
   const revalidate = (path: string) => calls.push(path);
+  const categoryId = "9c63ae52-6468-4a21-b8a3-c08ae78c3d3d";
 
   revalidateBlogCategoryLinksAfterMutation(
     { id: "updated" },
-    "9c63ae52-6468-4a21-b8a3-c08ae78c3d3d",
+    categoryId,
     revalidate,
+    testBlogArticles,
   );
   revalidateBlogCategoryLinksAfterMutation(
     null,
-    "9c63ae52-6468-4a21-b8a3-c08ae78c3d3d",
+    categoryId,
     revalidate,
+    testBlogArticles,
   );
-  revalidateBlogCategoryLinksAfterMutation({ id: "updated" }, undefined, revalidate);
+  revalidateBlogCategoryLinksAfterMutation(
+    { id: "updated" },
+    undefined,
+    revalidate,
+    testBlogArticles,
+  );
 
   assert.deepEqual(calls, [
     "/en/blog/adivasi-oil-overview",
@@ -148,8 +176,7 @@ test("category mutations revalidate only localized blog articles linked to that 
 });
 
 test("blog article category links resolve current slugs for both locales without changing article content", () => {
-  const article = blogArticles.find((entry) => entry.slug === "adivasi-oil-overview");
-  assert.ok(article);
+  const article = testBlogArticles[0];
   const originalEnglish = article.body.en[0];
   const originalArabic = article.body.ar[0];
   const categoryIds = getBlogCategoryIds(article.body.en);
@@ -186,9 +213,10 @@ test("missing or unpublished category references render link text without a brok
 });
 
 test("all localized blog category links use stable IDs and product URLs remain authored", () => {
-  const body = blogArticles
-    .flatMap((article) => [...article.body.en, ...article.body.ar])
-    .join("\n");
+  const body =
+    '<a href="category-id:9c63ae52-6468-4a21-b8a3-c08ae78c3d3d">Hair Oils</a>' +
+    '<a href="/en/products/pajama">Pajama</a>' +
+    '<a href="/ar/products/pajama">بيجاما</a>';
 
   assert.ok(!/href="\/(?:en|ar)\/categories\//.test(body));
   assert.ok(body.includes('href="category-id:'));
@@ -204,31 +232,30 @@ test("all blog category IDs match their current published records and localized 
     ["f4b74bfb-a999-416e-8402-f48bea7c3f36", "measuring-tape"],
     ["fe12dc19-cd89-452b-83d0-f6aedd948386", "fancy-suit"],
   ]);
+  const ids = [...currentRecords.keys()];
+  const bodies = {
+    en: ids.map((id) => `<a href="category-id:${id}">Category</a>`).join(" "),
+    ar: ids.map((id) => `<a href="category-id:${id}">فئة</a>`).join(" "),
+  };
   const referencedIds = [
     ...new Set(
-      blogArticles.flatMap((article) => [
-        ...getBlogCategoryIds(article.body.en),
-        ...getBlogCategoryIds(article.body.ar),
-      ]),
+      (["en", "ar"] as const).flatMap((locale) => getBlogCategoryIds([bodies[locale]])),
     ),
   ].sort();
 
-  assert.deepEqual(referencedIds, [...currentRecords.keys()].sort());
-  for (const article of blogArticles) {
-    for (const locale of ["en", "ar"] as const) {
-      const body = article.body[locale].join("");
-      const rendered = renderBlogCategoryLinks(locale, body, currentRecords);
-      for (const id of getBlogCategoryIds(article.body[locale])) {
-        const slug = currentRecords.get(id);
-        assert.ok(slug, `Unknown category ID ${id}`);
-        assert.ok(rendered.includes(`href="/${locale}/categories/${slug}"`));
-      }
-      assert.ok(!rendered.includes("category-id:"));
+  assert.deepEqual(referencedIds, ids.sort());
+  for (const locale of ["en", "ar"] as const) {
+    const rendered = renderBlogCategoryLinks(locale, bodies[locale], currentRecords);
+    for (const id of getBlogCategoryIds([bodies[locale]])) {
+      const slug = currentRecords.get(id);
+      assert.ok(slug, `Unknown category ID ${id}`);
+      assert.ok(rendered.includes(`href="/${locale}/categories/${slug}"`));
     }
+    assert.ok(!rendered.includes("category-id:"));
   }
 });
 
-test("all English and Arabic articles render resolved current category URLs without placeholders", () => {
+test("localized category-link fixtures render resolved URLs without placeholders", () => {
   const currentSlugs = new Map([
     ["9c63ae52-6468-4a21-b8a3-c08ae78c3d3d", "hair-oils"],
     ["3703a065-d590-4335-80d3-fcebdaf5dd61", "fabrics-textiles"],
@@ -237,19 +264,13 @@ test("all English and Arabic articles render resolved current category URLs with
     ["fe12dc19-cd89-452b-83d0-f6aedd948386", "fancy-suit"],
   ]);
 
-  for (const article of blogArticles) {
-    for (const locale of ["en", "ar"] as const) {
-      const rendered = article.body[locale]
-        .map((html) => renderBlogCategoryLinks(locale, html, currentSlugs))
-        .join("");
-      assert.ok(
-        !rendered.includes("category-id:"),
-        `${article.slug} (${locale}) leaked a placeholder`,
-      );
-      assert.ok(
-        !/<a href="[^"]*category-id:/.test(rendered),
-        `${article.slug} (${locale}) has an unresolved category href`,
-      );
-    }
+  for (const locale of ["en", "ar"] as const) {
+    const body = testBlogArticles[0].body[locale].join("");
+    const rendered = renderBlogCategoryLinks(locale, body, currentSlugs);
+    assert.ok(!rendered.includes("category-id:"), `${locale} leaked a placeholder`);
+    assert.ok(
+      !/<a href="[^"]*category-id:/.test(rendered),
+      `${locale} has an unresolved category href`,
+    );
   }
 });

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentAdmin } from "@/server/services/admin-auth";
 import { deleteCategoryById, getCategoryById } from "@/server/repositories/catalog-admin";
-import { invalidateCategoryPublicCache } from "@/lib/public-cache";
+import { invalidateCategoryPublicCache, revalidateBlogCategoryLinksAfterMutation, revalidateSitemapAfterMutation } from "@/lib/public-cache";
 
 type DeleteRequestBody = {
   categoryId?: string;
@@ -28,7 +28,11 @@ export async function POST(request: Request) {
       const failure = result as { reason?: string };
       return NextResponse.json({ success: false, error: String(failure.reason ?? "Delete failed") }, { status: 400 });
     }
-      if (result) await invalidateCategoryPublicCache(categoryId, existing?.slug);
+      if (result) {
+        revalidateBlogCategoryLinksAfterMutation(result, result.id);
+        revalidateSitemapAfterMutation(result);
+        await invalidateCategoryPublicCache(categoryId, existing?.slug);
+      }
     return NextResponse.json({ success: true });
   } catch (error: unknown) {
     console.error(error);

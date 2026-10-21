@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentAdmin } from "@/server/services/admin-auth";
 import { deleteProductById, getProductById } from "@/server/repositories/catalog-admin";
-import { invalidateProductPublicCache } from "@/lib/public-cache";
+import { invalidateProductPublicCache, revalidateSitemapAfterMutation } from "@/lib/public-cache";
 
 type DeleteRequestBody = {
   productId?: string;
@@ -25,6 +25,7 @@ export async function POST(request: Request) {
   try {
     const deleted = await deleteProductById(productId);
     if (!deleted) return NextResponse.json({ success: false, error: "Product not found" }, { status: 404 });
+    revalidateSitemapAfterMutation(deleted);
     await invalidateProductPublicCache(productId, existing?.slug);
     return NextResponse.json({ success: true });
   } catch (error: unknown) {

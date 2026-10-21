@@ -1,4 +1,6 @@
 import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
+import { blogArticles } from "@/lib/blog";
+import { getBlogCategoryIds } from "@/lib/blog-category-links";
 
 export const PUBLIC_CACHE_REVALIDATE_SECONDS = 300;
 
@@ -40,13 +42,40 @@ export async function invalidatePublicTag(tag: string) {
   revalidateTag(tag, "max");
 }
 
-export async function invalidateProductPublicCache(productId: string, slug?: string) {
+export function revalidateSitemapAfterMutation<T>(
+  mutationResult: T | null | undefined,
+  revalidate: (path: string) => void = revalidatePath,
+) {
+  if (mutationResult) revalidate("/sitemap.xml");
+}
+
+export function revalidateBlogCategoryLinksAfterMutation<T>(
+  mutationResult: T | null | undefined,
+  categoryId: string | undefined,
+  revalidate: (path: string) => void = revalidatePath,
+) {
+  if (!mutationResult || !categoryId) return;
+
+  for (const article of blogArticles) {
+    for (const locale of ["en", "ar"] as const) {
+      if (getBlogCategoryIds(article.body[locale]).includes(categoryId)) {
+        revalidate(`/${locale}/blog/${article.slug}`);
+      }
+    }
+  }
+}
+
+export function getProductSlugsForInvalidation(slug?: string, previousSlug?: string) {
+  return [...new Set([slug, previousSlug].filter((value): value is string => Boolean(value)))];
+}
+
+export async function invalidateProductPublicCache(productId: string, slug?: string, previousSlug?: string) {
   revalidateTag(publicCacheTags.products, "max");
   revalidateTag(publicCacheTags.product(productId), "max");
-  if (slug) {
-    revalidateTag(publicCacheTags.productSlug(slug), "max");
-    revalidatePath(`/en/products/${slug}`);
-    revalidatePath(`/ar/products/${slug}`);
+  for (const affectedSlug of getProductSlugsForInvalidation(slug, previousSlug)) {
+    revalidateTag(publicCacheTags.productSlug(affectedSlug), "max");
+    revalidatePath(`/en/products/${affectedSlug}`);
+    revalidatePath(`/ar/products/${affectedSlug}`);
   }
   revalidatePath("/en/products");
   revalidatePath("/ar/products");
@@ -54,14 +83,18 @@ export async function invalidateProductPublicCache(productId: string, slug?: str
   revalidatePath("/ar");
 }
 
-export async function invalidateCategoryPublicCache(categoryId: string, slug?: string) {
+export function getCategorySlugsForInvalidation(slug?: string, previousSlug?: string) {
+  return [...new Set([slug, previousSlug].filter((value): value is string => Boolean(value)))];
+}
+
+export async function invalidateCategoryPublicCache(categoryId: string, slug?: string, previousSlug?: string) {
   revalidateTag(publicCacheTags.categories, "max");
   revalidateTag(publicCacheTags.category(categoryId), "max");
   revalidateTag(publicCacheTags.products, "max");
-  if (slug) {
-    revalidateTag(publicCacheTags.categorySlug(slug), "max");
-    revalidatePath(`/en/categories/${slug}`);
-    revalidatePath(`/ar/categories/${slug}`);
+  for (const affectedSlug of getCategorySlugsForInvalidation(slug, previousSlug)) {
+    revalidateTag(publicCacheTags.categorySlug(affectedSlug), "max");
+    revalidatePath(`/en/categories/${affectedSlug}`);
+    revalidatePath(`/ar/categories/${affectedSlug}`);
   }
   revalidatePath("/en/categories");
   revalidatePath("/ar/categories");

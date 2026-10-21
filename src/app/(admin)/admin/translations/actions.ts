@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 
-import { invalidateCategoryPublicCache, invalidateProductPublicCache } from "@/lib/public-cache";
+import { invalidateCategoryPublicCache, invalidateProductPublicCache, revalidateBlogCategoryLinksAfterMutation, revalidateSitemapAfterMutation } from "@/lib/public-cache";
 import {
   createCategoryTranslation,
   createProductTranslation,
@@ -18,6 +18,7 @@ import {
 } from "@/server/repositories/catalog-admin";
 import { requireAdminSession } from "@/server/services/admin-auth";
 import { siteConfig } from "@/config/site";
+import { parseProductFaqEntries } from "@/lib/product-content";
 
 const idSchema = z.string().uuid();
 const localeSchema = z.enum(["en", "ar"]);
@@ -33,6 +34,8 @@ const productTranslationSchema = z.object({
   name: translationFields.name,
   shortDescription: z.string().max(10000, "Short description must be 10,000 characters or fewer.").optional().default(""),
   description: translationFields.description,
+  applications: z.string().max(10000, "Applications must be 10,000 characters or fewer.").optional().default(""),
+  faqs: z.string().max(25000, "FAQs must be 25,000 characters or fewer.").optional().default(""),
 });
 
 const categoryTranslationSchema = z.object({
@@ -70,6 +73,8 @@ export async function saveProductTranslation(input: unknown): Promise<ActionResu
   if (!parsed.success) return { ok: false, message: validationMessage(parsed.error) };
 
   const values = parsed.data;
+  const faqs = parseProductFaqEntries(values.faqs);
+  if (!faqs) return { ok: false, message: "Enter each FAQ as one line in the format: question :: answer." };
   try {
     if (values.locale === siteConfig.defaultLocale) {
       return { ok: false, message: "Manage the default product translation from the Product Create/Edit form." };
@@ -87,6 +92,8 @@ export async function saveProductTranslation(input: unknown): Promise<ActionResu
         name: values.name,
         shortDescription: values.shortDescription || null,
         description: values.description || null,
+        applications: values.applications.trim() || null,
+        faqs,
       });
     } else {
       translation = await createProductTranslation({
@@ -95,6 +102,8 @@ export async function saveProductTranslation(input: unknown): Promise<ActionResu
           name: values.name,
           shortDescription: values.shortDescription || null,
           description: values.description || null,
+          applications: values.applications.trim() || null,
+          faqs,
         });
     }
 
@@ -104,7 +113,10 @@ export async function saveProductTranslation(input: unknown): Promise<ActionResu
         : { ok: false, message: "A translation for this product and locale already exists. Edit the existing translation instead." };
     }
 
-    await invalidateAfterMutation("save", () => invalidateProductPublicCache(product.id, product.slug));
+    await invalidateAfterMutation("save", async () => {
+      revalidateSitemapAfterMutation(translation);
+      await invalidateProductPublicCache(product.id, product.slug);
+    });
     return { ok: true, message: values.translationId ? "Product translation updated." : "Product translation created." };
   } catch (error) {
     console.error("Failed to save product translation", { productId: values.productId, locale: values.locale, error });
@@ -126,7 +138,10 @@ export async function deleteProductTranslation(input: unknown): Promise<ActionRe
     const deleted = await deleteProductTranslationById(existing.id);
     if (!deleted) return { ok: false, message: "This product translation could not be found." };
     const product = await getProductById(existing.productId);
-    await invalidateAfterMutation("delete", () => invalidateProductPublicCache(existing.productId, product?.slug));
+    await invalidateAfterMutation("delete", async () => {
+      revalidateSitemapAfterMutation(deleted);
+      await invalidateProductPublicCache(existing.productId, product?.slug);
+    });
     return { ok: true, message: "Product translation deleted." };
   } catch (error) {
     console.error("Failed to delete product translation", { translationId: parsed.data.translationId, error });
@@ -168,7 +183,11 @@ export async function saveCategoryTranslation(input: unknown): Promise<ActionRes
     }
 
     if (!translation) return { ok: false, message: "This category translation could not be saved. Refresh the page and try again." };
-    await invalidateAfterMutation("save", () => invalidateCategoryPublicCache(category.id, category.slug));
+    await invalidateAfterMutation("save", async () => {
+      revalidateBlogCategoryLinksAfterMutation(translation, category.id);
+      revalidateSitemapAfterMutation(translation);
+      await invalidateCategoryPublicCache(category.id, category.slug);
+    });
     return { ok: true, message: values.translationId ? "Category translation updated." : "Category translation created." };
   } catch (error) {
     if (!values.translationId && isUniqueViolation(error)) {
@@ -190,7 +209,11 @@ export async function deleteCategoryTranslation(input: unknown): Promise<ActionR
     const deleted = await deleteCategoryTranslationById(existing.id);
     if (!deleted) return { ok: false, message: "This category translation could not be found." };
     const category = await getCategoryById(existing.categoryId);
-    await invalidateAfterMutation("delete", () => invalidateCategoryPublicCache(existing.categoryId, category?.slug));
+    await invalidateAfterMutation("delete", async () => {
+      revalidateBlogCategoryLinksAfterMutation(deleted, existing.categoryId);
+      revalidateSitemapAfterMutation(deleted);
+      await invalidateCategoryPublicCache(existing.categoryId, category?.slug);
+    });
     return { ok: true, message: "Category translation deleted." };
   } catch (error) {
     console.error("Failed to delete category translation", { translationId: parsed.data.translationId, error });

@@ -5,6 +5,7 @@ import { z } from "zod";
 const imageExtensions = new Set([".avif", ".gif", ".jpeg", ".jpg", ".png", ".webp"]);
 const marketingPattern = /(?:web|webbanner|galleryimage|banner|hero|marketing)/i;
 const numberedPattern = /^(.*?)-#(\d+)$/;
+const supportingDirectoryNames = new Set(["brands", "in-store-images", "logo"]);
 
 const manifestSchema = z.object({
   products: z.array(
@@ -242,8 +243,8 @@ export async function discoverCatalogue(source: string): Promise<DiscoveryReport
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)
     .sort((left, right) => left.localeCompare(right));
-  const ignoredDirectories = directories.filter(
-    (directory) => directory.toLowerCase() === "logo",
+  const ignoredDirectories = directories.filter((directory) =>
+    supportingDirectoryNames.has(directory.toLowerCase()),
   );
   const categories = directories.filter(
     (directory) => !ignoredDirectories.includes(directory) && directory.toLowerCase() !== "banner",
@@ -313,9 +314,10 @@ export async function discoverCatalogue(source: string): Promise<DiscoveryReport
       if (unresolved.has(relativePath)) ambiguousImages.push(relativePath);
       else if (!assigned.has(relativePath)) unassignedImages.push(relativePath);
     }
+    const manifestCategories = [...new Set(manifestResult.manifest.products.map((product) => product.category))];
     return {
       source: resolvedSource,
-      categories,
+      categories: manifestCategories,
       products,
       banners,
       ignoredDirectories,
@@ -359,7 +361,7 @@ export async function discoverCatalogue(source: string): Promise<DiscoveryReport
 
   return {
     source: resolvedSource,
-    categories,
+    categories: [...new Set(products.map((product) => product.category))],
     products,
     banners,
     ignoredDirectories,

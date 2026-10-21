@@ -192,15 +192,42 @@ async function listPublishedCategoriesUncached(locale: Locale) {
     ? await db.select().from(categoryTranslations).where(inArray(categoryTranslations.categoryId, categoryIds))
     : [];
 
-  return categoryRows.map((category) => {
-    const candidates = translations.filter((translation) => translation.categoryId === category.id);
-    const translation = candidates.find((candidate) => candidate.locale === locale) ?? candidates.find((candidate) => candidate.locale === "en");
-    return { ...category, name: translation?.name ?? category.slug, description: translation?.description ?? null };
+  return categoryRows.flatMap((category) => {
+    const translation = translations.find((candidate) => candidate.categoryId === category.id && candidate.locale === locale);
+    if (!translation) return [];
+    return [{ ...category, name: translation.name, description: translation.description ?? null }];
   });
 }
 
 export function listPublishedCategories(locale: Locale) {
   return withPublicCache(["public-categories", locale], () => listPublishedCategoriesUncached(locale), { revalidate: PUBLIC_CACHE_REVALIDATE_SECONDS, tags: [publicCacheTags.categories] });
+}
+
+export async function getPublishedCategorySlugsByIds(locale: Locale, categoryIds: readonly string[]) {
+  if (!categoryIds.length) return new Map<string, string>();
+
+  const rows = await db
+    .select({ id: categories.id, slug: categories.slug })
+    .from(categories)
+    .innerJoin(
+      categoryTranslations,
+      and(eq(categoryTranslations.categoryId, categories.id), eq(categoryTranslations.locale, locale)),
+    )
+    .where(and(eq(categories.status, "PUBLISHED"), inArray(categories.id, [...categoryIds])));
+
+  return new Map(rows.map((category) => [category.id, category.slug]));
+}
+
+export function listIndexableCategories(locale: Locale) {
+  return withPublicCache(["indexable-categories", locale], () => db
+    .select({ slug: categories.slug, name: categoryTranslations.name })
+    .from(categories)
+    .innerJoin(categoryTranslations, eq(categoryTranslations.categoryId, categories.id))
+    .where(and(eq(categories.status, "PUBLISHED"), eq(categoryTranslations.locale, locale)))
+    .orderBy(asc(categories.sortOrder), asc(categories.slug)), {
+    revalidate: PUBLIC_CACHE_REVALIDATE_SECONDS,
+    tags: [publicCacheTags.categories],
+  });
 }
 
 async function getCategoryBySlugUncached(locale: Locale, slug: string) {
@@ -325,6 +352,18 @@ export function listPublishedProducts(locale: Locale, options?: { categoryId?: s
   return withPublicCache(["public-products", locale, String(limit)], () => listPublishedProductsUncached(locale, { limit }), { revalidate: PUBLIC_CACHE_REVALIDATE_SECONDS, tags: [publicCacheTags.products] });
 }
 
+export function listIndexableProducts(locale: Locale) {
+  return withPublicCache(["indexable-products", locale], () => db
+    .select({ slug: products.slug, name: productTranslations.name })
+    .from(products)
+    .innerJoin(productTranslations, eq(productTranslations.productId, products.id))
+    .where(and(eq(products.status, "PUBLISHED"), eq(productTranslations.locale, locale)))
+    .orderBy(asc(productTranslations.name), asc(products.slug)), {
+    revalidate: PUBLIC_CACHE_REVALIDATE_SECONDS,
+    tags: [publicCacheTags.products],
+  });
+}
+
 async function getProductBySlugUncached(locale: Locale, slug: string) {
   const row = await db
     .select({
@@ -354,6 +393,8 @@ async function getProductBySlugUncached(locale: Locale, slug: string) {
       name: result.translation.name,
       shortDescription: result.translation.shortDescription ?? null,
       description: result.translation.description ?? null,
+      applications: result.translation.applications ?? null,
+      faqs: result.translation.faqs ?? [],
       seoTitle: result.translation.seoTitle ?? null,
       seoDescription: result.translation.seoDescription ?? null,
       brandName,
@@ -384,6 +425,8 @@ async function getProductBySlugUncached(locale: Locale, slug: string) {
     name: fallbackResult.translation.name,
     shortDescription: fallbackResult.translation.shortDescription ?? null,
     description: fallbackResult.translation.description ?? null,
+    applications: fallbackResult.translation.applications ?? null,
+    faqs: fallbackResult.translation.faqs ?? [],
     seoTitle: fallbackResult.translation.seoTitle ?? null,
     seoDescription: fallbackResult.translation.seoDescription ?? null,
     brandName: fallbackResult.brand?.name ?? null,
@@ -502,7 +545,8 @@ async function listRelatedProductsUncached(locale: Locale, currentProductId: str
     .innerJoin(products, eq(productCategories.productId, products.id))
     .leftJoin(productTranslations, and(eq(productTranslations.productId, products.id), eq(productTranslations.locale, locale)))
     .where(and(eq(products.status, "PUBLISHED"), inArray(productCategories.categoryId, uniqueCategoryIds)))
-    .orderBy(desc(products.createdAt), asc(products.id));
+    .orderBy(desc(products.createdAt), asc(products.id))
+    .limit(4);
 
   const seen = new Set<string>();
   const eligible = rows.filter(({ product, categoryId }) => {
@@ -670,11 +714,12 @@ export async function listProductCategoriesForProduct(productId: string, locale:
   const rows = await db
     .select({
       category: categories,
+      isPrimary: productCategories.isPrimary,
     })
     .from(productCategories)
     .innerJoin(categories, eq(productCategories.categoryId, categories.id))
     .where(and(eq(productCategories.productId, productId), eq(categories.status, "PUBLISHED")))
-    .orderBy(asc(categories.sortOrder));
+    .orderBy(desc(productCategories.isPrimary), asc(categories.sortOrder));
   const categoryIds = rows.map(({ category }) => category.id);
   const translations = categoryIds.length
     ? await db.select().from(categoryTranslations).where(inArray(categoryTranslations.categoryId, categoryIds))

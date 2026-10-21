@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Input, Label, Select, Textarea } from "@/components/ui/form";
 import AdminConfirmModal from "@/components/admin/admin-confirm-modal";
+import { formatProductFaqEntries, type ProductFaq } from "@/lib/product-content";
 import {
   deleteCategoryTranslation,
   deleteProductTranslation,
@@ -23,6 +24,8 @@ type ProductTranslation = {
   name: string;
   shortDescription: string | null;
   description: string | null;
+  applications: string | null;
+  faqs: ProductFaq[];
 };
 type CategoryTranslation = {
   id: string;
@@ -78,6 +81,8 @@ export function TranslationManager({
         name: String(values.get("name") ?? ""),
         shortDescription: String(values.get("shortDescription") ?? ""),
         description: String(values.get("description") ?? ""),
+        applications: String(values.get("applications") ?? ""),
+        faqs: String(values.get("faqs") ?? ""),
       });
       setProductFeedback({ kind: result.ok ? "success" : "error", message: result.message });
       if (result.ok) {
@@ -167,6 +172,15 @@ export function TranslationManager({
               <div>
                 <Label htmlFor="product-translation-description">Description</Label>
                 <Textarea id="product-translation-description" name="description" placeholder="Long description" rows={4} defaultValue={productEdit?.description ?? ""} />
+              </div>
+              <div>
+                <Label htmlFor="product-translation-applications">Applications / use cases (optional)</Label>
+                <Textarea id="product-translation-applications" name="applications" placeholder="One application per line" rows={3} defaultValue={productEdit?.applications ?? ""} />
+              </div>
+              <div>
+                <Label htmlFor="product-translation-faqs">FAQs (optional)</Label>
+                <Textarea id="product-translation-faqs" name="faqs" placeholder="One per line: question :: answer" rows={4} defaultValue={formatProductFaqEntries(productEdit?.faqs)} />
+                <p className="mt-1 text-xs text-[var(--text-muted)]">Enter each question and answer on a separate line using “question :: answer”.</p>
               </div>
               <div className="flex flex-wrap gap-3">
                 <Button type="submit" disabled={pending}>{pending ? "Saving…" : productEdit ? "Save" : "Save product translation"}</Button>

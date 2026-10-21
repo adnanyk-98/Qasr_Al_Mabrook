@@ -8,6 +8,7 @@ import { Input, Label, Select, Textarea } from "@/components/ui/form";
 import { ProductImageField } from "@/components/admin/product-image-field";
 import type { ProductActionState } from "@/server/services/admin-catalog";
 import { upsertProductAction } from "./actions";
+import { formatProductFaqEntries, type ProductFaq } from "@/lib/product-content";
 
 type ProductFormValues = {
   id?: string;
@@ -21,6 +22,8 @@ type ProductTranslationValues = {
   name: string;
   shortDescription: string | null;
   description: string | null;
+  applications: string | null;
+  faqs: ProductFaq[];
 };
 
 type ImageValues = { id: string; publicUrl: string; objectKey: string; width: number | null; height: number | null; isPrimary: boolean };
@@ -75,6 +78,18 @@ export function ProductForm({
         <Label htmlFor="productDescription">Long description ({defaultLocale})</Label>
         <Textarea id="productDescription" name="description" placeholder="Long product description" rows={6} required maxLength={50000} defaultValue={translation?.description ?? ""} aria-invalid={Boolean(errorFor("description"))} />
         {errorFor("description") ? <p className="mt-1 text-sm text-red-700">{errorFor("description")}</p> : null}
+      </div>
+
+      <div>
+        <Label htmlFor="productApplications">Applications / use cases ({defaultLocale}, optional)</Label>
+        <Textarea id="productApplications" name="applications" placeholder="One application per line" rows={3} maxLength={10000} defaultValue={translation?.applications ?? ""} />
+      </div>
+
+      <div>
+        <Label htmlFor="productFaqs">FAQs ({defaultLocale}, optional)</Label>
+        <Textarea id="productFaqs" name="faqs" placeholder={"One per line: question :: answer"} rows={4} maxLength={25000} defaultValue={formatProductFaqEntries(translation?.faqs)} aria-invalid={Boolean(errorFor("faqs"))} />
+        {errorFor("faqs") ? <p className="mt-1 text-sm text-red-700">{errorFor("faqs")}</p> : null}
+        <p className="mt-1 text-xs text-[var(--text-muted)]">Enter each question and answer on a separate line using “question :: answer”.</p>
       </div>
 
       <div>

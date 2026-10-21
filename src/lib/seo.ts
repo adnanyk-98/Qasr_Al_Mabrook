@@ -216,10 +216,11 @@ export interface CreateProductMetadataOptions extends CreateMetadataOptions {
 }
 
 export function createProductMetadata(options: CreateProductMetadataOptions): Metadata {
-  const { productName, categoryName, seoTitle, shortDescription, fullDescription, productImage, productImageAlt, ...rest } = options;
+  const { productName, categoryName, seoTitle, seoDescription, shortDescription, fullDescription, productImage, productImageAlt, ...rest } = options;
 
   const title = normalizeSeoText(seoTitle) || buildProductSeoTitle(productName, categoryName);
   const description =
+    normalizeSeoText(seoDescription) ||
     normalizeSeoText(fullDescription) ||
     normalizeSeoText(shortDescription) ||
     buildProductSeoDescription(productName, shortDescription, categoryName);
@@ -245,10 +246,19 @@ export interface CreateCategoryMetadataOptions extends CreateMetadataOptions {
 }
 
 export function createCategoryMetadata(options: CreateCategoryMetadataOptions): Metadata {
-  const { categoryName, description: categoryDescription, productNames = [], ...rest } = options;
+  const {
+    categoryName,
+    seoTitle,
+    seoDescription,
+    description: categoryDescription,
+    productNames = [],
+    ...rest
+  } = options;
 
-  const title = buildCategorySeoTitle(categoryName);
-  const description = buildCategorySeoDescription(categoryName, categoryDescription, productNames, rest.locale);
+  const title = normalizeSeoText(seoTitle) || buildCategorySeoTitle(categoryName);
+  const description =
+    normalizeSeoText(seoDescription) ||
+    buildCategorySeoDescription(categoryName, categoryDescription, productNames, rest.locale);
 
   return createPublicPageMetadata({
     ...rest,

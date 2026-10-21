@@ -40,8 +40,17 @@ export async function Footer({ locale = "en" }: { locale?: Locale }) {
             <li><Link href={localePath(locale, "/")} className="hover:text-[var(--brand-primary)]">{common("home")}</Link></li>
             <li><Link href={localePath(locale, "/products")} className="hover:text-[var(--brand-primary)]">{common("products")}</Link></li>
             <li><Link href={localePath(locale, "/blog")} className="hover:text-[var(--brand-primary)]">{common("blog")}</Link></li>
+            <li><Link href={localePath(locale, "/about-us")} className="hover:text-[var(--brand-primary)]">{common("aboutUs")}</Link></li>
+            <li><Link href={localePath(locale, "/contact-us")} className="hover:text-[var(--brand-primary)]">{common("contact")}</Link></li>
+            <li><Link href={localePath(locale, "/sitemap")} className="hover:text-[var(--brand-primary)]">{common("htmlSitemap")}</Link></li>
             <li><Link href={localePath(locale, "/store-locator")} className="hover:text-[var(--brand-primary)]">{common("storeLocator")}</Link></li>
           </ul>
+          <div className="mt-5 border-t border-[var(--brand-border)] pt-4">
+            <h3 className="text-sm font-semibold text-[var(--foreground)]">{common("browseCategories")}</h3>
+            <Link href={localePath(locale, "/categories")} className="mt-2 inline-block text-sm text-[var(--text-muted)] hover:text-[var(--brand-primary)]">
+              {common("categories")}
+            </Link>
+          </div>
         </div>
 
         <div>

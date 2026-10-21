@@ -278,6 +278,8 @@ export async function saveProductWithDefaultTranslation(input: {
   name: string;
   shortDescription: string;
   description: string;
+  applications?: string | null;
+  faqs?: Array<{ question: string; answer: string }>;
   categoryId?: string | null;
   isPrimaryCategory?: boolean;
 }) {
@@ -306,12 +308,12 @@ export async function saveProductWithDefaultTranslation(input: {
     const translation = translations[0]
       ? (await transaction
           .update(productTranslations)
-          .set({ name: input.name, shortDescription: input.shortDescription, description: input.description, updatedAt: new Date() })
+          .set({ name: input.name, shortDescription: input.shortDescription, description: input.description, applications: input.applications ?? null, faqs: input.faqs ?? [], updatedAt: new Date() })
           .where(eq(productTranslations.id, translations[0].id))
           .returning())[0]
       : (await transaction
           .insert(productTranslations)
-          .values({ productId: product.id, locale: input.locale, name: input.name, shortDescription: input.shortDescription, description: input.description })
+          .values({ productId: product.id, locale: input.locale, name: input.name, shortDescription: input.shortDescription, description: input.description, applications: input.applications ?? null, faqs: input.faqs ?? [] })
           .returning())[0];
     if (!translation) throw new Error("Product default translation could not be saved.");
 
@@ -350,7 +352,7 @@ export async function listProductTranslationsForProduct(productId: string) {
   return db.select().from(productTranslations).where(eq(productTranslations.productId, productId)).orderBy(asc(productTranslations.locale));
 }
 
-export async function createProductTranslation(input: { productId: string; locale: "en" | "ar"; name: string; shortDescription?: string | null; description?: string | null; seoTitle?: string | null; seoDescription?: string | null }) {
+export async function createProductTranslation(input: { productId: string; locale: "en" | "ar"; name: string; shortDescription?: string | null; description?: string | null; applications?: string | null; faqs?: Array<{ question: string; answer: string }>; seoTitle?: string | null; seoDescription?: string | null }) {
   return db.transaction(async (transaction) => {
     const lockKey = `product-translation:${input.productId}:${input.locale}`;
     await transaction.execute(sql`select pg_advisory_xact_lock(hashtextextended(${lockKey}, 0))`);
@@ -369,6 +371,8 @@ export async function createProductTranslation(input: { productId: string; local
         name: input.name,
         shortDescription: input.shortDescription ?? null,
         description: input.description ?? null,
+        applications: input.applications ?? null,
+        faqs: input.faqs ?? [],
         seoTitle: input.seoTitle ?? null,
         seoDescription: input.seoDescription ?? null,
       })
@@ -383,10 +387,10 @@ export async function getProductTranslationById(id: string) {
   return rows[0] ?? null;
 }
 
-export async function updateProductTranslationById(id: string, input: { name: string; shortDescription?: string | null; description?: string | null }) {
+export async function updateProductTranslationById(id: string, input: { name: string; shortDescription?: string | null; description?: string | null; applications?: string | null; faqs?: Array<{ question: string; answer: string }> }) {
   const rows = await db
     .update(productTranslations)
-    .set({ name: input.name, shortDescription: input.shortDescription ?? null, description: input.description ?? null, updatedAt: new Date() })
+    .set({ name: input.name, shortDescription: input.shortDescription ?? null, description: input.description ?? null, applications: input.applications ?? null, faqs: input.faqs ?? [], updatedAt: new Date() })
     .where(eq(productTranslations.id, id))
     .returning();
   return rows[0] ?? null;

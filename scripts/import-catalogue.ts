@@ -29,10 +29,10 @@ async function main() {
   console.log(
     `MANIFEST: ${report.manifestUsed ? "used" : "not present; deterministic filename parsing used"}`,
   );
-  console.log(`CATEGORIES (${report.categories.length}):`);
+  console.log(`CATEGORIES (${plan.categories.length}):`);
   for (const category of plan.categories)
     console.log(
-      `- UPSERT ${category.name} [slug=${category.slug}, status=${plan.status}]`,
+      `- RESOLVE ${category.sourceName} [categoryId=${category.categoryId}]`,
     );
   console.log(`PRODUCTS (${report.products.length}):`);
   for (const product of report.products) {

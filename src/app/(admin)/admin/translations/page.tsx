@@ -33,7 +33,7 @@ export default async function TranslationsPage() {
           products={products.map(({ id, slug }) => ({ id, slug }))}
           categories={categories.map(({ id, slug }) => ({ id, slug }))}
           defaultLocale={siteConfig.defaultLocale}
-          productTranslations={productTranslations.map(({ id, productId, locale, name, shortDescription, description }) => ({ id, productId, locale, name, shortDescription, description }))}
+          productTranslations={productTranslations.map(({ id, productId, locale, name, shortDescription, description, applications, faqs }) => ({ id, productId, locale, name, shortDescription, description, applications, faqs }))}
           categoryTranslations={categoryTranslations.map(({ id, categoryId, locale, name, shortDescription, description }) => ({ id, categoryId, locale, name, shortDescription, description }))}
         />
 

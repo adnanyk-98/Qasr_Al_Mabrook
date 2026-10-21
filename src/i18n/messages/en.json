@@ -5,6 +5,10 @@
     "products": "Products",
     "blog": "Blog",
     "categories": "Categories",
+    "browseCategories": "Browse categories",
+    "browseCategoryNamed": "Browse {categoryName}",
+    "aboutUs": "About Us",
+    "htmlSitemap": "Site map",
     "search": "Search",
     "contact": "Contact",
     "storeLocator": "Store Locator",
@@ -220,5 +224,10 @@
     "blogDescription": "Explore practical catalogue guidance, product discovery tips, and shopping insights for everyday buying decisions.",
     "requestQuoteTitle": "Request a quote",
     "contactTitle": "Contact us"
+  },
+  "sitemap": {
+    "title": "Site map",
+    "description": "Browse public pages, product categories, and products in the Qasr Al Mabrook catalogue.",
+    "pagesHeading": "Pages"
   }
 }

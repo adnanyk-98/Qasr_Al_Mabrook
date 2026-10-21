@@ -31,8 +31,9 @@ import {
 import { getProductById, updateCategory, getCategoryById, setCategoryImage } from "@/server/repositories/catalog-admin";
 import { requireAdminSession } from "@/server/services/admin-auth";
 import { siteConfig } from "@/config/site";
+import { parseProductFaqEntries } from "@/lib/product-content";
 import { resolvePrimaryProductImageId } from "@/lib/product-image-primary";
-import { invalidateBrandPublicCache, invalidateCategoryPublicCache, invalidateHomepagePublicCache, invalidateProductPublicCache } from "@/lib/public-cache";
+import { invalidateBrandPublicCache, invalidateCategoryPublicCache, invalidateHomepagePublicCache, invalidateProductPublicCache, revalidateBlogCategoryLinksAfterMutation, revalidateSitemapAfterMutation } from "@/lib/public-cache";
 
 const idSchema = z.string().uuid();
 const localeSchema = z.enum(["en", "ar"]);
@@ -75,11 +76,11 @@ export async function upsertCategoryAction(formData: FormData) {
   const parsedStatus = statusSchema.parse(String(formData.get("status") ?? "DRAFT"));
 
   if (categoryId) {
+    const existingCategory = await getCategoryById(categoryId);
     // preserve ARCHIVED status if admin didn't intentionally change it (form defaults to DRAFT)
     let statusToUse = parsedStatus;
     if (parsedStatus === "DRAFT") {
-      const existing = await getCategoryById(categoryId);
-      if (existing?.status === "ARCHIVED") {
+      if (existingCategory?.status === "ARCHIVED") {
         statusToUse = "ARCHIVED";
       }
     }
@@ -91,6 +92,8 @@ export async function upsertCategoryAction(formData: FormData) {
       status: statusToUse,
       sortOrder: sortOrderSchema.parse(formData.get("sortOrder") ?? 0),
     });
+    revalidateBlogCategoryLinksAfterMutation(updatedCategory, updatedCategory?.id);
+    revalidateSitemapAfterMutation(updatedCategory);
     // attempt to attach image metadata when provided
     const providedImageUrl = String(formData.get("imageUrl") ?? "").trim();
     if (providedImageUrl) {
@@ -101,7 +104,7 @@ export async function upsertCategoryAction(formData: FormData) {
         await setCategoryImage({ categoryId, objectKey, publicUrl: providedImageUrl, width, height });
       }
     }
-    if (updatedCategory) await invalidateCategoryPublicCache(updatedCategory.id, updatedCategory.slug);
+    if (updatedCategory) await invalidateCategoryPublicCache(updatedCategory.id, updatedCategory.slug, existingCategory?.slug);
   } else {
     const created = await createCategory({
       slug,
@@ -109,6 +112,8 @@ export async function upsertCategoryAction(formData: FormData) {
       status: parsedStatus,
       sortOrder: sortOrderSchema.parse(formData.get("sortOrder") ?? 0),
     });
+    revalidateBlogCategoryLinksAfterMutation(created, created?.id);
+    revalidateSitemapAfterMutation(created);
 
     const providedImageUrl = String(formData.get("imageUrl") ?? "").trim();
     if (providedImageUrl && created?.id) {
@@ -207,6 +212,8 @@ const productFormSchema = z.object({
   name: z.string().trim().min(1, "Product name is required.").max(255, "Product name must be 255 characters or fewer."),
   shortDescription: z.string().trim().min(1, "Short description is required.").max(10000, "Short description must be 10,000 characters or fewer."),
   description: z.string().trim().min(1, "Long description is required.").max(50000, "Long description must be 50,000 characters or fewer."),
+  applications: z.string().max(10000, "Applications must be 10,000 characters or fewer.").optional().default(""),
+  faqs: z.string().max(25000, "FAQs must be 25,000 characters or fewer.").optional().default(""),
   slug: z.string().trim().max(255, "Slug must be 255 characters or fewer.").optional().default(""),
   brandId: z.string().uuid().optional().or(z.literal("")),
   defaultSku: z.string().trim().max(255, "SKU must be 255 characters or fewer.").optional().default(""),
@@ -222,6 +229,8 @@ export async function upsertProductAction(formData: FormData): Promise<ProductAc
     name: String(formData.get("name") ?? ""),
     shortDescription: String(formData.get("shortDescription") ?? ""),
     description: String(formData.get("description") ?? ""),
+    applications: String(formData.get("applications") ?? ""),
+    faqs: String(formData.get("faqs") ?? ""),
     slug: String(formData.get("slug") ?? ""),
     brandId: String(formData.get("brandId") ?? ""),
     defaultSku: String(formData.get("defaultSku") ?? ""),
@@ -238,6 +247,10 @@ export async function upsertProductAction(formData: FormData): Promise<ProductAc
   }
 
   const values = parsed.data;
+  const faqs = parseProductFaqEntries(values.faqs);
+  if (!faqs) {
+    return { status: "error", message: "Enter each FAQ as one line in the format: question :: answer." };
+  }
   const productId = values.productId || undefined;
   const slug = slugify(values.slug) || slugify(values.name);
   const existingProduct = productId ? await getProductById(productId) : null;
@@ -260,6 +273,8 @@ export async function upsertProductAction(formData: FormData): Promise<ProductAc
       name: values.name,
       shortDescription: values.shortDescription,
       description: values.description,
+      applications: values.applications.trim() || null,
+      faqs,
       categoryId: values.categoryId || null,
       isPrimaryCategory: values.isPrimaryCategory,
     });
@@ -270,6 +285,11 @@ export async function upsertProductAction(formData: FormData): Promise<ProductAc
   if (!saved) return { status: "error", message: "The product could not be saved. Refresh the page and try again." };
 
   const createdOrUpdatedProductId = saved.product.id;
+  try {
+    revalidateSitemapAfterMutation(saved);
+  } catch (error) {
+    console.error("Product saved but XML sitemap revalidation failed", { productId: createdOrUpdatedProductId, error });
+  }
 
   // If client uploaded an image to R2, create a product_images row and mark it primary
   // Support multiple uploaded images. Client includes repeated fields: imageUrl, objectKey, width, height
@@ -341,7 +361,7 @@ export async function upsertProductAction(formData: FormData): Promise<ProductAc
   }
 
   try {
-    await invalidateProductPublicCache(createdOrUpdatedProductId, slug);
+    await invalidateProductPublicCache(createdOrUpdatedProductId, slug, existingProduct?.slug);
   } catch (error) {
     console.error("Product saved but public cache invalidation failed", { productId: createdOrUpdatedProductId, slug, error });
   }
@@ -369,7 +389,10 @@ export async function upsertProductTranslationAction(formData: FormData) {
     seoTitle: String(formData.get("seoTitle") ?? "") || null,
     seoDescription: String(formData.get("seoDescription") ?? "") || null,
   });
-  if (createdTranslation) await invalidateProductPublicCache(productId);
+  if (createdTranslation) {
+    revalidateSitemapAfterMutation(createdTranslation);
+    await invalidateProductPublicCache(productId);
+  }
 
   redirect("/admin/translations");
 }
@@ -491,6 +514,8 @@ export async function upsertCategoryTranslationAction(formData: FormData) {
   };
   const updatedTranslation = await upsertCategoryTranslation(input);
   if (updatedTranslation) {
+    revalidateBlogCategoryLinksAfterMutation(updatedTranslation, categoryId);
+    revalidateSitemapAfterMutation(updatedTranslation);
     const category = await getCategoryById(categoryId);
     if (category) await invalidateCategoryPublicCache(category.id, category.slug);
   }

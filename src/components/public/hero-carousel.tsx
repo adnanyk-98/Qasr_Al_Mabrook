@@ -471,6 +471,7 @@ export function HeroCarousel({
                             className="h-full w-full object-contain object-center"
                             fill
                             sizes="(max-width: 767px) 100vw, 100vw"
+                            loading={index === 1 ? "eager" : "lazy"}
                             unoptimized
                           />
                         </picture>
@@ -489,6 +490,7 @@ export function HeroCarousel({
                             className="h-full w-full object-contain object-center"
                             fill
                             sizes="(max-width: 767px) 100vw, 100vw"
+                            loading={index === 1 ? "eager" : "lazy"}
                             unoptimized
                           />
                         </picture>

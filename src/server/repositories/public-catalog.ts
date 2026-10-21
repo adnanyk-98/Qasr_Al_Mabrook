@@ -3,6 +3,12 @@ import { and, asc, desc, eq, exists, ilike, inArray, or, sql } from "drizzle-orm
 import { db } from "@/db";
 import { type Locale } from "@/lib/locales";
 import {
+  mapAutocompleteRows,
+  mapProductCategoriesForLocale,
+  mapPublishedBrands,
+  mapPublishedCategories,
+} from "@/lib/public-catalog-mapping";
+import {
   PUBLIC_CACHE_REVALIDATE_SECONDS,
   publicCacheTags,
   withPublicCache,
@@ -52,19 +58,7 @@ async function getPublishedBrandsUncached(locale: Locale) {
         .where(inArray(brandTranslations.brandId, brandIds))
     : [];
 
-  return publishedBrands.map((brand) => {
-    const candidates = translations.filter(
-      (translation) => translation.brandId === brand.id,
-    );
-    const translation =
-      candidates.find((candidate) => candidate.locale === locale) ??
-      candidates.find((candidate) => candidate.locale === "en");
-    return {
-      id: brand.id,
-      name: translation?.name ?? brand.baseName,
-      logoUrl: brand.logoUrl,
-    };
-  });
+  return mapPublishedBrands(publishedBrands, translations, locale);
 }
 
 export function getPublishedBrands(locale: Locale) {
@@ -292,20 +286,7 @@ async function listPublishedCategoriesUncached(locale: Locale) {
         .where(inArray(categoryTranslations.categoryId, categoryIds))
     : [];
 
-  return categoryRows.flatMap((category) => {
-    const translation = translations.find(
-      (candidate) =>
-        candidate.categoryId === category.id && candidate.locale === locale,
-    );
-    if (!translation) return [];
-    return [
-      {
-        ...category,
-        name: translation.name,
-        description: translation.description ?? null,
-      },
-    ];
-  });
+  return mapPublishedCategories(categoryRows, translations, locale);
 }
 
 export function listPublishedCategories(locale: Locale) {
@@ -1056,26 +1037,7 @@ export async function searchPublishedProductsAutocomplete(
     .orderBy(desc(products.createdAt), asc(products.id))
     .limit(Math.max(1, Math.min(12, limit)));
 
-  const seen = new Set<string>();
-
-  return rows.flatMap((row) => {
-    if (seen.has(row.productId)) return [];
-    seen.add(row.productId);
-    return [
-      {
-        id: row.productId,
-        slug: row.slug,
-        name: row.productName ?? row.slug,
-        categoryName: row.categoryName ?? row.categorySlug ?? null,
-        sku: row.sku,
-        imageUrl: row.primaryImageUrl,
-        imageAlt:
-          locale === "ar"
-            ? (row.primaryImageAltAr ?? row.primaryImageAltEn)
-            : (row.primaryImageAltEn ?? row.primaryImageAltAr),
-      },
-    ];
-  });
+  return mapAutocompleteRows(rows, locale);
 }
 
 export async function getPublishedProductsAutocompleteIndex(locale: Locale) {
@@ -1197,15 +1159,7 @@ export async function listProductCategoriesForProduct(
         .where(inArray(categoryTranslations.categoryId, categoryIds))
     : [];
 
-  return rows.map(({ category }) => {
-    const candidates = translations.filter(
-      (translation) => translation.categoryId === category.id,
-    );
-    const translation =
-      candidates.find((candidate) => candidate.locale === locale) ??
-      candidates.find((candidate) => candidate.locale === "en");
-    return { category, translation: translation ?? null };
-  });
+  return mapProductCategoriesForLocale(rows, translations, locale);
 }
 
 async function listFilterableAttributesUncached(locale: Locale) {

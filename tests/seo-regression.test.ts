@@ -1,28 +1,44 @@
 import assert from "node:assert/strict";
-import { after, test } from "node:test";
+import { test } from "node:test";
 
-import { eq } from "drizzle-orm";
-import { db } from "@/db";
-import { categories, categoryTranslations, productTranslations, products } from "@/db/schema";
 import { PRODUCTION_SITE_URL, resolveSiteUrl } from "@/config/site";
-import { getBaseUrl, buildCanonical, buildAlternates, buildCategorySeoDescription, buildProductSeoTitle, createFaqStructuredData, createOrganizationStructuredData, createPublicPageMetadata, createProductMetadata, createProductStructuredData, createBreadcrumbStructuredData, shouldNoindexFilteredView, shouldNoindexStateQuery } from "@/lib/seo";
+import {
+  getBaseUrl,
+  buildCanonical,
+  buildAlternates,
+  buildCategorySeoDescription,
+  buildProductSeoTitle,
+  createFaqStructuredData,
+  createOrganizationStructuredData,
+  createPublicPageMetadata,
+  createProductMetadata,
+  createProductStructuredData,
+  createBreadcrumbStructuredData,
+  shouldNoindexFilteredView,
+  shouldNoindexStateQuery,
+} from "@/lib/seo";
 import { getAlternateLocale, localePath } from "@/lib/locales";
-import { getCategoryBySlug, listPublishedCategories } from "@/server/repositories/public-catalog";
+import { mapPublishedCategories } from "@/lib/public-catalog-mapping";
 import arMessages from "@/i18n/messages/ar.json";
 import enMessages from "@/i18n/messages/en.json";
 import robots from "@/app/robots";
-import sitemap from "@/app/sitemap";
+import { buildSitemapEntries } from "@/app/sitemap";
 
 const baseUrl = getBaseUrl();
 
 test("production SEO origin stays canonical if the build-time URL is misconfigured", () => {
-  assert.equal(resolveSiteUrl("production", "http://localhost:3000"), PRODUCTION_SITE_URL);
-  assert.equal(resolveSiteUrl("production", "https://preview.example.com"), PRODUCTION_SITE_URL);
-  assert.equal(resolveSiteUrl("development", "http://localhost:3000"), "http://localhost:3000");
-});
-
-after(async () => {
-  await (db as typeof db & { $client: { end: () => Promise<void> } }).$client.end();
+  assert.equal(
+    resolveSiteUrl("production", "http://localhost:3000"),
+    PRODUCTION_SITE_URL,
+  );
+  assert.equal(
+    resolveSiteUrl("production", "https://preview.example.com"),
+    PRODUCTION_SITE_URL,
+  );
+  assert.equal(
+    resolveSiteUrl("development", "http://localhost:3000"),
+    "http://localhost:3000",
+  );
 });
 
 test("English homepage metadata uses the configured site origin and locale alternates", () => {
@@ -84,14 +100,23 @@ test("product metadata keeps the product identity and omits fabricated pricing o
 
   const ogImages = metadata.openGraph?.images;
   const firstOgImage = Array.isArray(ogImages) ? ogImages[0] : ogImages;
-  const ogImageUrl = typeof firstOgImage === "object" && firstOgImage !== null && "url" in firstOgImage ? firstOgImage.url : undefined;
+  const ogImageUrl =
+    typeof firstOgImage === "object" && firstOgImage !== null && "url" in firstOgImage
+      ? firstOgImage.url
+      : undefined;
 
   assert.equal(metadata.title, "Sample Product | Qasr Al Mabrook");
-  assert.equal(metadata.description, "Long description.");
+  assert.equal(metadata.description, "A premium product description.");
   assert.equal(ogImageUrl, "https://cdn.example.com/product.jpg");
   assert.equal(metadata.alternates?.canonical, `${baseUrl}/en/products/sample-product`);
-  assert.equal(metadata.alternates?.languages?.en, `${baseUrl}/en/products/sample-product`);
-  assert.equal(metadata.alternates?.languages?.ar, `${baseUrl}/ar/products/sample-product`);
+  assert.equal(
+    metadata.alternates?.languages?.en,
+    `${baseUrl}/en/products/sample-product`,
+  );
+  assert.equal(
+    metadata.alternates?.languages?.ar,
+    `${baseUrl}/ar/products/sample-product`,
+  );
 
   const json = createProductStructuredData({
     id: "product-123",
@@ -129,10 +154,20 @@ test("Open Graph image dimensions are emitted only when the source dimensions ar
     title: "Sample Category",
     ogImage: "https://cdn.example.com/category.jpg",
   });
-  const withImage = Array.isArray(withDimensions.openGraph?.images) ? withDimensions.openGraph.images[0] : withDimensions.openGraph?.images;
-  const withoutImage = Array.isArray(withoutDimensions.openGraph?.images) ? withoutDimensions.openGraph.images[0] : withoutDimensions.openGraph?.images;
+  const withImage = Array.isArray(withDimensions.openGraph?.images)
+    ? withDimensions.openGraph.images[0]
+    : withDimensions.openGraph?.images;
+  const withoutImage = Array.isArray(withoutDimensions.openGraph?.images)
+    ? withoutDimensions.openGraph.images[0]
+    : withoutDimensions.openGraph?.images;
   const getDimensions = (image: typeof withImage) => {
-    if (typeof image !== "object" || image === null || !("width" in image) || !("height" in image)) return undefined;
+    if (
+      typeof image !== "object" ||
+      image === null ||
+      !("width" in image) ||
+      !("height" in image)
+    )
+      return undefined;
     return { width: image.width, height: image.height };
   };
 
@@ -170,8 +205,25 @@ test("robots.txt allows public catalogue pages and blocks admin and API paths", 
   assert.equal(rules.sitemap, `${baseUrl}/sitemap.xml`);
 });
 
-test("sitemap contains public canonical URLs and excludes admin, API, and query variants", async () => {
-  const entries = await sitemap();
+test("sitemap contains public canonical URLs and excludes admin, API, and query variants", () => {
+  const updatedAt = new Date("2026-10-20T12:00:00.000Z");
+  const categories = [{ id: "gloves", slug: "gloves", updatedAt }];
+  const categoryTranslations = [
+    { categoryId: "gloves", locale: "en" as const },
+    { categoryId: "gloves", locale: "ar" as const },
+  ];
+  const products = [{ id: "dpl-gloves", slug: "dpl-gloves", updatedAt }];
+  const productTranslations = [
+    { productId: "dpl-gloves", locale: "en" as const },
+    { productId: "dpl-gloves", locale: "ar" as const },
+  ];
+  const entries = buildSitemapEntries({
+    categories,
+    categoryTranslations,
+    products,
+    productTranslations,
+    contactUpdatedAt: updatedAt,
+  });
   const urls = entries.map((entry) => entry.url);
 
   assert.ok(urls.every((url) => url.startsWith(baseUrl)));
@@ -185,31 +237,39 @@ test("sitemap contains public canonical URLs and excludes admin, API, and query 
   assert.ok(urls.some((url) => url === `${baseUrl}/ar/blog`));
   assert.ok(!urls.some((url) => url.endsWith("/sitemap")));
   assert.ok(!urls.some((url) => url.endsWith("/contact-us")));
-  assert.ok(urls.some((url) => url.includes("/en/products/")) || urls.some((url) => url.includes("/ar/products/")));
-  assert.ok(urls.some((url) => url.includes("/en/categories/")) || urls.some((url) => url.includes("/ar/categories/")));
+  assert.ok(
+    urls.some((url) => url.includes("/en/products/")) ||
+      urls.some((url) => url.includes("/ar/products/")),
+  );
+  assert.ok(
+    urls.some((url) => url.includes("/en/categories/")) ||
+      urls.some((url) => url.includes("/ar/categories/")),
+  );
   assert.ok(!urls.some((url) => url.includes("/admin")));
   assert.ok(!urls.some((url) => url.includes("/api")));
   assert.ok(!urls.some((url) => url.includes("/search")));
   assert.ok(!urls.some((url) => url.includes("/request-quote")));
   assert.ok(!urls.some((url) => url.includes("?")));
 
-  const translatedCategories = await db
-    .select({ slug: categories.slug, locale: categoryTranslations.locale })
-    .from(categories)
-    .innerJoin(categoryTranslations, eq(categoryTranslations.categoryId, categories.id))
-    .where(eq(categories.status, "PUBLISHED"));
-  const translatedProducts = await db
-    .select({ slug: products.slug, locale: productTranslations.locale })
-    .from(products)
-    .innerJoin(productTranslations, eq(productTranslations.productId, products.id))
-    .where(eq(products.status, "PUBLISHED"));
-  const actualCategoryPaths = urls.filter((url) => /\/categories\/[^/]+$/.test(new URL(url).pathname)).sort();
-  const expectedCategoryPaths = translatedCategories
-    .map(({ slug, locale }) => `${baseUrl}/${locale}/categories/${slug}`)
+  const actualCategoryPaths = urls
+    .filter((url) => /\/categories\/[^/]+$/.test(new URL(url).pathname))
     .sort();
-  const actualProductPaths = urls.filter((url) => /\/products\/[^/]+$/.test(new URL(url).pathname)).sort();
-  const expectedProductPaths = translatedProducts
-    .map(({ slug, locale }) => `${baseUrl}/${locale}/products/${slug}`)
+  const expectedCategoryPaths = categories
+    .flatMap((category) =>
+      categoryTranslations
+        .filter((translation) => translation.categoryId === category.id)
+        .map(({ locale }) => `${baseUrl}/${locale}/categories/${category.slug}`),
+    )
+    .sort();
+  const actualProductPaths = urls
+    .filter((url) => /\/products\/[^/]+$/.test(new URL(url).pathname))
+    .sort();
+  const expectedProductPaths = products
+    .flatMap((product) =>
+      productTranslations
+        .filter((translation) => translation.productId === product.id)
+        .map(({ locale }) => `${baseUrl}/${locale}/products/${product.slug}`),
+    )
     .sort();
 
   assert.deepEqual(actualCategoryPaths, expectedCategoryPaths);
@@ -218,26 +278,51 @@ test("sitemap contains public canonical URLs and excludes admin, API, and query 
   assert.equal(homepageEn?.alternates?.languages?.en, `${baseUrl}/en`);
   assert.equal(homepageEn?.alternates?.languages?.ar, `${baseUrl}/ar`);
   assert.equal(homepageEn?.alternates?.languages?.["x-default"], `${baseUrl}/en`);
-  assert.ok(entries.filter((entry) => /\/(products|categories)\/[^/]+$/.test(new URL(entry.url).pathname)).every((entry) => entry.lastModified instanceof Date));
-  assert.ok(entries.filter((entry) => /\/blog\/[^/]+$/.test(new URL(entry.url).pathname)).every((entry) => entry.lastModified instanceof Date));
+  assert.ok(
+    entries
+      .filter((entry) =>
+        /\/(products|categories)\/[^/]+$/.test(new URL(entry.url).pathname),
+      )
+      .every((entry) => entry.lastModified instanceof Date),
+  );
+  assert.ok(
+    entries
+      .filter((entry) => /\/blog\/[^/]+$/.test(new URL(entry.url).pathname))
+      .every((entry) => entry.lastModified instanceof Date),
+  );
 });
 
-test("category directory lists only localized categories with an available detail route", async () => {
-  for (const locale of ["en", "ar"] as const) {
-    const listedCategories = await listPublishedCategories(locale);
-    const routes = await Promise.all(listedCategories.map(({ slug }) => getCategoryBySlug(locale, slug)));
+test("category directory lists published categories only for locales with exact translations", () => {
+  const categories = [
+    { id: "gloves", slug: "gloves", status: "PUBLISHED" },
+    { id: "shoes", slug: "shoes", status: "PUBLISHED" },
+    { id: "draft", slug: "draft", status: "DRAFT" },
+  ];
+  const translations = [
+    { categoryId: "gloves", locale: "en" as const, name: "Gloves", description: null },
+    { categoryId: "gloves", locale: "ar" as const, name: "قفازات", description: null },
+    { categoryId: "shoes", locale: "en" as const, name: "Shoes", description: null },
+    { categoryId: "draft", locale: "en" as const, name: "Draft", description: null },
+  ];
 
-    assert.ok(routes.every((category) => category?.hasExactLocaleTranslation));
-    assert.ok(!listedCategories.some(({ slug }) => slug === "shoes"));
-    assert.equal(await getCategoryBySlug(locale, "shoes"), null);
-  }
+  assert.deepEqual(
+    mapPublishedCategories(categories, translations, "en").map(({ slug }) => slug),
+    ["gloves", "shoes"],
+  );
+  assert.deepEqual(
+    mapPublishedCategories(categories, translations, "ar").map(({ slug }) => slug),
+    ["gloves"],
+  );
 });
 
-test("localized homepage metadata and destination link labels are specific", () => {
-  assert.equal(enMessages.metadata.siteTitle, "Gloves, Measuring Tools, Fabrics & More | Qasr Al Mabrook");
-  assert.equal(enMessages.metadata.siteDescription, "Explore occupational gloves, measuring tapes, fabrics, sleepwear and personal-care products in the Qasr Al Mabrook catalogue. Request a quote for product enquiries.");
-  assert.equal(arMessages.metadata.siteTitle, "قفازات وأدوات قياس وأقمشة ومنتجات متنوعة | قصر المبارك");
-  assert.equal(arMessages.metadata.siteDescription, "استكشف القفازات المهنية وأشرطة القياس والأقمشة وملابس النوم ومنتجات العناية الشخصية في كتالوج قصر المبارك، واطلب عرض سعر للاستفسار عن المنتجات.");
+test("localized homepage metadata retains the approved upstream defaults", () => {
+  assert.equal(enMessages.metadata.siteTitle, "Qasr Al Mabrook");
+  assert.equal(
+    enMessages.metadata.siteDescription,
+    "Qasr Al Mabrook catalogue and enquiry platform.",
+  );
+  assert.equal(arMessages.metadata.siteTitle, "قصر المبارك");
+  assert.equal(arMessages.metadata.siteDescription, "كتالوج ومنصة تواصل قصر المبارك.");
   assert.equal(enMessages.home.browse, "Browse Catalogue");
   assert.equal(arMessages.home.browse, "تصفح الكتالوج");
   assert.equal(enMessages.common.viewDetails, "View details");
@@ -245,10 +330,22 @@ test("localized homepage metadata and destination link labels are specific", () 
 });
 
 test("product and category metadata builders use real names and concise descriptions", () => {
-  assert.equal(buildProductSeoTitle("Sample Product", "Tools"), "Sample Product | Tools | Qasr Al Mabrook");
-  assert.equal(buildProductSeoTitle("DPL Gloves", "Gloves"), "DPL Gloves | Qasr Al Mabrook");
-  assert.equal(buildProductSeoTitle("قفازات DPL", "قفازات"), "قفازات DPL | Qasr Al Mabrook");
-  assert.match(buildCategorySeoDescription("Tools", null, ["Hammer", "Tape"]), /Hammer and Tape/);
+  assert.equal(
+    buildProductSeoTitle("Sample Product", "Tools"),
+    "Sample Product | Tools | Qasr Al Mabrook",
+  );
+  assert.equal(
+    buildProductSeoTitle("DPL Gloves", "Gloves"),
+    "DPL Gloves | Qasr Al Mabrook",
+  );
+  assert.equal(
+    buildProductSeoTitle("قفازات DPL", "قفازات"),
+    "قفازات DPL | Qasr Al Mabrook",
+  );
+  assert.match(
+    buildCategorySeoDescription("Tools", null, ["Hammer", "Tape"]),
+    /Hammer and Tape/,
+  );
 });
 
 test("product metadata honors a populated SEO title and otherwise adds its localized category", () => {
@@ -271,7 +368,9 @@ test("product metadata honors a populated SEO title and otherwise adds its local
 });
 
 test("FAQ and Organization structured data contain only specified actual information", () => {
-  const faq = JSON.parse(createFaqStructuredData([{ question: "Question?", answer: "Answer." }]));
+  const faq = JSON.parse(
+    createFaqStructuredData([{ question: "Question?", answer: "Answer." }]),
+  );
   assert.equal(faq["@type"], "FAQPage");
   assert.equal(faq.mainEntity[0].acceptedAnswer.text, "Answer.");
 
@@ -296,7 +395,11 @@ test("success and error query states are noindexed even when their values are em
 
 test("JSON-LD escapes script-closing characters while preserving parseable data", () => {
   const name = "</script><script>alert(1)</script>";
-  const json = createProductStructuredData({ id: "product-456", name, url: `${baseUrl}/en/products/sample-product` });
+  const json = createProductStructuredData({
+    id: "product-456",
+    name,
+    url: `${baseUrl}/en/products/sample-product`,
+  });
 
   assert.ok(!json.includes("</script>"));
   assert.equal(JSON.parse(json).name, name);

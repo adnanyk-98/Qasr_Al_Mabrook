@@ -27,9 +27,13 @@ export async function Footer({ locale = "en" }: { locale?: Locale }) {
               height={362}
               className="h-auto w-16 sm:w-20 md:w-24"
             />
-            <div className="text-lg font-semibold text-[var(--foreground)]">{siteConfig.name}</div>
+            <div className="text-lg font-semibold text-[var(--foreground)]">
+              {siteConfig.name}
+            </div>
           </div>
-          <p className="max-w-sm text-sm leading-6 text-[var(--text-muted)]">{t("description")}</p>
+          <p className="max-w-sm text-sm leading-6 text-[var(--text-muted)]">
+            {t("description")}
+          </p>
         </div>
 
         <div>
@@ -37,17 +41,71 @@ export async function Footer({ locale = "en" }: { locale?: Locale }) {
             {t("explore")}
           </h2>
           <ul className="space-y-3 text-sm text-[var(--text-muted)]">
-            <li><Link href={localePath(locale, "/")} className="hover:text-[var(--brand-primary)]">{common("home")}</Link></li>
-            <li><Link href={localePath(locale, "/products")} className="hover:text-[var(--brand-primary)]">{common("products")}</Link></li>
-            <li><Link href={localePath(locale, "/blog")} className="hover:text-[var(--brand-primary)]">{common("blog")}</Link></li>
-            <li><Link href={localePath(locale, "/about-us")} className="hover:text-[var(--brand-primary)]">{common("aboutUs")}</Link></li>
-            <li><Link href={localePath(locale, "/contact-us")} className="hover:text-[var(--brand-primary)]">{common("contact")}</Link></li>
-            <li><Link href={localePath(locale, "/sitemap")} className="hover:text-[var(--brand-primary)]">{common("htmlSitemap")}</Link></li>
-            <li><Link href={localePath(locale, "/store-locator")} className="hover:text-[var(--brand-primary)]">{common("storeLocator")}</Link></li>
+            <li>
+              <Link
+                href={localePath(locale, "/")}
+                className="hover:text-[var(--brand-primary)]"
+              >
+                {common("home")}
+              </Link>
+            </li>
+            <li>
+              <Link
+                href={localePath(locale, "/products")}
+                className="hover:text-[var(--brand-primary)]"
+              >
+                {common("products")}
+              </Link>
+            </li>
+            <li>
+              <Link
+                href={localePath(locale, "/blog")}
+                className="hover:text-[var(--brand-primary)]"
+              >
+                {common("blog")}
+              </Link>
+            </li>
+            <li>
+              <Link
+                href={localePath(locale, "/about-us")}
+                className="hover:text-[var(--brand-primary)]"
+              >
+                {common("aboutUs")}
+              </Link>
+            </li>
+            <li>
+              <Link
+                href={localePath(locale, "/contact-us")}
+                className="hover:text-[var(--brand-primary)]"
+              >
+                {common("contact")}
+              </Link>
+            </li>
+            <li>
+              <Link
+                href={localePath(locale, "/sitemap")}
+                className="hover:text-[var(--brand-primary)]"
+              >
+                {common("htmlSitemap")}
+              </Link>
+            </li>
+            <li>
+              <Link
+                href={localePath(locale, "/store-locator")}
+                className="hover:text-[var(--brand-primary)]"
+              >
+                {common("storeLocator")}
+              </Link>
+            </li>
           </ul>
           <div className="mt-5 border-t border-[var(--brand-border)] pt-4">
-            <h3 className="text-sm font-semibold text-[var(--foreground)]">{common("browseCategories")}</h3>
-            <Link href={localePath(locale, "/categories")} className="mt-2 inline-block text-sm text-[var(--text-muted)] hover:text-[var(--brand-primary)]">
+            <h3 className="text-sm font-semibold text-[var(--foreground)]">
+              {common("browseCategories")}
+            </h3>
+            <Link
+              href={localePath(locale, "/categories")}
+              className="mt-2 inline-block text-sm text-[var(--text-muted)] hover:text-[var(--brand-primary)]"
+            >
               {common("categories")}
             </Link>
           </div>
@@ -59,16 +117,30 @@ export async function Footer({ locale = "en" }: { locale?: Locale }) {
           </h2>
           <ul className="space-y-3 text-sm text-[var(--text-muted)]">
             <li>
-              <span className="block font-medium text-[var(--foreground)]">{t("address")}</span>
-              <span className="block max-w-xs leading-6">{siteConfig.contact.address}</span>
+              <span className="block font-medium text-[var(--foreground)]">
+                {t("address")}
+              </span>
+              <span className="block max-w-xs leading-6">
+                {siteConfig.contact.address}
+              </span>
             </li>
             <li>
-              <span className="block font-medium text-[var(--foreground)]">{t("phone")}</span>
+              <span className="block font-medium text-[var(--foreground)]">
+                {t("phone")}
+              </span>
               {phoneHref ? (
-                <TrackedLink event="phone_click" params={{ locale, source: "footer" }} href={phoneHref} dir="ltr" className="hover:text-[var(--brand-primary)]">
+                <TrackedLink
+                  event="phone_click"
+                  params={{ locale, source: "footer" }}
+                  href={phoneHref}
+                  dir="ltr"
+                  className="hover:text-[var(--brand-primary)]"
+                >
                   <bdi dir="ltr">{displayedPhoneNumber}</bdi>
                 </TrackedLink>
-              ) : <bdi dir="ltr">{displayedPhoneNumber}</bdi>}
+              ) : (
+                <bdi dir="ltr">{displayedPhoneNumber}</bdi>
+              )}
             </li>
           </ul>
         </div>

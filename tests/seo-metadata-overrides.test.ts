@@ -1,11 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import {
-  createCategoryMetadata,
-  createProductMetadata,
-  getBaseUrl,
-} from "@/lib/seo";
+import { createCategoryMetadata, createProductMetadata, getBaseUrl } from "@/lib/seo";
 
 const baseUrl = getBaseUrl();
 
@@ -24,14 +20,8 @@ test("product SEO description overrides long and short descriptions", () => {
   assert.equal(metadata.title, "قفازات مهنية");
   assert.equal(metadata.description, "قفازات مهنية ببطانة داخلية.");
   assert.equal(metadata.alternates?.canonical, `${baseUrl}/ar/products/dpl-gloves`);
-  assert.equal(
-    metadata.alternates?.languages?.ar,
-    `${baseUrl}/ar/products/dpl-gloves`,
-  );
-  assert.equal(
-    metadata.alternates?.languages?.en,
-    `${baseUrl}/en/products/dpl-gloves`,
-  );
+  assert.equal(metadata.alternates?.languages?.ar, `${baseUrl}/ar/products/dpl-gloves`);
+  assert.equal(metadata.alternates?.languages?.en, `${baseUrl}/en/products/dpl-gloves`);
 });
 
 test("blank product SEO overrides fall back to existing content and title defaults", () => {
@@ -65,14 +55,8 @@ test("category SEO overrides are honored without changing canonical or locale al
   assert.equal(metadata.title, "قفازات العمل | قصر المبارك");
   assert.equal(metadata.description, "قفازات مهنية مع بطانة داخلية.");
   assert.equal(metadata.alternates?.canonical, `${baseUrl}/ar/categories/gloves`);
-  assert.equal(
-    metadata.alternates?.languages?.ar,
-    `${baseUrl}/ar/categories/gloves`,
-  );
-  assert.equal(
-    metadata.alternates?.languages?.en,
-    `${baseUrl}/en/categories/gloves`,
-  );
+  assert.equal(metadata.alternates?.languages?.ar, `${baseUrl}/ar/categories/gloves`);
+  assert.equal(metadata.alternates?.languages?.en, `${baseUrl}/en/categories/gloves`);
 });
 
 test("blank category SEO overrides preserve generated title and description defaults", () => {

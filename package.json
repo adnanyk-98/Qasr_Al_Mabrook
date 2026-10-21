@@ -27,7 +27,7 @@
     "db:reset-admin-password": "tsx scripts/reset-admin-password.ts",
     "catalogue:import": "tsx scripts/import-catalogue.ts",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "tsx scripts/check-changed-formatting.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.382.0",

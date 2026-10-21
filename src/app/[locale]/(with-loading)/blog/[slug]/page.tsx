@@ -11,10 +11,7 @@ import {
   getBlogArticles,
   resolveBlogHref,
 } from "@/lib/blog";
-import {
-  getBlogCategoryIds,
-  renderBlogCategoryLinks,
-} from "@/lib/blog-category-links";
+import { getBlogCategoryIds, renderBlogCategoryLinks } from "@/lib/blog-category-links";
 import { locales, localePath, type Locale } from "@/lib/locales";
 import { getPublishedCategorySlugsByIds } from "@/server/repositories/public-catalog";
 import {

@@ -22,7 +22,18 @@ export async function CategoryCard({
 }) {
   const t = await getTranslations({ locale, namespace: "common" });
   return (
-    <TrackedLink event="category_view" params={{ category_id: categoryId, category_name: name, locale, source: "category-card" }} href={localePath(locale, `/categories/${slug}`)} aria-label={t("browseCategoryNamed", { categoryName: name })} className="group flex h-full flex-col rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-white p-3 shadow-[var(--shadow-sm)] transition-colors hover:border-[var(--brand-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2">
+    <TrackedLink
+      event="category_view"
+      params={{
+        category_id: categoryId,
+        category_name: name,
+        locale,
+        source: "category-card",
+      }}
+      href={localePath(locale, `/categories/${slug}`)}
+      aria-label={t("browseCategoryNamed", { categoryName: name })}
+      className="group flex h-full flex-col rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-white p-3 shadow-[var(--shadow-sm)] transition-colors hover:border-[var(--brand-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2"
+    >
       <div className="px-1 pb-0 pt-1">
         <PublicImageSlot
           src={imageUrl}
@@ -33,9 +44,15 @@ export async function CategoryCard({
         />
       </div>
       <div className="mt-4 flex flex-1 flex-col">
-        <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[var(--brand-primary)]">{slug}</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[var(--brand-primary)]">
+          {slug}
+        </p>
         <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">{name}</h2>
-        {description ? <p className="mt-3 text-sm leading-6 text-[var(--text-muted)]">{description}</p> : null}
+        {description ? (
+          <p className="mt-3 text-sm leading-6 text-[var(--text-muted)]">
+            {description}
+          </p>
+        ) : null}
       </div>
     </TrackedLink>
   );

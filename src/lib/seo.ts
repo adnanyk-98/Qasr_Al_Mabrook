@@ -13,7 +13,9 @@ export function getBaseUrl(): string {
   return siteConfig.url;
 }
 
-export function createFaqStructuredData(faqs: Array<{ question: string; answer: string }>): string {
+export function createFaqStructuredData(
+  faqs: Array<{ question: string; answer: string }>,
+): string {
   return serializeJsonLd({
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -43,7 +45,11 @@ export function buildCanonical(locale: Locale, path: string): string {
  * @param path Base path (without locale prefix)
  * @param hasAlternate Whether the alternate locale has valid content
  */
-export function buildAlternates(locale: Locale, path: string, hasAlternate = true): Metadata["alternates"] {
+export function buildAlternates(
+  locale: Locale,
+  path: string,
+  hasAlternate = true,
+): Metadata["alternates"] {
   if (!hasAlternate) {
     return undefined;
   }
@@ -76,7 +82,10 @@ export interface CreateMetadataOptions {
 
 export function normalizeSeoText(value?: string | null): string | null {
   if (!value) return null;
-  const normalized = value.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  const normalized = value
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
   return normalized.length > 0 ? normalized : null;
 }
 
@@ -86,7 +95,10 @@ export function truncateSeoText(value: string, maxLength = 155): string {
 
   const shortened = characters.slice(0, maxLength - 1).join("");
   const lastSpace = shortened.lastIndexOf(" ");
-  const readable = lastSpace >= Math.floor(maxLength * 0.65) ? shortened.slice(0, lastSpace) : shortened.trimEnd();
+  const readable =
+    lastSpace >= Math.floor(maxLength * 0.65)
+      ? shortened.slice(0, lastSpace)
+      : shortened.trimEnd();
   return `${readable}…`;
 }
 
@@ -103,36 +115,54 @@ export function buildCategorySeoDescription(
 ): string {
   const name = normalizeSeoText(categoryName) || "Products";
   const cleanDescription = normalizeSeoText(description);
-  const exampleProducts = productNames.map(normalizeSeoText).filter((productName): productName is string => Boolean(productName)).slice(0, 2);
+  const exampleProducts = productNames
+    .map(normalizeSeoText)
+    .filter((productName): productName is string => Boolean(productName))
+    .slice(0, 2);
   const productText = exampleProducts.length
     ? locale === "ar"
       ? `ومنها ${exampleProducts.join(" و")}.`
       : `Including ${exampleProducts.join(" and ")}.`
     : "";
   const descriptionText = cleanDescription ? `${cleanDescription} ` : "";
-  const base = locale === "ar"
-    ? `تصفح منتجات ${name} في كتالوج قصر المبارك. ${productText} ${descriptionText}`
-    : `Browse ${name} products at Qasr Al Mabrook. ${productText} ${descriptionText}`;
+  const base =
+    locale === "ar"
+      ? `تصفح منتجات ${name} في كتالوج قصر المبارك. ${productText} ${descriptionText}`
+      : `Browse ${name} products at Qasr Al Mabrook. ${productText} ${descriptionText}`;
   return truncateSeoText(normalizeSeoText(base) ?? base);
 }
 
-export function buildProductSeoTitle(productName?: string | null, categoryName?: string | null): string {
+export function buildProductSeoTitle(
+  productName?: string | null,
+  categoryName?: string | null,
+): string {
   const name = normalizeSeoText(productName) || "Product";
   const category = normalizeSeoText(categoryName);
-  const includesCategory = category && name.toLocaleLowerCase().includes(category.toLocaleLowerCase());
-  return category && !includesCategory ? `${name} | ${category} | Qasr Al Mabrook` : `${name} | Qasr Al Mabrook`;
+  const includesCategory =
+    category && name.toLocaleLowerCase().includes(category.toLocaleLowerCase());
+  return category && !includesCategory
+    ? `${name} | ${category} | Qasr Al Mabrook`
+    : `${name} | Qasr Al Mabrook`;
 }
 
-export function buildProductSeoDescription(productName?: string | null, shortDescription?: string | null, categoryName?: string | null): string {
+export function buildProductSeoDescription(
+  productName?: string | null,
+  shortDescription?: string | null,
+  categoryName?: string | null,
+): string {
   const cleanName = normalizeSeoText(productName) || "Product";
   const cleanShortDescription = normalizeSeoText(shortDescription);
   if (cleanShortDescription) return truncateSeoText(cleanShortDescription);
   const category = normalizeSeoText(categoryName);
   if (category) {
-    return truncateSeoText(`Explore ${cleanName} in the ${category} collection at Qasr Al Mabrook.`);
+    return truncateSeoText(
+      `Explore ${cleanName} in the ${category} collection at Qasr Al Mabrook.`,
+    );
   }
 
-  return truncateSeoText(`Explore ${cleanName} at Qasr Al Mabrook and browse the selection available in our catalogue.`);
+  return truncateSeoText(
+    `Explore ${cleanName} at Qasr Al Mabrook and browse the selection available in our catalogue.`,
+  );
 }
 
 export function createPublicPageMetadata(options: CreateMetadataOptions): Metadata {
@@ -164,13 +194,16 @@ export function createPublicPageMetadata(options: CreateMetadataOptions): Metada
     return `${getBaseUrl()}/${imagePath}`;
   };
 
-  const resolvedOgImage = resolveSeoImageUrl(ogImage) ?? `${getBaseUrl()}${siteConfig.brand.logoColorPng}`;
+  const resolvedOgImage =
+    resolveSeoImageUrl(ogImage) ?? `${getBaseUrl()}${siteConfig.brand.logoColorPng}`;
 
   // Build metadata object
   const openGraphImage = {
     url: resolvedOgImage,
     alt: ogImageAlt || finalTitle,
-    ...(ogImage && ogImageWidth && ogImageHeight ? { width: ogImageWidth, height: ogImageHeight } : {}),
+    ...(ogImage && ogImageWidth && ogImageHeight
+      ? { width: ogImageWidth, height: ogImageHeight }
+      : {}),
   };
 
   const metadata: Metadata = {
@@ -216,9 +249,20 @@ export interface CreateProductMetadataOptions extends CreateMetadataOptions {
 }
 
 export function createProductMetadata(options: CreateProductMetadataOptions): Metadata {
-  const { productName, categoryName, seoTitle, seoDescription, shortDescription, fullDescription, productImage, productImageAlt, ...rest } = options;
+  const {
+    productName,
+    categoryName,
+    seoTitle,
+    seoDescription,
+    shortDescription,
+    fullDescription,
+    productImage,
+    productImageAlt,
+    ...rest
+  } = options;
 
-  const title = normalizeSeoText(seoTitle) || buildProductSeoTitle(productName, categoryName);
+  const title =
+    normalizeSeoText(seoTitle) || buildProductSeoTitle(productName, categoryName);
   const description =
     normalizeSeoText(seoDescription) ||
     normalizeSeoText(fullDescription) ||
@@ -245,7 +289,9 @@ export interface CreateCategoryMetadataOptions extends CreateMetadataOptions {
   productNames?: string[];
 }
 
-export function createCategoryMetadata(options: CreateCategoryMetadataOptions): Metadata {
+export function createCategoryMetadata(
+  options: CreateCategoryMetadataOptions,
+): Metadata {
   const {
     categoryName,
     seoTitle,
@@ -258,7 +304,12 @@ export function createCategoryMetadata(options: CreateCategoryMetadataOptions): 
   const title = normalizeSeoText(seoTitle) || buildCategorySeoTitle(categoryName);
   const description =
     normalizeSeoText(seoDescription) ||
-    buildCategorySeoDescription(categoryName, categoryDescription, productNames, rest.locale);
+    buildCategorySeoDescription(
+      categoryName,
+      categoryDescription,
+      productNames,
+      rest.locale,
+    );
 
   return createPublicPageMetadata({
     ...rest,
@@ -281,7 +332,9 @@ export interface ProductStructuredDataOptions {
   url: string;
 }
 
-export function createProductStructuredData(options: ProductStructuredDataOptions): string {
+export function createProductStructuredData(
+  options: ProductStructuredDataOptions,
+): string {
   const { id, name, description, image, sku, brand, url } = options;
 
   const schema = {
@@ -351,8 +404,11 @@ export interface BlogPostingStructuredDataOptions {
   locale: Locale;
 }
 
-export function createBlogPostingStructuredData(options: BlogPostingStructuredDataOptions): string {
-  const { title, description, image, url, datePublished, dateModified, locale } = options;
+export function createBlogPostingStructuredData(
+  options: BlogPostingStructuredDataOptions,
+): string {
+  const { title, description, image, url, datePublished, dateModified, locale } =
+    options;
 
   const schema = {
     "@context": "https://schema.org",
@@ -388,7 +444,10 @@ export interface BreadcrumbItem {
   path: string;
 }
 
-export function createBreadcrumbStructuredData(locale: Locale, items: BreadcrumbItem[]): string {
+export function createBreadcrumbStructuredData(
+  locale: Locale,
+  items: BreadcrumbItem[],
+): string {
   const breadcrumbs = [
     { name: locale === "ar" ? "الرئيسية" : "Home", path: "/" },
     ...items,
@@ -412,14 +471,20 @@ export function createBreadcrumbStructuredData(locale: Locale, items: Breadcrumb
  * Check if a URL should be noindexed based on query parameters
  * Non-empty search query params should typically be noindexed to prevent index bloat
  */
-export function shouldNoindexFilteredView(searchParams: Record<string, string | string[] | undefined>): boolean {
+export function shouldNoindexFilteredView(
+  searchParams: Record<string, string | string[] | undefined>,
+): boolean {
   // If there are any filter parameters present, noindex
   const hasAnyParams = Object.keys(searchParams).length > 0;
   return hasAnyParams;
 }
 
-export function shouldNoindexStateQuery(searchParams: Record<string, string | string[] | undefined>): boolean {
-  return ["success", "error"].some((key) => Object.prototype.hasOwnProperty.call(searchParams, key));
+export function shouldNoindexStateQuery(
+  searchParams: Record<string, string | string[] | undefined>,
+): boolean {
+  return ["success", "error"].some((key) =>
+    Object.prototype.hasOwnProperty.call(searchParams, key),
+  );
 }
 
 function serializeJsonLd(schema: object): string {

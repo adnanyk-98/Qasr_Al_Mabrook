@@ -20,10 +20,17 @@ import {
 import { validateR2Configuration } from "@/lib/production-readiness";
 import { resolvePrimaryProductImageId } from "@/server/services/admin-catalog";
 
-const importerSource = readFileSync(path.resolve("src/server/catalogue-import.ts"), "utf8");
+const importerSource = readFileSync(
+  path.resolve("src/server/catalogue-import.ts"),
+  "utf8",
+).replace(/\s+/g, " ");
 
 test("local DATABASE_URL accepted", () => {
-  const mode = validateLocalImportMode("local", true, "postgresql://user:pass@localhost:5432/db");
+  const mode = validateLocalImportMode(
+    "local",
+    true,
+    "postgresql://user:pass@localhost:5432/db",
+  );
   assert.equal(mode.ok, true);
 });
 
@@ -119,8 +126,20 @@ test("keeps the current primary image unless the new image is explicitly marked 
 test("catalogue import maps each supported source directory to its stable category ID", () => {
   const plan = buildCatalogueImportPlan({
     source: "catalogue",
-    categories: ["Adivasi Oil", "Cloth Piece", "Pajama", "Measuring Tape", "FANCY SUIT"],
-    products: ["Adivasi Oil", "Cloth Piece", "Pajama", "Measuring Tape", "FANCY SUIT"].map((category) => ({
+    categories: [
+      "Adivasi Oil",
+      "Cloth Piece",
+      "Pajama",
+      "Measuring Tape",
+      "FANCY SUIT",
+    ],
+    products: [
+      "Adivasi Oil",
+      "Cloth Piece",
+      "Pajama",
+      "Measuring Tape",
+      "FANCY SUIT",
+    ].map((category) => ({
       category,
       name: `${category} product`,
       images: [],
@@ -141,24 +160,26 @@ test("catalogue import maps each supported source directory to its stable catego
       { sourceName: "Adivasi Oil", categoryId: "9c63ae52-6468-4a21-b8a3-c08ae78c3d3d" },
       { sourceName: "Cloth Piece", categoryId: "3703a065-d590-4335-80d3-fcebdaf5dd61" },
       { sourceName: "Pajama", categoryId: "a8d36d07-3881-410a-a8a5-cb81ba72dc00" },
-      { sourceName: "Measuring Tape", categoryId: "f4b74bfb-a999-416e-8402-f48bea7c3f36" },
+      {
+        sourceName: "Measuring Tape",
+        categoryId: "f4b74bfb-a999-416e-8402-f48bea7c3f36",
+      },
       { sourceName: "FANCY SUIT", categoryId: "fe12dc19-cd89-452b-83d0-f6aedd948386" },
     ],
   );
-  assert.deepEqual(plan.products.map((product) => product.category), [
-    "Adivasi Oil",
-    "Cloth Piece",
-    "Pajama",
-    "Measuring Tape",
-    "FANCY SUIT",
-  ]);
+  assert.deepEqual(
+    plan.products.map((product) => product.category),
+    ["Adivasi Oil", "Cloth Piece", "Pajama", "Measuring Tape", "FANCY SUIT"],
+  );
 });
 
 test("category resolution reuses mapped IDs even when current slugs change", () => {
   const plan = buildCatalogueImportPlan({
     source: "catalogue",
     categories: ["Adivasi Oil"],
-    products: [{ category: "Adivasi Oil", name: "Adivasi Oil", images: [], primaryImage: "" }],
+    products: [
+      { category: "Adivasi Oil", name: "Adivasi Oil", images: [], primaryImage: "" },
+    ],
     banners: [],
     ignoredDirectories: [],
     unassignedImages: [],
@@ -179,7 +200,9 @@ test("category resolution fails safely when a mapped ID is missing", () => {
   const plan = buildCatalogueImportPlan({
     source: "catalogue",
     categories: ["Adivasi Oil"],
-    products: [{ category: "Adivasi Oil", name: "Adivasi Oil", images: [], primaryImage: "" }],
+    products: [
+      { category: "Adivasi Oil", name: "Adivasi Oil", images: [], primaryImage: "" },
+    ],
     banners: [],
     ignoredDirectories: [],
     unassignedImages: [],
@@ -199,7 +222,9 @@ test("category resolution rejects a legacy slug owned by another category ID", (
   const plan = buildCatalogueImportPlan({
     source: "catalogue",
     categories: ["Adivasi Oil"],
-    products: [{ category: "Adivasi Oil", name: "Adivasi Oil", images: [], primaryImage: "" }],
+    products: [
+      { category: "Adivasi Oil", name: "Adivasi Oil", images: [], primaryImage: "" },
+    ],
     banners: [],
     ignoredDirectories: [],
     unassignedImages: [],
@@ -210,16 +235,23 @@ test("category resolution rejects a legacy slug owned by another category ID", (
   });
 
   assert.throws(
-    () => resolveCatalogueCategoryIds(plan.categories, [
-      { id: "9c63ae52-6468-4a21-b8a3-c08ae78c3d3d", slug: "hair-oils" },
-      { id: "another-category", slug: "adivasi-oil" },
-    ]),
+    () =>
+      resolveCatalogueCategoryIds(plan.categories, [
+        { id: "9c63ae52-6468-4a21-b8a3-c08ae78c3d3d", slug: "hair-oils" },
+        { id: "another-category", slug: "adivasi-oil" },
+      ]),
     /legacy slug "adivasi-oil" belongs to category ID "another-category"/,
   );
 });
 
 test("products from every source folder receive the mapped category ID", () => {
-  const sourceFolders = ["Adivasi Oil", "Cloth Piece", "Pajama", "Measuring Tape", "FANCY SUIT"];
+  const sourceFolders = [
+    "Adivasi Oil",
+    "Cloth Piece",
+    "Pajama",
+    "Measuring Tape",
+    "FANCY SUIT",
+  ];
   const plan = buildCatalogueImportPlan({
     source: "catalogue",
     categories: sourceFolders,
@@ -237,16 +269,25 @@ test("products from every source folder receive the mapped category ID", () => {
     manifestErrors: [],
     unreferencedManifestImages: [],
   });
-  const categoryIds = resolveCatalogueCategoryIds(plan.categories, plan.categories.map(({ categoryId }) => ({
-    id: categoryId,
-    slug: "current-slug-may-change",
-  })));
+  const categoryIds = resolveCatalogueCategoryIds(
+    plan.categories,
+    plan.categories.map(({ categoryId }) => ({
+      id: categoryId,
+      slug: "current-slug-may-change",
+    })),
+  );
   const assignments = buildProductCategoryAssignments(
-    plan.products.map((product, index) => ({ productId: `product-${index}`, sourceCategory: product.category })),
+    plan.products.map((product, index) => ({
+      productId: `product-${index}`,
+      sourceCategory: product.category,
+    })),
     categoryIds,
   );
 
-  assert.deepEqual(assignments.map(({ categoryId }) => categoryId), plan.categories.map(({ categoryId }) => categoryId));
+  assert.deepEqual(
+    assignments.map(({ categoryId }) => categoryId),
+    plan.categories.map(({ categoryId }) => categoryId),
+  );
 });
 
 test("existing product-category relationships are preserved and only missing ones are returned", () => {
@@ -279,8 +320,13 @@ test("legacy-category preflight runs before R2 uploads and importer database wri
 
   assert.ok(preflight >= 0 && preflight < r2Client);
   assert.ok(r2Client < transaction);
-  assert.ok(transactionCategoryCheck > transaction && transactionCategoryCheck < productInsert);
-  assert.ok(importerSource.includes("transaction.insert(productCategories).values(missingRelations)"));
+  assert.ok(
+    transactionCategoryCheck > transaction && transactionCategoryCheck < productInsert,
+  );
+  assert.match(
+    importerSource,
+    /transaction\s*\.insert\(productCategories\)\s*\.values\(missingRelations\)/,
+  );
   assert.ok(!importerSource.includes(".insert(categories)"));
 });
 
@@ -290,16 +336,20 @@ test("catalogue import cleans objects created before a later upload or transacti
   const deletedKeys: string[] = [];
 
   await assert.rejects(
-    runCatalogueImportWithCleanup(async () => {
-      objectKeys.add("catalogue/new-image.jpg");
-      throw importError;
-    }, objectKeys, {
-      isOwnedByImport: async () => true,
-      isReferenced: async () => false,
-      deleteObject: async (objectKey) => {
-        deletedKeys.push(objectKey);
+    runCatalogueImportWithCleanup(
+      async () => {
+        objectKeys.add("catalogue/new-image.jpg");
+        throw importError;
       },
-    }),
+      objectKeys,
+      {
+        isOwnedByImport: async () => true,
+        isReferenced: async () => false,
+        deleteObject: async (objectKey) => {
+          deletedKeys.push(objectKey);
+        },
+      },
+    ),
     (error) => error === importError,
   );
 
@@ -313,20 +363,27 @@ test("catalogue import preserves its original error and reports cleanup failures
   const cleanupFailures: Array<{ objectKey: string; error: unknown }> = [];
 
   await assert.rejects(
-    runCatalogueImportWithCleanup(async () => {
-      throw importError;
-    }, objectKeys, {
-      isOwnedByImport: async () => true,
-      isReferenced: async () => false,
-      deleteObject: async () => {
-        throw cleanupError;
+    runCatalogueImportWithCleanup(
+      async () => {
+        throw importError;
       },
-      reportCleanupFailure: (objectKey, error) => cleanupFailures.push({ objectKey, error }),
-    }),
+      objectKeys,
+      {
+        isOwnedByImport: async () => true,
+        isReferenced: async () => false,
+        deleteObject: async () => {
+          throw cleanupError;
+        },
+        reportCleanupFailure: (objectKey, error) =>
+          cleanupFailures.push({ objectKey, error }),
+      },
+    ),
     (error) => error === importError,
   );
 
-  assert.deepEqual(cleanupFailures, [{ objectKey: "catalogue/new-image.jpg", error: cleanupError }]);
+  assert.deepEqual(cleanupFailures, [
+    { objectKey: "catalogue/new-image.jpg", error: cleanupError },
+  ]);
 });
 
 test("catalogue import never deletes an existing object that is not owned by the failed run", async () => {
@@ -335,16 +392,20 @@ test("catalogue import never deletes an existing object that is not owned by the
   const skippedKeys: string[] = [];
 
   await assert.rejects(
-    runCatalogueImportWithCleanup(async () => {
-      throw new Error("later failure");
-    }, objectKeys, {
-      isOwnedByImport: async () => false,
-      isReferenced: async () => false,
-      deleteObject: async () => {
-        deleteCalled = true;
+    runCatalogueImportWithCleanup(
+      async () => {
+        throw new Error("later failure");
       },
-      reportCleanupSkipped: (objectKey) => skippedKeys.push(objectKey),
-    }),
+      objectKeys,
+      {
+        isOwnedByImport: async () => false,
+        isReferenced: async () => false,
+        deleteObject: async () => {
+          deleteCalled = true;
+        },
+        reportCleanupSkipped: (objectKey) => skippedKeys.push(objectKey),
+      },
+    ),
     /later failure/,
   );
 
@@ -358,16 +419,20 @@ test("catalogue import retains an owned object if the database still references 
   const skippedKeys: string[] = [];
 
   await assert.rejects(
-    runCatalogueImportWithCleanup(async () => {
-      throw new Error("transaction outcome was ambiguous");
-    }, objectKeys, {
-      isOwnedByImport: async () => true,
-      isReferenced: async () => true,
-      deleteObject: async () => {
-        deleteCalled = true;
+    runCatalogueImportWithCleanup(
+      async () => {
+        throw new Error("transaction outcome was ambiguous");
       },
-      reportCleanupSkipped: (objectKey) => skippedKeys.push(objectKey),
-    }),
+      objectKeys,
+      {
+        isOwnedByImport: async () => true,
+        isReferenced: async () => true,
+        deleteObject: async () => {
+          deleteCalled = true;
+        },
+        reportCleanupSkipped: (objectKey) => skippedKeys.push(objectKey),
+      },
+    ),
     /transaction outcome was ambiguous/,
   );
 
@@ -379,16 +444,20 @@ test("catalogue import retains newly uploaded objects after successful database 
   const objectKeys = new Set<string>();
   let deleteCalled = false;
 
-  const result = await runCatalogueImportWithCleanup(async () => {
-    objectKeys.add("catalogue/committed-image.jpg");
-    return "committed";
-  }, objectKeys, {
-    isOwnedByImport: async () => true,
-    isReferenced: async () => false,
-    deleteObject: async () => {
-      deleteCalled = true;
+  const result = await runCatalogueImportWithCleanup(
+    async () => {
+      objectKeys.add("catalogue/committed-image.jpg");
+      return "committed";
     },
-  });
+    objectKeys,
+    {
+      isOwnedByImport: async () => true,
+      isReferenced: async () => false,
+      deleteObject: async () => {
+        deleteCalled = true;
+      },
+    },
+  );
 
   assert.equal(result, "committed");
   assert.equal(deleteCalled, false);
@@ -396,7 +465,9 @@ test("catalogue import retains newly uploaded objects after successful database 
 
 test("catalogue importer uses conditional R2 writes and persists the exact uploaded key", () => {
   assert.ok(importerSource.includes('IfNoneMatch: "*"'));
-  assert.ok(importerSource.includes('Metadata: { "catalogue-import-run-id": importRunId }'));
+  assert.ok(
+    importerSource.includes('Metadata: { "catalogue-import-run-id": importRunId }'),
+  );
   assert.ok(importerSource.includes("const key = objectKeysByImage.get(image)"));
   assert.ok(importerSource.includes("return await db.transaction"));
   assert.ok(importerSource.includes("isReferenced: async (objectKey)"));
@@ -404,18 +475,26 @@ test("catalogue importer uses conditional R2 writes and persists the exact uploa
 
 test("catalogue import rejects unsupported product-bearing source folders", () => {
   assert.throws(
-    () => buildCatalogueImportPlan({
-      source: "catalogue",
-      categories: ["Unknown Category"],
-      products: [{ category: "Unknown Category", name: "Unknown product", images: [], primaryImage: "" }],
-      banners: [],
-      ignoredDirectories: [],
-      unassignedImages: [],
-      ambiguousImages: [],
-      manifestUsed: true,
-      manifestErrors: [],
-      unreferencedManifestImages: [],
-    }),
+    () =>
+      buildCatalogueImportPlan({
+        source: "catalogue",
+        categories: ["Unknown Category"],
+        products: [
+          {
+            category: "Unknown Category",
+            name: "Unknown product",
+            images: [],
+            primaryImage: "",
+          },
+        ],
+        banners: [],
+        ignoredDirectories: [],
+        unassignedImages: [],
+        ambiguousImages: [],
+        manifestUsed: true,
+        manifestErrors: [],
+        unreferencedManifestImages: [],
+      }),
     /Unsupported catalogue category folder "Unknown Category"/,
   );
 });
@@ -423,27 +502,47 @@ test("catalogue import rejects unsupported product-bearing source folders", () =
 test("catalogue discovery excludes explicit brand and store-locator supporting directories", async () => {
   const source = await mkdtemp(path.join(os.tmpdir(), "catalogue-discovery-"));
   try {
-    for (const directory of ["Adivasi Oil", "Brands", "In-Store-Images", "LOGO", "Banner"]) {
+    for (const directory of [
+      "Adivasi Oil",
+      "Brands",
+      "In-Store-Images",
+      "LOGO",
+      "Banner",
+    ]) {
       await mkdir(path.join(source, directory));
     }
-    await writeFile(path.join(source, "Adivasi Oil", "Adivasi Oil-#01.jpg"), Buffer.from("fixture"));
+    await writeFile(
+      path.join(source, "Adivasi Oil", "Adivasi Oil-#01.jpg"),
+      Buffer.from("fixture"),
+    );
     await writeFile(path.join(source, "Brands", "logo.png"), Buffer.from("fixture"));
-    await writeFile(path.join(source, "In-Store-Images", "In-Store-Images-01.jpg"), Buffer.from("fixture"));
-    await writeFile(path.join(source, "catalogue-manifest.json"), JSON.stringify({
-      products: [{
-        category: "Adivasi Oil",
-        name: "Adivasi Oil",
-        images: ["Adivasi Oil-#01.jpg"],
-        primaryImage: "Adivasi Oil-#01.jpg",
-      }],
-      unresolvedImages: [],
-    }));
+    await writeFile(
+      path.join(source, "In-Store-Images", "In-Store-Images-01.jpg"),
+      Buffer.from("fixture"),
+    );
+    await writeFile(
+      path.join(source, "catalogue-manifest.json"),
+      JSON.stringify({
+        products: [
+          {
+            category: "Adivasi Oil",
+            name: "Adivasi Oil",
+            images: ["Adivasi Oil-#01.jpg"],
+            primaryImage: "Adivasi Oil-#01.jpg",
+          },
+        ],
+        unresolvedImages: [],
+      }),
+    );
 
     const report = await discoverCatalogue(source);
 
     assert.deepEqual(report.categories, ["Adivasi Oil"]);
     assert.deepEqual(report.ignoredDirectories, ["Brands", "In-Store-Images", "LOGO"]);
-    assert.deepEqual(report.products.map((product) => product.category), ["Adivasi Oil"]);
+    assert.deepEqual(
+      report.products.map((product) => product.category),
+      ["Adivasi Oil"],
+    );
   } finally {
     await rm(source, { recursive: true, force: true });
   }

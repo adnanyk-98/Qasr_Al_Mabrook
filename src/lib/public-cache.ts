@@ -4,7 +4,11 @@ import { getBlogCategoryIds } from "@/lib/blog-category-links";
 
 export const PUBLIC_CACHE_REVALIDATE_SECONDS = 300;
 
-export function withPublicCache<T>(cacheKey: readonly string[], callback: () => Promise<T>, options?: { revalidate?: number; tags?: string[] }) {
+export function withPublicCache<T>(
+  cacheKey: readonly string[],
+  callback: () => Promise<T>,
+  options?: { revalidate?: number; tags?: string[] },
+) {
   try {
     const cached = unstable_cache(callback, [...cacheKey], {
       revalidate: options?.revalidate ?? PUBLIC_CACHE_REVALIDATE_SECONDS,
@@ -34,7 +38,8 @@ export const publicCacheTags = {
   productSlug: (slug: string) => `catalogue:product-slug:${slug}`,
   category: (id: string) => `catalogue:category:${id}`,
   categorySlug: (slug: string) => `catalogue:category-slug:${slug}`,
-  staticPage: (slug: string, locale: string) => `catalogue:static-page:${slug}:${locale}`,
+  staticPage: (slug: string, locale: string) =>
+    `catalogue:static-page:${slug}:${locale}`,
   settings: "catalogue:public-settings",
 };
 
@@ -66,10 +71,16 @@ export function revalidateBlogCategoryLinksAfterMutation<T>(
 }
 
 export function getProductSlugsForInvalidation(slug?: string, previousSlug?: string) {
-  return [...new Set([slug, previousSlug].filter((value): value is string => Boolean(value)))];
+  return [
+    ...new Set([slug, previousSlug].filter((value): value is string => Boolean(value))),
+  ];
 }
 
-export async function invalidateProductPublicCache(productId: string, slug?: string, previousSlug?: string) {
+export async function invalidateProductPublicCache(
+  productId: string,
+  slug?: string,
+  previousSlug?: string,
+) {
   revalidateTag(publicCacheTags.products, "max");
   revalidateTag(publicCacheTags.product(productId), "max");
   for (const affectedSlug of getProductSlugsForInvalidation(slug, previousSlug)) {
@@ -84,10 +95,16 @@ export async function invalidateProductPublicCache(productId: string, slug?: str
 }
 
 export function getCategorySlugsForInvalidation(slug?: string, previousSlug?: string) {
-  return [...new Set([slug, previousSlug].filter((value): value is string => Boolean(value)))];
+  return [
+    ...new Set([slug, previousSlug].filter((value): value is string => Boolean(value))),
+  ];
 }
 
-export async function invalidateCategoryPublicCache(categoryId: string, slug?: string, previousSlug?: string) {
+export async function invalidateCategoryPublicCache(
+  categoryId: string,
+  slug?: string,
+  previousSlug?: string,
+) {
   revalidateTag(publicCacheTags.categories, "max");
   revalidateTag(publicCacheTags.category(categoryId), "max");
   revalidateTag(publicCacheTags.products, "max");

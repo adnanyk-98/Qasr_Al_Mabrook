@@ -1,11 +1,12 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import { serverEnv } from "@/config/env";
 import {
+  categoryTranslations,
   categories,
   productCategories,
   productImages,
@@ -13,36 +14,37 @@ import {
   products,
 } from "@/db/schema";
 import type { DiscoveryReport } from "@/lib/catalogue-discovery";
-import {
-  buildProductCategoryAssignments,
-  buildCatalogueImportPlan,
-  getMissingProductCategoryRelations,
-  resolveCatalogueCategoryIdsForImport,
-  runCatalogueImportWithCleanup,
-} from "@/lib/catalogue-import";
-import {
-  DeleteObjectCommand,
-  HeadObjectCommand,
-  PutObjectCommand,
-  S3Client,
-} from "@aws-sdk/client-s3";
+import { buildCatalogueImportPlan } from "@/lib/catalogue-import";
+import { S3Client, HeadObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 
 // no local staging for confirmed imports; we upload directly to R2.
 
 async function assertNoExistingDataConflicts(
   plan: ReturnType<typeof buildCatalogueImportPlan>,
 ) {
-  await resolveCatalogueCategoryIdsForImport(
-    plan.categories,
-    (ids) => db
-      .select({ id: categories.id, slug: categories.slug })
+  for (const category of plan.categories) {
+    const existing = await db
+      .select()
       .from(categories)
-      .where(inArray(categories.id, ids)),
-    (slugs) => db
-      .select({ id: categories.id, slug: categories.slug })
-      .from(categories)
-      .where(inArray(categories.slug, slugs)),
-  );
+      .where(eq(categories.slug, category.slug))
+      .limit(1);
+    if (!existing[0]) continue;
+    const translation = await db
+      .select()
+      .from(categoryTranslations)
+      .where(
+        and(
+          eq(categoryTranslations.categoryId, existing[0].id),
+          eq(categoryTranslations.locale, "en"),
+        ),
+      )
+      .limit(1);
+    if (!translation[0] || translation[0].name !== category.name) {
+      throw new Error(
+        `Import conflict for category slug "${category.slug}"; existing data is not an exact importer match.`,
+      );
+    }
+  }
 
   for (const product of plan.products) {
     const existing = await db
@@ -72,9 +74,7 @@ async function assertNoExistingDataConflicts(
 export async function importLocalCatalogue(report: DiscoveryReport) {
   // Validate manifest errors first
   if (report.manifestErrors.length) {
-    throw new Error(
-      "Catalogue import refused while manifest errors remain.",
-    );
+    throw new Error("Catalogue import refused while manifest errors remain.");
   }
 
   // Prevent accidental writes to an unintended remote DB: require explicit approval when DATABASE_URL is remote
@@ -133,65 +133,98 @@ export async function importLocalCatalogue(report: DiscoveryReport) {
     },
   });
 
+  const uploadedObjects: string[] = [];
+  const normalizedSizes = new Map<
+    string,
+    { width: number | null; height: number | null }
+  >();
+
   const { generateR2ObjectKey } = await import("@/lib/catalogue-import");
-  const importRunId = crypto.randomUUID();
-  const attemptedObjectKeys = new Set<string>();
 
-  const performImport = async () => {
-    const normalizedSizes = new Map<string, { width: number | null; height: number | null }>();
-    const objectKeysByImage = new WeakMap<object, string>();
+  // Upload/reconcile objects (normalize first)
+  for (const product of plan.products) {
+    for (const image of product.images) {
+      const key = generateR2ObjectKey(product.slug, image.filename);
+      const localPath = path.join(report.source, image.relativePath);
+      // Read source buffer
+      let srcBuffer: Buffer;
+      try {
+        srcBuffer = await readFile(localPath);
+      } catch (err) {
+        throw new Error(`Failed to read local image ${localPath}: ${String(err)}`);
+      }
 
-    // Upload/reconcile objects (normalize first)
-    for (const product of plan.products) {
-      for (const image of product.images) {
-        const key = generateR2ObjectKey(product.slug, image.filename);
-        objectKeysByImage.set(image, key);
-        const localPath = path.join(report.source, image.relativePath);
-        // Read source buffer
-        let srcBuffer: Buffer;
+      // Preserve source image bytes and dimensions without any destructive trimming or normalization.
+      const sharpMod = (await import("sharp")).default;
+      const finalBuffer = srcBuffer;
+      const finalMeta = await sharpMod(finalBuffer).metadata();
+
+      // Record original dimensions for DB use without altering the stored asset.
+      normalizedSizes.set(key, {
+        width: finalMeta.width ?? null,
+        height: finalMeta.height ?? null,
+      });
+
+      // Check if object exists in R2 (head)
+      let objectExists = false;
+      try {
+        await s3.send(new HeadObjectCommand({ Bucket: bucket, Key: key }));
+        objectExists = true;
+      } catch {
+        objectExists = false;
+      }
+
+      if (!objectExists) {
+        // Upload the normalized buffer; fail fast on any upload error
         try {
-          srcBuffer = await readFile(localPath);
-        } catch (err) {
-          throw new Error(`Failed to read local image ${localPath}: ${String(err)}`);
-        }
-
-        // Preserve source image bytes and dimensions without any destructive trimming or normalization.
-        const sharpMod = (await import("sharp")).default;
-        const finalBuffer = srcBuffer;
-        const finalMeta = await sharpMod(finalBuffer).metadata();
-
-        // Record original dimensions for DB use without altering the stored asset.
-        normalizedSizes.set(key, { width: finalMeta.width ?? null, height: finalMeta.height ?? null });
-
-        // Conditional creation and run metadata make later cleanup ownership verifiable.
-        attemptedObjectKeys.add(key);
-        try {
-          await s3.send(new PutObjectCommand({
-            Bucket: bucket,
-            Key: key,
-            Body: finalBuffer,
-            IfNoneMatch: "*",
-            Metadata: { "catalogue-import-run-id": importRunId },
-          }));
+          await s3.send(
+            new PutObjectCommand({ Bucket: bucket, Key: key, Body: finalBuffer }),
+          );
+          uploadedObjects.push(key);
         } catch (uploadErr) {
-          throw new Error(`Failed to upload image ${image.relativePath} to R2: ${String(uploadErr)}`);
+          throw new Error(
+            `Failed to upload image ${image.relativePath} to R2: ${String(uploadErr)}`,
+          );
         }
       }
     }
+  }
 
-    return await db.transaction(async (transaction) => {
-    const categoryIds = await resolveCatalogueCategoryIdsForImport(
-      plan.categories,
-      (ids) => transaction
-        .select({ id: categories.id, slug: categories.slug })
+  return db.transaction(async (transaction) => {
+    const categoryIds = new Map<string, string>();
+    for (const category of plan.categories) {
+      const existing = await transaction
+        .select()
         .from(categories)
-        .where(inArray(categories.id, ids)),
-      (slugs) => transaction
-        .select({ id: categories.id, slug: categories.slug })
-        .from(categories)
-        .where(inArray(categories.slug, slugs)),
-    );
-    const productCategorySources: Array<{ productId: string; sourceCategory: string }> = [];
+        .where(eq(categories.slug, category.slug))
+        .limit(1);
+      const record =
+        existing[0] ??
+        (
+          await transaction
+            .insert(categories)
+            .values({ slug: category.slug, status: plan.status })
+            .returning()
+        )[0];
+      if (!record) throw new Error(`Could not create category: ${category.name}`);
+      categoryIds.set(category.name, record.id);
+
+      const translation = await transaction
+        .select()
+        .from(categoryTranslations)
+        .where(
+          and(
+            eq(categoryTranslations.categoryId, record.id),
+            eq(categoryTranslations.locale, "en"),
+          ),
+        )
+        .limit(1);
+      if (!translation[0])
+        await transaction
+          .insert(categoryTranslations)
+          .values({ categoryId: record.id, locale: "en", name: category.name })
+          .returning();
+    }
 
     for (const product of plan.products) {
       const existing = await transaction
@@ -225,13 +258,27 @@ export async function importLocalCatalogue(report: DiscoveryReport) {
           .values({ productId: record.id, locale: "en", name: product.name })
           .returning();
 
-      productCategorySources.push({ productId: record.id, sourceCategory: product.category });
+      const categoryId = categoryIds.get(product.category);
+      if (!categoryId)
+        throw new Error(`Missing imported category: ${product.category}`);
+      const relation = await transaction
+        .select()
+        .from(productCategories)
+        .where(
+          and(
+            eq(productCategories.productId, record.id),
+            eq(productCategories.categoryId, categoryId),
+          ),
+        )
+        .limit(1);
+      if (!relation[0])
+        await transaction
+          .insert(productCategories)
+          .values({ productId: record.id, categoryId, isPrimary: true })
+          .returning();
 
       for (const image of product.images) {
-        const key = objectKeysByImage.get(image);
-        if (!key) {
-          throw new Error(`Missing uploaded object key for image ${image.relativePath}.`);
-        }
+        const key = generateR2ObjectKey(product.slug, image.filename);
         const publicUrl = `${serverEnv.R2_PUBLIC_BASE_URL?.replace(/\/$/, "")}/${key}`;
         // Find existing image by objectKey
         const existingImage = await transaction
@@ -256,7 +303,10 @@ export async function importLocalCatalogue(report: DiscoveryReport) {
 
           const oldRecord = productImagesForProduct.find((r) => {
             const url = r.publicUrl ?? "";
-            return url.includes("/catalogue/") && url.toLowerCase().endsWith(image.filename.toLowerCase());
+            return (
+              url.includes("/catalogue/") &&
+              url.toLowerCase().endsWith(image.filename.toLowerCase())
+            );
           });
 
           if (oldRecord) {
@@ -306,67 +356,6 @@ export async function importLocalCatalogue(report: DiscoveryReport) {
       }
     }
 
-    const desiredRelations = buildProductCategoryAssignments(productCategorySources, categoryIds);
-    if (desiredRelations.length) {
-      const existingRelations = await transaction
-        .select({
-          productId: productCategories.productId,
-          categoryId: productCategories.categoryId,
-        })
-        .from(productCategories)
-        .where(inArray(productCategories.productId, [...new Set(desiredRelations.map(({ productId }) => productId))]));
-      const missingRelations = getMissingProductCategoryRelations(desiredRelations, existingRelations);
-      if (missingRelations.length) {
-        await transaction.insert(productCategories).values(missingRelations).returning();
-      }
-    }
-
     return plan;
-    });
-  };
-
-  return runCatalogueImportWithCleanup(
-    performImport,
-    attemptedObjectKeys,
-    {
-      isOwnedByImport: async (objectKey) => {
-        try {
-          const head = await s3.send(new HeadObjectCommand({ Bucket: bucket, Key: objectKey }));
-          return head.Metadata?.["catalogue-import-run-id"] === importRunId;
-        } catch (error) {
-          if (
-            error &&
-            typeof error === "object" &&
-            "$metadata" in error &&
-            error.$metadata &&
-            typeof error.$metadata === "object" &&
-            "httpStatusCode" in error.$metadata &&
-            error.$metadata.httpStatusCode === 404
-          ) {
-            return false;
-          }
-          throw error;
-        }
-      },
-      isReferenced: async (objectKey) => {
-        const existing = await db
-          .select({ id: productImages.id })
-          .from(productImages)
-          .where(eq(productImages.objectKey, objectKey))
-          .limit(1);
-        return existing.length > 0;
-      },
-      deleteObject: async (objectKey) => {
-        await s3.send(new DeleteObjectCommand({ Bucket: bucket, Key: objectKey }));
-      },
-      reportCleanupFailure: (objectKey, error) => {
-        console.error(`Failed to clean up R2 object "${objectKey}" after catalogue import failure.`, error);
-      },
-      reportCleanupSkipped: (objectKey) => {
-        console.warn(
-          `Skipped cleanup of R2 object "${objectKey}" because it is not owned by this import or is still referenced.`,
-        );
-      },
-    },
-  );
+  });
 }

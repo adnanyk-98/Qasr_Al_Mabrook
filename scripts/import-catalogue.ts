@@ -31,37 +31,51 @@ async function main() {
   );
   console.log(`CATEGORIES (${plan.categories.length}):`);
   for (const category of plan.categories)
-    console.log(
-      `- RESOLVE ${category.sourceName} [categoryId=${category.categoryId}]`,
-    );
+    console.log(`- RESOLVE ${category.sourceName} [categoryId=${category.categoryId}]`);
   console.log(`PRODUCTS (${report.products.length}):`);
   for (const product of report.products) {
-    const productSlug = plan.products.find((candidate) => candidate.name === product.name && candidate.category === product.category)?.slug ?? "";
+    const productSlug =
+      plan.products.find(
+        (candidate) =>
+          candidate.name === product.name && candidate.category === product.category,
+      )?.slug ?? "";
     console.log(
       `- UPSERT ${product.category} / ${product.name} [slug=${productSlug}, status=${plan.status}, images=${product.images.length}]`,
     );
     for (const image of product.images) {
-        const { generateR2ObjectKey, generateR2PublicUrl, readOriginalProductImageMetadata } = await import("@/lib/catalogue-import");
-        const objectKey = generateR2ObjectKey(productSlug, image.filename);
-        const publicUrl = process.env.R2_PUBLIC_BASE_URL ? generateR2PublicUrl(process.env.R2_PUBLIC_BASE_URL, objectKey) : "(R2_PUBLIC_BASE_URL not set)";
-        console.log(
-          `  - ${image.filename} [${image.role}]${image.width && image.height ? ` ${image.width}x${image.height}` : ""}`,
+      const {
+        generateR2ObjectKey,
+        generateR2PublicUrl,
+        readOriginalProductImageMetadata,
+      } = await import("@/lib/catalogue-import");
+      const objectKey = generateR2ObjectKey(productSlug, image.filename);
+      const publicUrl = process.env.R2_PUBLIC_BASE_URL
+        ? generateR2PublicUrl(process.env.R2_PUBLIC_BASE_URL, objectKey)
+        : "(R2_PUBLIC_BASE_URL not set)";
+      console.log(
+        `  - ${image.filename} [${image.role}]${image.width && image.height ? ` ${image.width}x${image.height}` : ""}`,
+      );
+      console.log(`    SOURCE: ${report.source}/${image.relativePath}`);
+
+      try {
+        const srcBuffer = await import("node:fs/promises").then((mod) =>
+          mod.readFile(`${report.source}/${image.relativePath}`),
         );
-        console.log(`    SOURCE: ${report.source}/${image.relativePath}`);
+        const metadata = await readOriginalProductImageMetadata(srcBuffer);
+        console.log(
+          `    ORIGINAL DIMENSIONS: ${metadata.width ?? "unknown"}x${metadata.height ?? "unknown"}`,
+        );
+        console.log("    PRODUCT IMAGE POLICY: upload original bytes unchanged to R2");
+      } catch (err) {
+        console.log(
+          `    IMAGE METADATA ERROR: ${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
 
-        try {
-          const srcBuffer = await import("node:fs/promises").then((mod) => mod.readFile(`${report.source}/${image.relativePath}`));
-          const metadata = await readOriginalProductImageMetadata(srcBuffer);
-          console.log(`    ORIGINAL DIMENSIONS: ${metadata.width ?? "unknown"}x${metadata.height ?? "unknown"}`);
-          console.log("    PRODUCT IMAGE POLICY: upload original bytes unchanged to R2");
-        } catch (err) {
-          console.log(`    IMAGE METADATA ERROR: ${err instanceof Error ? err.message : String(err)}`);
-        }
-
-        console.log(`    R2 OBJECT KEY: ${objectKey}`);
-        console.log(`    R2 PUBLIC URL: ${publicUrl}`);
-        console.log(`    SORT_ORDER: ${image.sortOrder ?? "(none)"}`);
-        console.log(`    PRIMARY: ${image.filename === product.primaryImage}`);
+      console.log(`    R2 OBJECT KEY: ${objectKey}`);
+      console.log(`    R2 PUBLIC URL: ${publicUrl}`);
+      console.log(`    SORT_ORDER: ${image.sortOrder ?? "(none)"}`);
+      console.log(`    PRIMARY: ${image.filename === product.primaryImage}`);
     }
     console.log(`  PRIMARY: ${product.primaryImage}`);
   }

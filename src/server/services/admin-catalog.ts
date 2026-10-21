@@ -28,12 +28,24 @@ import {
   createVariantDefinition,
   updateProductImage,
 } from "@/server/repositories/catalog-admin";
-import { getProductById, updateCategory, getCategoryById, setCategoryImage } from "@/server/repositories/catalog-admin";
+import {
+  getProductById,
+  updateCategory,
+  getCategoryById,
+  setCategoryImage,
+} from "@/server/repositories/catalog-admin";
 import { requireAdminSession } from "@/server/services/admin-auth";
 import { siteConfig } from "@/config/site";
 import { parseProductFaqEntries } from "@/lib/product-content";
 import { resolvePrimaryProductImageId } from "@/lib/product-image-primary";
-import { invalidateBrandPublicCache, invalidateCategoryPublicCache, invalidateHomepagePublicCache, invalidateProductPublicCache, revalidateBlogCategoryLinksAfterMutation, revalidateSitemapAfterMutation } from "@/lib/public-cache";
+import {
+  invalidateBrandPublicCache,
+  invalidateCategoryPublicCache,
+  invalidateHomepagePublicCache,
+  invalidateProductPublicCache,
+  revalidateBlogCategoryLinksAfterMutation,
+  revalidateSitemapAfterMutation,
+} from "@/lib/public-cache";
 
 const idSchema = z.string().uuid();
 const localeSchema = z.enum(["en", "ar"]);
@@ -44,18 +56,38 @@ async function authorizeAdminMutation() {
   await requireAdminSession();
 }
 
-function validateImageReference(publicUrl: string, objectKey: string, width: number, height: number) {
+function validateImageReference(
+  publicUrl: string,
+  objectKey: string,
+  width: number,
+  height: number,
+) {
   const parsedUrl = z.string().url().safeParse(publicUrl);
   if (!parsedUrl.success) return false;
 
   const url = new URL(publicUrl);
-  const allowedOrigin = serverEnv.R2_PUBLIC_BASE_URL ? new URL(serverEnv.R2_PUBLIC_BASE_URL).origin : null;
-  const isLocalDevelopment = serverEnv.NODE_ENV !== "production" && ["localhost", "127.0.0.1"].includes(url.hostname);
+  const allowedOrigin = serverEnv.R2_PUBLIC_BASE_URL
+    ? new URL(serverEnv.R2_PUBLIC_BASE_URL).origin
+    : null;
+  const isLocalDevelopment =
+    serverEnv.NODE_ENV !== "production" &&
+    ["localhost", "127.0.0.1"].includes(url.hostname);
   if (url.protocol !== "https:" && !isLocalDevelopment) return false;
   if (allowedOrigin && url.origin !== allowedOrigin) return false;
   if (!/\.(?:avif|gif|jpe?g|png|webp)$/i.test(url.pathname)) return false;
-  if (!/^[a-zA-Z0-9][a-zA-Z0-9._/-]{0,511}$/.test(objectKey) || objectKey.includes("..")) return false;
-  return Number.isInteger(width) && Number.isInteger(height) && width >= 1 && width <= 10000 && height >= 1 && height <= 10000;
+  if (
+    !/^[a-zA-Z0-9][a-zA-Z0-9._/-]{0,511}$/.test(objectKey) ||
+    objectKey.includes("..")
+  )
+    return false;
+  return (
+    Number.isInteger(width) &&
+    Number.isInteger(height) &&
+    width >= 1 &&
+    width <= 10000 &&
+    height >= 1 &&
+    height <= 10000
+  );
 }
 
 function slugify(value: string) {
@@ -70,7 +102,9 @@ function slugify(value: string) {
 
 export async function upsertCategoryAction(formData: FormData) {
   await authorizeAdminMutation();
-  const slug = slugify(String(formData.get("slug") ?? "")) || slugify(String(formData.get("name") ?? ""));
+  const slug =
+    slugify(String(formData.get("slug") ?? "")) ||
+    slugify(String(formData.get("name") ?? ""));
   const parentId = String(formData.get("parentId") ?? "") || null;
   const categoryId = String(formData.get("categoryId") ?? "");
   const parsedStatus = statusSchema.parse(String(formData.get("status") ?? "DRAFT"));
@@ -97,14 +131,27 @@ export async function upsertCategoryAction(formData: FormData) {
     // attempt to attach image metadata when provided
     const providedImageUrl = String(formData.get("imageUrl") ?? "").trim();
     if (providedImageUrl) {
-      const objectKey = String(formData.get("objectKey") ?? providedImageUrl.split("/").pop() ?? "").trim();
+      const objectKey = String(
+        formData.get("objectKey") ?? providedImageUrl.split("/").pop() ?? "",
+      ).trim();
       const width = Number(formData.get("width") ?? 0);
       const height = Number(formData.get("height") ?? 0);
       if (validateImageReference(providedImageUrl, objectKey, width, height)) {
-        await setCategoryImage({ categoryId, objectKey, publicUrl: providedImageUrl, width, height });
+        await setCategoryImage({
+          categoryId,
+          objectKey,
+          publicUrl: providedImageUrl,
+          width,
+          height,
+        });
       }
     }
-    if (updatedCategory) await invalidateCategoryPublicCache(updatedCategory.id, updatedCategory.slug, existingCategory?.slug);
+    if (updatedCategory)
+      await invalidateCategoryPublicCache(
+        updatedCategory.id,
+        updatedCategory.slug,
+        existingCategory?.slug,
+      );
   } else {
     const created = await createCategory({
       slug,
@@ -117,11 +164,19 @@ export async function upsertCategoryAction(formData: FormData) {
 
     const providedImageUrl = String(formData.get("imageUrl") ?? "").trim();
     if (providedImageUrl && created?.id) {
-      const objectKey = String(formData.get("objectKey") ?? providedImageUrl.split("/").pop() ?? "").trim();
+      const objectKey = String(
+        formData.get("objectKey") ?? providedImageUrl.split("/").pop() ?? "",
+      ).trim();
       const width = Number(formData.get("width") ?? 0);
       const height = Number(formData.get("height") ?? 0);
       if (validateImageReference(providedImageUrl, objectKey, width, height)) {
-        await setCategoryImage({ categoryId: created.id, objectKey, publicUrl: providedImageUrl, width, height });
+        await setCategoryImage({
+          categoryId: created.id,
+          objectKey,
+          publicUrl: providedImageUrl,
+          width,
+          height,
+        });
       }
     }
     if (created) await invalidateCategoryPublicCache(created.id, created.slug);
@@ -142,7 +197,14 @@ export async function upsertBrandAction(formData: FormData) {
 
   if (brandId) {
     if (!idSchema.safeParse(brandId).success) redirect("/admin/brands");
-    const updatedBrand = await updateBrand({ id: brandId, name, slug, logoUrl, sortOrder, enabled });
+    const updatedBrand = await updateBrand({
+      id: brandId,
+      name,
+      slug,
+      logoUrl,
+      sortOrder,
+      enabled,
+    });
     if (updatedBrand) await invalidateBrandPublicCache();
   } else {
     const createdBrand = await createBrand({ name, slug, logoUrl, sortOrder, enabled });
@@ -165,7 +227,9 @@ export async function deleteBrandAction(formData: FormData) {
 export async function upsertAttributeAction(formData: FormData) {
   await authorizeAdminMutation();
   const code = String(formData.get("code") ?? "").trim();
-  const dataType = (String(formData.get("dataType") ?? "TEXT") as "TEXT" | "NUMBER" | "BOOLEAN" | "SELECT" | "MULTI_SELECT" | "COLOR") || "TEXT";
+  const dataType =
+    (String(formData.get("dataType") ?? "TEXT") as
+      "TEXT" | "NUMBER" | "BOOLEAN" | "SELECT" | "MULTI_SELECT" | "COLOR") || "TEXT";
 
   await createAttribute({
     code,
@@ -209,20 +273,52 @@ export type ProductActionState = {
 
 const productFormSchema = z.object({
   productId: z.string().uuid().optional().or(z.literal("")),
-  name: z.string().trim().min(1, "Product name is required.").max(255, "Product name must be 255 characters or fewer."),
-  shortDescription: z.string().trim().min(1, "Short description is required.").max(10000, "Short description must be 10,000 characters or fewer."),
-  description: z.string().trim().min(1, "Long description is required.").max(50000, "Long description must be 50,000 characters or fewer."),
-  applications: z.string().max(10000, "Applications must be 10,000 characters or fewer.").optional().default(""),
-  faqs: z.string().max(25000, "FAQs must be 25,000 characters or fewer.").optional().default(""),
-  slug: z.string().trim().max(255, "Slug must be 255 characters or fewer.").optional().default(""),
+  name: z
+    .string()
+    .trim()
+    .min(1, "Product name is required.")
+    .max(255, "Product name must be 255 characters or fewer."),
+  shortDescription: z
+    .string()
+    .trim()
+    .min(1, "Short description is required.")
+    .max(10000, "Short description must be 10,000 characters or fewer."),
+  description: z
+    .string()
+    .trim()
+    .min(1, "Long description is required.")
+    .max(50000, "Long description must be 50,000 characters or fewer."),
+  applications: z
+    .string()
+    .max(10000, "Applications must be 10,000 characters or fewer.")
+    .optional()
+    .default(""),
+  faqs: z
+    .string()
+    .max(25000, "FAQs must be 25,000 characters or fewer.")
+    .optional()
+    .default(""),
+  slug: z
+    .string()
+    .trim()
+    .max(255, "Slug must be 255 characters or fewer.")
+    .optional()
+    .default(""),
   brandId: z.string().uuid().optional().or(z.literal("")),
-  defaultSku: z.string().trim().max(255, "SKU must be 255 characters or fewer.").optional().default(""),
+  defaultSku: z
+    .string()
+    .trim()
+    .max(255, "SKU must be 255 characters or fewer.")
+    .optional()
+    .default(""),
   status: statusSchema,
   categoryId: z.string().uuid().optional().or(z.literal("")),
   isPrimaryCategory: z.boolean(),
 });
 
-export async function upsertProductAction(formData: FormData): Promise<ProductActionState> {
+export async function upsertProductAction(
+  formData: FormData,
+): Promise<ProductActionState> {
   await authorizeAdminMutation();
   const parsed = productFormSchema.safeParse({
     productId: String(formData.get("productId") ?? ""),
@@ -249,17 +345,25 @@ export async function upsertProductAction(formData: FormData): Promise<ProductAc
   const values = parsed.data;
   const faqs = parseProductFaqEntries(values.faqs);
   if (!faqs) {
-    return { status: "error", message: "Enter each FAQ as one line in the format: question :: answer." };
+    return {
+      status: "error",
+      message: "Enter each FAQ as one line in the format: question :: answer.",
+    };
   }
   const productId = values.productId || undefined;
   const slug = slugify(values.slug) || slugify(values.name);
   const existingProduct = productId ? await getProductById(productId) : null;
   if (productId && !existingProduct) {
-    return { status: "error", message: "The product being edited no longer exists. Refresh the page and try again." };
+    return {
+      status: "error",
+      message:
+        "The product being edited no longer exists. Refresh the page and try again.",
+    };
   }
 
   let statusToUse = values.status;
-  if (statusToUse === "DRAFT" && existingProduct?.status === "ARCHIVED") statusToUse = "ARCHIVED";
+  if (statusToUse === "DRAFT" && existingProduct?.status === "ARCHIVED")
+    statusToUse = "ARCHIVED";
 
   let saved;
   try {
@@ -279,91 +383,132 @@ export async function upsertProductAction(formData: FormData): Promise<ProductAc
       isPrimaryCategory: values.isPrimaryCategory,
     });
   } catch (error) {
-    console.error("Failed to save product and default translation", { productId, slug, error });
-    return { status: "error", message: "Could not save the product. No product translation was committed; please try again." };
+    console.error("Failed to save product and default translation", {
+      productId,
+      slug,
+      error,
+    });
+    return {
+      status: "error",
+      message:
+        "Could not save the product. No product translation was committed; please try again.",
+    };
   }
-  if (!saved) return { status: "error", message: "The product could not be saved. Refresh the page and try again." };
+  if (!saved)
+    return {
+      status: "error",
+      message: "The product could not be saved. Refresh the page and try again.",
+    };
 
   const createdOrUpdatedProductId = saved.product.id;
   try {
     revalidateSitemapAfterMutation(saved);
   } catch (error) {
-    console.error("Product saved but XML sitemap revalidation failed", { productId: createdOrUpdatedProductId, error });
+    console.error("Product saved but XML sitemap revalidation failed", {
+      productId: createdOrUpdatedProductId,
+      error,
+    });
   }
 
   // If client uploaded an image to R2, create a product_images row and mark it primary
   // Support multiple uploaded images. Client includes repeated fields: imageUrl, objectKey, width, height
-  const imageUrls = formData.getAll("imageUrl").map((v) => String(v ?? "").trim()).filter(Boolean);
+  const imageUrls = formData
+    .getAll("imageUrl")
+    .map((v) => String(v ?? "").trim())
+    .filter(Boolean);
   let imageSaveWarning: string | null = null;
   try {
     if (imageUrls.length && createdOrUpdatedProductId) {
-    const objectKeys = formData.getAll("objectKey").map((v) => String(v ?? "").trim());
-    const widths = formData.getAll("width").map((v) => Number(v ?? 0));
-    const heights = formData.getAll("height").map((v) => Number(v ?? 0));
-    const sortOrders = formData.getAll("sortOrder").map((v) => Number(v ?? 0));
-    const primaryObjectKey = String(formData.get("primaryObjectKey") ?? "").trim();
-    const imageIds = formData.getAll("imageId").map((v) => String(v ?? "").trim());
-    const currentProduct = await getProductById(createdOrUpdatedProductId);
-    let primaryImageId: string | null = currentProduct?.primaryImageId ?? null;
+      const objectKeys = formData
+        .getAll("objectKey")
+        .map((v) => String(v ?? "").trim());
+      const widths = formData.getAll("width").map((v) => Number(v ?? 0));
+      const heights = formData.getAll("height").map((v) => Number(v ?? 0));
+      const sortOrders = formData.getAll("sortOrder").map((v) => Number(v ?? 0));
+      const primaryObjectKey = String(formData.get("primaryObjectKey") ?? "").trim();
+      const imageIds = formData.getAll("imageId").map((v) => String(v ?? "").trim());
+      const currentProduct = await getProductById(createdOrUpdatedProductId);
+      let primaryImageId: string | null = currentProduct?.primaryImageId ?? null;
 
-    for (let i = 0; i < imageUrls.length; i++) {
-      const providedImageUrl = imageUrls[i];
-      const objectKey = objectKeys[i] ?? providedImageUrl.split("/").pop() ?? "";
-      const width = Number.isFinite(widths[i]) ? widths[i] : 0;
-      const height = Number.isFinite(heights[i]) ? heights[i] : 0;
-      const imageId = imageIds[i] ?? "";
-      const sortOrder = Number.isFinite(sortOrders[i]) ? sortOrders[i] : i;
-      if (!validateImageReference(providedImageUrl, objectKey, width, height)) continue;
+      for (let i = 0; i < imageUrls.length; i++) {
+        const providedImageUrl = imageUrls[i];
+        const objectKey = objectKeys[i] ?? providedImageUrl.split("/").pop() ?? "";
+        const width = Number.isFinite(widths[i]) ? widths[i] : 0;
+        const height = Number.isFinite(heights[i]) ? heights[i] : 0;
+        const imageId = imageIds[i] ?? "";
+        const sortOrder = Number.isFinite(sortOrders[i]) ? sortOrders[i] : i;
+        if (!validateImageReference(providedImageUrl, objectKey, width, height))
+          continue;
 
-      const isPrimarySelection = Boolean(primaryObjectKey ? primaryObjectKey === objectKey : i === 0);
+        const isPrimarySelection = Boolean(
+          primaryObjectKey ? primaryObjectKey === objectKey : i === 0,
+        );
 
-      if (imageId) {
-        const updatedImage = await updateProductImage({ id: imageId, productId: createdOrUpdatedProductId, sortOrder, isPrimary: isPrimarySelection });
-        if (updatedImage && isPrimarySelection) {
+        if (imageId) {
+          const updatedImage = await updateProductImage({
+            id: imageId,
+            productId: createdOrUpdatedProductId,
+            sortOrder,
+            isPrimary: isPrimarySelection,
+          });
+          if (updatedImage && isPrimarySelection) {
+            primaryImageId = resolvePrimaryProductImageId({
+              currentPrimaryImageId: primaryImageId,
+              candidateImageId: imageId,
+              isPrimaryChecked: true,
+            });
+          }
+          if (updatedImage)
+            await invalidateProductPublicCache(createdOrUpdatedProductId, slug);
+          continue;
+        }
+
+        const img = await createProductImage({
+          productId: createdOrUpdatedProductId,
+          objectKey,
+          publicUrl: providedImageUrl,
+          width: Number.isInteger(width) ? width : undefined,
+          height: Number.isInteger(height) ? height : undefined,
+          sortOrder,
+          isPrimary: isPrimarySelection,
+        });
+
+        if (img?.id && isPrimarySelection) {
           primaryImageId = resolvePrimaryProductImageId({
             currentPrimaryImageId: primaryImageId,
-            candidateImageId: imageId,
+            candidateImageId: img.id,
             isPrimaryChecked: true,
           });
         }
-          if (updatedImage) await invalidateProductPublicCache(createdOrUpdatedProductId, slug);
-        continue;
+        if (img) await invalidateProductPublicCache(createdOrUpdatedProductId, slug);
       }
 
-      const img = await createProductImage({
-        productId: createdOrUpdatedProductId,
-        objectKey,
-        publicUrl: providedImageUrl,
-        width: Number.isInteger(width) ? width : undefined,
-        height: Number.isInteger(height) ? height : undefined,
-        sortOrder,
-        isPrimary: isPrimarySelection,
-      });
-
-      if (img?.id && isPrimarySelection) {
-        primaryImageId = resolvePrimaryProductImageId({
-          currentPrimaryImageId: primaryImageId,
-          candidateImageId: img.id,
-          isPrimaryChecked: true,
-        });
+      if (primaryImageId) {
+        await setProductPrimaryImage(createdOrUpdatedProductId, primaryImageId);
       }
-      if (img) await invalidateProductPublicCache(createdOrUpdatedProductId, slug);
-    }
-
-    if (primaryImageId) {
-      await setProductPrimaryImage(createdOrUpdatedProductId, primaryImageId);
-    }
       await invalidateProductPublicCache(createdOrUpdatedProductId, slug);
     }
   } catch (error) {
-    console.error("Product and default translation saved, but image associations failed", { productId: createdOrUpdatedProductId, slug, error });
-    imageSaveWarning = " The product was saved, but its image association could not be completed.";
+    console.error(
+      "Product and default translation saved, but image associations failed",
+      { productId: createdOrUpdatedProductId, slug, error },
+    );
+    imageSaveWarning =
+      " The product was saved, but its image association could not be completed.";
   }
 
   try {
-    await invalidateProductPublicCache(createdOrUpdatedProductId, slug, existingProduct?.slug);
+    await invalidateProductPublicCache(
+      createdOrUpdatedProductId,
+      slug,
+      existingProduct?.slug,
+    );
   } catch (error) {
-    console.error("Product saved but public cache invalidation failed", { productId: createdOrUpdatedProductId, slug, error });
+    console.error("Product saved but public cache invalidation failed", {
+      productId: createdOrUpdatedProductId,
+      slug,
+      error,
+    });
   }
 
   return {
@@ -402,7 +547,10 @@ export async function upsertVariantAction(formData: FormData) {
   const productId = String(formData.get("productId") ?? "");
   const attributeId = String(formData.get("attributeId") ?? "");
 
-  if (!idSchema.safeParse(productId).success || !idSchema.safeParse(attributeId).success) {
+  if (
+    !idSchema.safeParse(productId).success ||
+    !idSchema.safeParse(attributeId).success
+  ) {
     redirect("/admin/variants");
   }
 
@@ -439,7 +587,9 @@ export async function upsertSpecificationAction(formData: FormData) {
 
   await createSpecificationDefinition({
     code,
-    dataType: (String(formData.get("dataType") ?? "TEXT") as "TEXT" | "NUMBER" | "BOOLEAN") || "TEXT",
+    dataType:
+      (String(formData.get("dataType") ?? "TEXT") as "TEXT" | "NUMBER" | "BOOLEAN") ||
+      "TEXT",
     status: statusSchema.parse(String(formData.get("status") ?? "DRAFT")),
     sortOrder: sortOrderSchema.parse(formData.get("sortOrder") ?? 0),
   });
@@ -449,7 +599,9 @@ export async function upsertSpecificationAction(formData: FormData) {
 
 export async function upsertSpecificationTranslationAction(formData: FormData) {
   await authorizeAdminMutation();
-  const specificationDefinitionId = String(formData.get("specificationDefinitionId") ?? "");
+  const specificationDefinitionId = String(
+    formData.get("specificationDefinitionId") ?? "",
+  );
   if (!idSchema.safeParse(specificationDefinitionId).success) {
     redirect("/admin/specifications");
   }
@@ -467,12 +619,18 @@ export async function upsertImageAction(formData: FormData) {
   await authorizeAdminMutation();
   const productId = String(formData.get("productId") ?? "");
   const publicUrl = String(formData.get("publicUrl") ?? "").trim();
-  const objectKey = String(formData.get("objectKey") ?? publicUrl.split("/").pop() ?? "image").trim();
+  const objectKey = String(
+    formData.get("objectKey") ?? publicUrl.split("/").pop() ?? "image",
+  ).trim();
   const width = Number(formData.get("width") ?? 0);
   const height = Number(formData.get("height") ?? 0);
   const isPrimary = String(formData.get("isPrimary") ?? "") === "on";
 
-  if (!idSchema.safeParse(productId).success || !publicUrl || !validateImageReference(publicUrl, objectKey, width, height)) {
+  if (
+    !idSchema.safeParse(productId).success ||
+    !publicUrl ||
+    !validateImageReference(publicUrl, objectKey, width, height)
+  ) {
     redirect("/admin/images");
   }
 
@@ -551,7 +709,8 @@ export async function upsertHomepageSectionAction(formData: FormData) {
   if (sectionId) {
     const current = await getHomepageSectionById(sectionId);
     const currentConfig = (current?.configurationJson ?? {}) as Record<string, unknown>;
-    existingImageUrl = typeof currentConfig.imageUrl === "string" ? currentConfig.imageUrl : "";
+    existingImageUrl =
+      typeof currentConfig.imageUrl === "string" ? currentConfig.imageUrl : "";
   }
 
   const configurationJson: Record<string, unknown> = {
@@ -575,7 +734,9 @@ export async function upsertHomepageSectionAction(formData: FormData) {
     const updatedSection = await updateHomepageSection({
       id: sectionId,
       sectionType: sectionType || undefined,
-      status: statusSchema.safeParse(status).success ? (status as "DRAFT" | "PUBLISHED" | "ARCHIVED") : "DRAFT",
+      status: statusSchema.safeParse(status).success
+        ? (status as "DRAFT" | "PUBLISHED" | "ARCHIVED")
+        : "DRAFT",
       sortOrder,
       configurationJson,
     });
@@ -621,7 +782,10 @@ export async function upsertCategoryAttributeAction(formData: FormData) {
   const categoryId = String(formData.get("categoryId") ?? "");
   const attributeId = String(formData.get("attributeId") ?? "");
 
-  if (!idSchema.safeParse(categoryId).success || !idSchema.safeParse(attributeId).success) {
+  if (
+    !idSchema.safeParse(categoryId).success ||
+    !idSchema.safeParse(attributeId).success
+  ) {
     redirect("/admin/attributes");
   }
 
@@ -640,7 +804,10 @@ export async function upsertProductCategoryAction(formData: FormData) {
   const productId = String(formData.get("productId") ?? "");
   const categoryId = String(formData.get("categoryId") ?? "");
 
-  if (!idSchema.safeParse(productId).success || !idSchema.safeParse(categoryId).success) {
+  if (
+    !idSchema.safeParse(productId).success ||
+    !idSchema.safeParse(categoryId).success
+  ) {
     redirect("/admin/products");
   }
 

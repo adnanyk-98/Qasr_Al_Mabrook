@@ -238,10 +238,10 @@ test("localized homepage metadata and destination link labels are specific", () 
   assert.equal(enMessages.metadata.siteDescription, "Explore occupational gloves, measuring tapes, fabrics, sleepwear and personal-care products in the Qasr Al Mabrook catalogue. Request a quote for product enquiries.");
   assert.equal(arMessages.metadata.siteTitle, "قفازات وأدوات قياس وأقمشة ومنتجات متنوعة | قصر المبارك");
   assert.equal(arMessages.metadata.siteDescription, "استكشف القفازات المهنية وأشرطة القياس والأقمشة وملابس النوم ومنتجات العناية الشخصية في كتالوج قصر المبارك، واطلب عرض سعر للاستفسار عن المنتجات.");
-  assert.equal(enMessages.common.viewProduct.replace("{productName}", "DPL Gloves"), "View DPL Gloves");
-  assert.equal(arMessages.common.viewProduct.replace("{productName}", "قفازات DPL"), "عرض قفازات DPL");
-  assert.equal(enMessages.common.browseCategoryNamed.replace("{categoryName}", "Gloves"), "Browse Gloves");
-  assert.equal(arMessages.common.browseCategoryNamed.replace("{categoryName}", "قفازات"), "تصفح قفازات");
+  assert.equal(enMessages.home.browse, "Browse Catalogue");
+  assert.equal(arMessages.home.browse, "تصفح الكتالوج");
+  assert.equal(enMessages.common.viewDetails, "View details");
+  assert.equal(arMessages.common.viewDetails, "عرض التفاصيل");
 });
 
 test("product and category metadata builders use real names and concise descriptions", () => {

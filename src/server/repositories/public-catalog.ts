@@ -320,10 +320,7 @@ export async function getPublishedCategorySlugsByIds(
     );
 
   return new Map(
-    rows.map((category) => [
-      category.id,
-      canonicalPublicCategorySlug(category.slug),
-    ]),
+    rows.map((category) => [category.id, canonicalPublicCategorySlug(category.slug)]),
   );
 }
 

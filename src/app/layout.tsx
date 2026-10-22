@@ -20,8 +20,7 @@ const geistMono = Geist_Mono({
 
 export async function generateMetadata(): Promise<Metadata> {
   const requestHeaders = await headers();
-  const host =
-    requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
+  const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
 
   return {
     title: {
@@ -35,7 +34,9 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   const requestHeaders = await headers();
   const locale = requestHeaders.get("x-qam-locale") === "ar" ? "ar" : "en";
   const dir = resolvePageDirection(locale);

@@ -112,7 +112,10 @@ export function truncateSeoText(value: string, maxLength = 155): string {
   return `${readable}…`;
 }
 
-export function hasLocaleScript(value: string | null | undefined, locale: Locale): boolean {
+export function hasLocaleScript(
+  value: string | null | undefined,
+  locale: Locale,
+): boolean {
   if (!value) return false;
   return locale === "ar" ? /[\u0600-\u06ff]/u.test(value) : /[A-Za-z]/u.test(value);
 }
@@ -193,8 +196,7 @@ export function buildProductSeoTitle(
   categoryName?: string | null,
   locale: Locale = "en",
 ): string {
-  const name =
-    normalizeSeoText(productName) || (locale === "ar" ? "منتج" : "Product");
+  const name = normalizeSeoText(productName) || (locale === "ar" ? "منتج" : "Product");
   const category = normalizeSeoText(categoryName);
   const includesCategory =
     category && name.toLocaleLowerCase().includes(category.toLocaleLowerCase());
@@ -249,7 +251,8 @@ export function createPublicPageMetadata(options: CreateMetadataOptions): Metada
     locale,
   );
 
-  const finalDescription = normalizeSeoText(description) ||
+  const finalDescription =
+    normalizeSeoText(description) ||
     (locale === "ar"
       ? "تصفح كتالوج قصر المبارك واكتشف المنتجات والفئات المتاحة، ثم تواصل للاستفسار."
       : "Browse the Qasr Al Mabrook catalogue, explore available products and categories, and get in touch with an enquiry.");

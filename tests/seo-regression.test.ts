@@ -377,11 +377,19 @@ test("sitemap adds only existing localized category and product URLs with recipr
 
   assert.ok(englishCategory);
   assert.ok(arabicProduct);
-  assert.equal(englishCategory.alternates?.languages?.en, `${baseUrl}/en/categories/gloves`);
+  assert.equal(
+    englishCategory.alternates?.languages?.en,
+    `${baseUrl}/en/categories/gloves`,
+  );
   assert.equal(englishCategory.alternates?.languages?.ar, undefined);
-  assert.equal(arabicProduct.alternates?.languages?.ar, `${baseUrl}/ar/products/dpl-gloves`);
+  assert.equal(
+    arabicProduct.alternates?.languages?.ar,
+    `${baseUrl}/ar/products/dpl-gloves`,
+  );
   assert.equal(arabicProduct.alternates?.languages?.en, undefined);
-  assert.ok(entries.every((entry) => new URL(entry.url).origin === PRODUCTION_SITE_URL));
+  assert.ok(
+    entries.every((entry) => new URL(entry.url).origin === PRODUCTION_SITE_URL),
+  );
 });
 
 test("sitemap uses the current category URL rather than the legacy cloth-piece path", () => {
@@ -396,14 +404,10 @@ test("sitemap uses the current category URL rather than the legacy cloth-piece p
   });
 
   assert.ok(
-    entries.some(
-      (entry) => entry.url === `${baseUrl}/en/categories/fabrics-textiles`,
-    ),
+    entries.some((entry) => entry.url === `${baseUrl}/en/categories/fabrics-textiles`),
   );
   assert.ok(
-    entries.some(
-      (entry) => entry.url === `${baseUrl}/ar/categories/fabrics-textiles`,
-    ),
+    entries.some((entry) => entry.url === `${baseUrl}/ar/categories/fabrics-textiles`),
   );
   assert.ok(entries.every((entry) => !entry.url.includes("/categories/cloth-piece")));
 });
@@ -418,8 +422,18 @@ test("category directory lists published categories only for locales with exact 
   const translations = [
     { categoryId: "gloves", locale: "en" as const, name: "Gloves", description: null },
     { categoryId: "gloves", locale: "ar" as const, name: "قفازات", description: null },
-    { categoryId: "fabrics", locale: "en" as const, name: "Fabrics & Textiles", description: null },
-    { categoryId: "fabrics", locale: "ar" as const, name: "الأقمشة والمنسوجات", description: null },
+    {
+      categoryId: "fabrics",
+      locale: "en" as const,
+      name: "Fabrics & Textiles",
+      description: null,
+    },
+    {
+      categoryId: "fabrics",
+      locale: "ar" as const,
+      name: "الأقمشة والمنسوجات",
+      description: null,
+    },
     { categoryId: "shoes", locale: "en" as const, name: "Shoes", description: null },
     { categoryId: "draft", locale: "en" as const, name: "Draft", description: null },
   ];
@@ -503,18 +517,14 @@ test("homepage, category, product, and blog titles contain the brand at most onc
     createPublicPageMetadata({
       locale: "en",
       path: "/blog/product-discovery-for-smarter-shopping",
-      title: getBlogArticleBySlug(
-        "en",
-        "product-discovery-for-smarter-shopping",
-      )?.seoTitle,
+      title: getBlogArticleBySlug("en", "product-discovery-for-smarter-shopping")
+        ?.seoTitle,
     }).title,
     createPublicPageMetadata({
       locale: "ar",
       path: "/blog/product-discovery-for-smarter-shopping",
-      title: getBlogArticleBySlug(
-        "ar",
-        "product-discovery-for-smarter-shopping",
-      )?.seoTitle,
+      title: getBlogArticleBySlug("ar", "product-discovery-for-smarter-shopping")
+        ?.seoTitle,
     }).title,
     createPublicPageMetadata({
       locale: "en",
@@ -552,8 +562,7 @@ test("homepage, category, product, and blog titles contain the brand at most onc
     createPublicPageMetadata({
       locale: "en",
       path: "/categories/hair-oils",
-      title:
-        "Hair Oils | Qasr Al Mabrook | Qasr Al Mabrook Product Catalogue",
+      title: "Hair Oils | Qasr Al Mabrook | Qasr Al Mabrook Product Catalogue",
     }).title,
     "Hair Oils | Qasr Al Mabrook",
   );
@@ -561,7 +570,10 @@ test("homepage, category, product, and blog titles contain the brand at most onc
 
 test("the three long English blog titles are shortened while preserving their topics", () => {
   const choosing = getBlogArticleBySlug("en", "choosing-everyday-essentials");
-  const discovery = getBlogArticleBySlug("en", "product-discovery-for-smarter-shopping");
+  const discovery = getBlogArticleBySlug(
+    "en",
+    "product-discovery-for-smarter-shopping",
+  );
   const oil = getBlogArticleBySlug("en", "adivasi-oil-overview");
   assert.ok(choosing);
   assert.ok(discovery);
@@ -613,10 +625,7 @@ test("product metadata honors a populated SEO title and otherwise adds its local
     categoryName: "الأدوات والقياس",
   });
 
-  assert.equal(
-    explicitTitle.title,
-    "Owner-approved product title | Qasr Al Mabrook",
-  );
+  assert.equal(explicitTitle.title, "Owner-approved product title | Qasr Al Mabrook");
   assert.equal(generatedTitle.title, "منتج تجريبي | الأدوات والقياس | قصر المبارك");
 });
 
@@ -731,7 +740,10 @@ test("representative English and Arabic catalogue and blog metadata uses locale 
     ["ar", blogAr, "/blog/adivasi-oil-overview"],
   ] as const) {
     assert.equal(metadata.alternates?.canonical, `${baseUrl}/${locale}${path}`);
-    assert.equal(metadata.alternates?.languages?.[locale], `${baseUrl}/${locale}${path}`);
+    assert.equal(
+      metadata.alternates?.languages?.[locale],
+      `${baseUrl}/${locale}${path}`,
+    );
     assert.equal(
       metadata.alternates?.languages?.[locale === "en" ? "ar" : "en"],
       `${baseUrl}/${locale === "en" ? "ar" : "en"}${path}`,

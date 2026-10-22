@@ -3,14 +3,24 @@
  */
 
 import { type Metadata } from "next";
-import { siteConfig } from "@/config/site";
+import { PRODUCTION_SITE_URL, siteConfig } from "@/config/site";
 import { getAlternateLocale, localePath, type Locale } from "@/lib/locales";
+import { sanitizeCatalogueDescription } from "@/lib/public-catalog-mapping";
 
 /**
  * Get the base URL for SEO/metadata generation
  */
 export function getBaseUrl(): string {
-  return siteConfig.url;
+  return PRODUCTION_SITE_URL;
+}
+
+export function shouldNoindexHost(host?: string | null): boolean {
+  const normalizedHost = host
+    ?.split(",", 1)[0]
+    .trim()
+    .replace(/:\d+$/, "")
+    .toLowerCase();
+  return normalizedHost !== "www.qasralmabrook.com";
 }
 
 export function createFaqStructuredData(
@@ -82,11 +92,11 @@ export interface CreateMetadataOptions {
 
 export function normalizeSeoText(value?: string | null): string | null {
   if (!value) return null;
-  const normalized = value
-    .replace(/<[^>]*>/g, " ")
+  const normalized = sanitizeCatalogueDescription(value)
+    ?.replace(/<[^>]*>/g, " ")
     .replace(/\s+/g, " ")
     .trim();
-  return normalized.length > 0 ? normalized : null;
+  return normalized && normalized.length > 0 ? normalized : null;
 }
 
 export function truncateSeoText(value: string, maxLength = 155): string {
@@ -102,9 +112,22 @@ export function truncateSeoText(value: string, maxLength = 155): string {
   return `${readable}…`;
 }
 
-export function buildCategorySeoTitle(categoryName?: string | null): string {
-  const name = normalizeSeoText(categoryName) || "Products";
-  return `${name} | Qasr Al Mabrook`;
+export function hasLocaleScript(value: string | null | undefined, locale: Locale): boolean {
+  if (!value) return false;
+  return locale === "ar" ? /[\u0600-\u06ff]/u.test(value) : /[A-Za-z]/u.test(value);
+}
+
+function localizedBrand(locale: Locale): string {
+  return locale === "ar" ? "قصر المبارك" : "Qasr Al Mabrook";
+}
+
+export function buildCategorySeoTitle(
+  categoryName?: string | null,
+  locale: Locale = "en",
+): string {
+  const name =
+    normalizeSeoText(categoryName) || (locale === "ar" ? "المنتجات" : "Products");
+  return `${name} | ${localizedBrand(locale)}`;
 }
 
 export function buildCategorySeoDescription(
@@ -113,11 +136,16 @@ export function buildCategorySeoDescription(
   productNames: string[] = [],
   locale: Locale = "en",
 ): string {
-  const name = normalizeSeoText(categoryName) || "Products";
-  const cleanDescription = normalizeSeoText(description);
+  const name =
+    normalizeSeoText(categoryName) || (locale === "ar" ? "المنتجات" : "Products");
+  const cleanDescription = hasLocaleScript(description, locale)
+    ? normalizeSeoText(description)
+    : null;
   const exampleProducts = productNames
     .map(normalizeSeoText)
-    .filter((productName): productName is string => Boolean(productName))
+    .filter((productName): productName is string =>
+      Boolean(productName && hasLocaleScript(productName, locale)),
+    )
     .slice(0, 2);
   const productText = exampleProducts.length
     ? locale === "ar"
@@ -135,33 +163,43 @@ export function buildCategorySeoDescription(
 export function buildProductSeoTitle(
   productName?: string | null,
   categoryName?: string | null,
+  locale: Locale = "en",
 ): string {
-  const name = normalizeSeoText(productName) || "Product";
+  const name =
+    normalizeSeoText(productName) || (locale === "ar" ? "منتج" : "Product");
   const category = normalizeSeoText(categoryName);
   const includesCategory =
     category && name.toLocaleLowerCase().includes(category.toLocaleLowerCase());
   return category && !includesCategory
-    ? `${name} | ${category} | Qasr Al Mabrook`
-    : `${name} | Qasr Al Mabrook`;
+    ? `${name} | ${category} | ${localizedBrand(locale)}`
+    : `${name} | ${localizedBrand(locale)}`;
 }
 
 export function buildProductSeoDescription(
   productName?: string | null,
   shortDescription?: string | null,
   categoryName?: string | null,
+  locale: Locale = "en",
 ): string {
-  const cleanName = normalizeSeoText(productName) || "Product";
-  const cleanShortDescription = normalizeSeoText(shortDescription);
+  const cleanName =
+    normalizeSeoText(productName) || (locale === "ar" ? "المنتج" : "Product");
+  const cleanShortDescription = hasLocaleScript(shortDescription, locale)
+    ? normalizeSeoText(shortDescription)
+    : null;
   if (cleanShortDescription) return truncateSeoText(cleanShortDescription);
   const category = normalizeSeoText(categoryName);
   if (category) {
     return truncateSeoText(
-      `Explore ${cleanName} in the ${category} collection at Qasr Al Mabrook.`,
+      locale === "ar"
+        ? `تصفح ${cleanName} ضمن فئة ${category} في كتالوج قصر المبارك.`
+        : `Explore ${cleanName} in the ${category} collection at Qasr Al Mabrook.`,
     );
   }
 
   return truncateSeoText(
-    `Explore ${cleanName} at Qasr Al Mabrook and browse the selection available in our catalogue.`,
+    locale === "ar"
+      ? `تصفح ${cleanName} في كتالوج قصر المبارك.`
+      : `Explore ${cleanName} in the Qasr Al Mabrook catalogue.`,
   );
 }
 
@@ -178,11 +216,12 @@ export function createPublicPageMetadata(options: CreateMetadataOptions): Metada
     hasAlternate = true,
   } = options;
 
-  const finalTitle = normalizeSeoText(title) || siteConfig.name;
+  const finalTitle = normalizeSeoText(title) || localizedBrand(locale);
 
-  const finalDescription =
-    normalizeSeoText(description) ||
-    "Browse the Qasr Al Mabrook catalogue for clothing, essentials, fabrics, footwear, and everyday products. Explore categories and request a quote for what you need.";
+  const finalDescription = normalizeSeoText(description) ||
+    (locale === "ar"
+      ? "تصفح كتالوج قصر المبارك واكتشف المنتجات والفئات المتاحة، ثم تواصل للاستفسار."
+      : "Browse the Qasr Al Mabrook catalogue, explore available products and categories, and get in touch with an enquiry.");
 
   // Canonical URL
   const canonical = buildCanonical(locale, path);
@@ -262,12 +301,24 @@ export function createProductMetadata(options: CreateProductMetadataOptions): Me
   } = options;
 
   const title =
-    normalizeSeoText(seoTitle) || buildProductSeoTitle(productName, categoryName);
+    (hasLocaleScript(seoTitle, options.locale) ? normalizeSeoText(seoTitle) : null) ||
+    buildProductSeoTitle(productName, categoryName, options.locale);
   const description =
-    normalizeSeoText(seoDescription) ||
-    normalizeSeoText(fullDescription) ||
-    normalizeSeoText(shortDescription) ||
-    buildProductSeoDescription(productName, shortDescription, categoryName);
+    (hasLocaleScript(seoDescription, options.locale)
+      ? normalizeSeoText(seoDescription)
+      : null) ||
+    (hasLocaleScript(fullDescription, options.locale)
+      ? normalizeSeoText(fullDescription)
+      : null) ||
+    (hasLocaleScript(shortDescription, options.locale)
+      ? normalizeSeoText(shortDescription)
+      : null) ||
+    buildProductSeoDescription(
+      productName,
+      shortDescription,
+      categoryName,
+      options.locale,
+    );
 
   return createPublicPageMetadata({
     ...rest,
@@ -301,9 +352,13 @@ export function createCategoryMetadata(
     ...rest
   } = options;
 
-  const title = normalizeSeoText(seoTitle) || buildCategorySeoTitle(categoryName);
+  const title =
+    (hasLocaleScript(seoTitle, rest.locale) ? normalizeSeoText(seoTitle) : null) ||
+    buildCategorySeoTitle(categoryName, rest.locale);
   const description =
-    normalizeSeoText(seoDescription) ||
+    (hasLocaleScript(seoDescription, rest.locale)
+      ? normalizeSeoText(seoDescription)
+      : null) ||
     buildCategorySeoDescription(
       categoryName,
       categoryDescription,

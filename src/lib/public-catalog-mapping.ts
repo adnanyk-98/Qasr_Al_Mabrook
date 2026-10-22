@@ -2,6 +2,27 @@ import type { Locale } from "@/lib/locales";
 
 type LocalizedRecord = { locale: Locale };
 
+const internalDescriptionPatterns = [
+  /\b(?:database|db)\b/i,
+  /\b(?:product )?record does not\b/i,
+  /\bdoes not (?:include|specify|record)\b/i,
+  /قاعدة البيانات|سجل المنتج|سجل قاعدة البيانات|لا يتضمن|لا يحدد|لا يذكر|لا تسجل/u,
+];
+
+export function sanitizeCatalogueDescription(
+  value: string | null | undefined,
+): string | null {
+  if (!value) return null;
+
+  const sentences = value.split(/(?<=[.!?؟])\s+/u);
+  const publicSentences = sentences.filter(
+    (sentence) =>
+      !internalDescriptionPatterns.some((pattern) => pattern.test(sentence)),
+  );
+  const cleaned = publicSentences.join(" ").replace(/\s+/g, " ").trim();
+  return cleaned || null;
+}
+
 export function findLocaleTranslation<T extends LocalizedRecord>(
   translations: readonly T[],
   locale: Locale,
@@ -53,7 +74,7 @@ export function mapPublishedCategories<
       {
         ...category,
         name: translation.name,
-        description: translation.description,
+        description: sanitizeCatalogueDescription(translation.description),
       },
     ];
   });

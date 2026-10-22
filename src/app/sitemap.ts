@@ -1,4 +1,5 @@
 import { type MetadataRoute } from "next";
+import { connection } from "next/server";
 import { db } from "@/db";
 import {
   categories,
@@ -157,6 +158,7 @@ export function buildSitemapEntries(data: SitemapData): MetadataRoute.Sitemap {
  * Excludes admin, search, filters, and non-indexable content
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  await connection();
   try {
     const publishedCategories = await db
       .select({

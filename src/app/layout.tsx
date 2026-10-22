@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { Jost, Geist_Mono } from "next/font/google";
 import { siteConfig } from "@/config/site";
+import { getBaseUrl, shouldNoindexHost } from "@/lib/seo";
 import { DocumentLocaleSync } from "@/components/i18n/document-locale-sync";
 import { resolvePageDirection } from "@/lib/homepage-content";
 import "./globals.css";
@@ -17,14 +18,22 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: siteConfig.name,
-    template: `%s | ${siteConfig.name}`,
-  },
-  description: "Qasr Al Mabrook product catalogue and enquiry platform.",
-  metadataBase: new URL(siteConfig.url),
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const requestHeaders = await headers();
+  const host =
+    requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
+
+  return {
+    title: {
+      default: siteConfig.name,
+      template: `%s | ${siteConfig.name}`,
+    },
+    metadataBase: new URL(getBaseUrl()),
+    robots: shouldNoindexHost(host)
+      ? { index: false, follow: true }
+      : { index: true, follow: true },
+  };
+}
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const requestHeaders = await headers();

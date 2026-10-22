@@ -14,6 +14,17 @@ const mutableLocalAssetHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+	htmlLimitedBots: /bot|crawler|spider/i,
+	async redirects() {
+		return [
+			{ source: "/en/categories/adivasi-oil", destination: "/en/categories/hair-oils", permanent: true },
+			{ source: "/ar/categories/adivasi-oil", destination: "/ar/categories/hair-oils", permanent: true },
+			{ source: "/en/categories/cloth-piece", destination: "/en/categories/fabrics-textiles", permanent: true },
+			{ source: "/ar/categories/cloth-piece", destination: "/ar/categories/fabrics-textiles", permanent: true },
+			{ source: "/en/categories/pajama", destination: "/en/categories/mens-bottom-wear", permanent: true },
+			{ source: "/ar/categories/pajama", destination: "/ar/categories/mens-bottom-wear", permanent: true },
+		];
+	},
 	async headers() {
 		return [
 			{ source: "/(.*)", headers: securityHeaders },

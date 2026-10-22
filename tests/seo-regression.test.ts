@@ -7,6 +7,7 @@ import {
   buildCanonical,
   buildAlternates,
   buildCategorySeoDescription,
+  createCategoryMetadata,
   buildProductSeoTitle,
   createFaqStructuredData,
   createOrganizationStructuredData,
@@ -14,11 +15,18 @@ import {
   createProductMetadata,
   createProductStructuredData,
   createBreadcrumbStructuredData,
+  hasLocaleScript,
+  shouldNoindexHost,
   shouldNoindexFilteredView,
   shouldNoindexStateQuery,
 } from "@/lib/seo";
 import { getAlternateLocale, localePath } from "@/lib/locales";
-import { mapPublishedCategories } from "@/lib/public-catalog-mapping";
+import { getBlogArticleBySlug } from "@/lib/blog";
+import nextConfig from "../next.config";
+import {
+  mapPublishedCategories,
+  sanitizeCatalogueDescription,
+} from "@/lib/public-catalog-mapping";
 import arMessages from "@/i18n/messages/ar.json";
 import enMessages from "@/i18n/messages/en.json";
 import robots from "@/app/robots";
@@ -39,6 +47,56 @@ test("production SEO origin stays canonical if the build-time URL is misconfigur
     resolveSiteUrl("development", "http://localhost:3000"),
     "http://localhost:3000",
   );
+  assert.equal(baseUrl, PRODUCTION_SITE_URL);
+});
+
+test("staging and noncanonical hosts are noindexed while the production host remains indexable", () => {
+  assert.equal(shouldNoindexHost("preview-qam.vercel.app"), true);
+  assert.equal(shouldNoindexHost("localhost:3000"), true);
+  assert.equal(shouldNoindexHost("www.qasralmabrook.com"), false);
+  assert.equal(shouldNoindexHost("www.qasralmabrook.com:443"), false);
+});
+
+test("crawler metadata is blocking while regular user agents keep normal streaming behavior", () => {
+  assert.ok(nextConfig.htmlLimitedBots instanceof RegExp);
+  assert.ok(nextConfig.htmlLimitedBots.test("Googlebot"));
+  assert.ok(nextConfig.htmlLimitedBots.test("Screaming Frog SEO Spider"));
+  assert.equal(nextConfig.htmlLimitedBots.test("Mozilla/5.0"), false);
+});
+
+test("About metadata can distinguish English and Arabic descriptions", () => {
+  assert.equal(hasLocaleScript("Learn about Qasr Al Mabrook.", "ar"), false);
+  assert.equal(hasLocaleScript("تعرّف على قصر المبارك.", "ar"), true);
+  assert.equal(hasLocaleScript("Learn about Qasr Al Mabrook.", "en"), true);
+});
+
+test("internal database caveats are removed from public English and Arabic descriptions", () => {
+  assert.equal(
+    sanitizeCatalogueDescription(
+      "Adivasi Oil is listed in the catalogue. The database does not record ingredients or applications.",
+    ),
+    "Adivasi Oil is listed in the catalogue.",
+  );
+  assert.equal(
+    sanitizeCatalogueDescription(
+      "زيت أديفاسي مدرج في الكتالوج. لا تسجل قاعدة البيانات مكونات أو استخدامات إضافية.",
+    ),
+    "زيت أديفاسي مدرج في الكتالوج.",
+  );
+  const [category] = mapPublishedCategories(
+    [{ id: "hair-oils", slug: "hair-oils", status: "PUBLISHED" }],
+    [
+      {
+        categoryId: "hair-oils",
+        locale: "en" as const,
+        name: "Hair Oils",
+        description:
+          "This category includes Adivasi Oil. The database does not record further ingredients or applications.",
+      },
+    ],
+    "en",
+  );
+  assert.equal(category.description, "This category includes Adivasi Oil.");
 });
 
 test("English homepage metadata uses the configured site origin and locale alternates", () => {
@@ -292,6 +350,30 @@ test("sitemap contains public canonical URLs and excludes admin, API, and query 
   );
 });
 
+test("sitemap adds only existing localized category and product URLs with reciprocal alternates", () => {
+  const updatedAt = new Date("2026-10-20T12:00:00.000Z");
+  const entries = buildSitemapEntries({
+    categories: [{ id: "gloves", slug: "gloves", updatedAt }],
+    categoryTranslations: [{ categoryId: "gloves", locale: "en" }],
+    products: [{ id: "dpl-gloves", slug: "dpl-gloves", updatedAt }],
+    productTranslations: [{ productId: "dpl-gloves", locale: "ar" }],
+  });
+  const englishCategory = entries.find(
+    (entry) => entry.url === `${baseUrl}/en/categories/gloves`,
+  );
+  const arabicProduct = entries.find(
+    (entry) => entry.url === `${baseUrl}/ar/products/dpl-gloves`,
+  );
+
+  assert.ok(englishCategory);
+  assert.ok(arabicProduct);
+  assert.equal(englishCategory.alternates?.languages?.en, `${baseUrl}/en/categories/gloves`);
+  assert.equal(englishCategory.alternates?.languages?.ar, undefined);
+  assert.equal(arabicProduct.alternates?.languages?.ar, `${baseUrl}/ar/products/dpl-gloves`);
+  assert.equal(arabicProduct.alternates?.languages?.en, undefined);
+  assert.ok(entries.every((entry) => new URL(entry.url).origin === PRODUCTION_SITE_URL));
+});
+
 test("category directory lists published categories only for locales with exact translations", () => {
   const categories = [
     { id: "gloves", slug: "gloves", status: "PUBLISHED" },
@@ -315,18 +397,44 @@ test("category directory lists published categories only for locales with exact 
   );
 });
 
-test("localized homepage metadata retains the approved upstream defaults", () => {
-  assert.equal(enMessages.metadata.siteTitle, "Qasr Al Mabrook");
+test("localized homepage metadata is distinct, useful, and localized", () => {
+  assert.equal(enMessages.metadata.siteTitle, "Qasr Al Mabrook Product Catalogue");
   assert.equal(
     enMessages.metadata.siteDescription,
-    "Qasr Al Mabrook catalogue and enquiry platform.",
+    "Explore the Qasr Al Mabrook product catalogue by category, review product details, and contact the team with an enquiry.",
   );
-  assert.equal(arMessages.metadata.siteTitle, "قصر المبارك");
-  assert.equal(arMessages.metadata.siteDescription, "كتالوج ومنصة تواصل قصر المبارك.");
+  assert.equal(arMessages.metadata.siteTitle, "كتالوج منتجات قصر المبارك");
+  assert.equal(
+    arMessages.metadata.siteDescription,
+    "تصفح كتالوج منتجات قصر المبارك حسب الفئة، وراجع تفاصيل المنتجات، وتواصل مع الفريق للاستفسار.",
+  );
   assert.equal(enMessages.home.browse, "Browse Catalogue");
   assert.equal(arMessages.home.browse, "تصفح الكتالوج");
   assert.equal(enMessages.common.viewDetails, "View details");
   assert.equal(arMessages.common.viewDetails, "عرض التفاصيل");
+});
+
+test("the three long English blog titles are shortened while preserving their topics", () => {
+  const choosing = getBlogArticleBySlug("en", "choosing-everyday-essentials");
+  const discovery = getBlogArticleBySlug("en", "product-discovery-for-smarter-shopping");
+  const oil = getBlogArticleBySlug("en", "adivasi-oil-overview");
+  assert.ok(choosing);
+  assert.ok(discovery);
+  assert.ok(oil);
+
+  assert.equal(choosing.title, "Everyday Essentials by Category");
+  assert.equal(choosing.seoTitle, "Everyday Essentials by Category");
+  assert.equal(discovery.title, "Product Discovery: Measuring Tapes");
+  assert.equal(discovery.seoTitle, "Product Discovery: Measuring Tapes");
+  assert.match(discovery.excerpt, /measuring-tape family/i);
+  assert.match(discovery.body.join(" "), /Measuring Tapes category/);
+  assert.equal(oil.title, "Adivasi Oil Overview");
+  assert.equal(oil.seoTitle, "Adivasi Oil Overview");
+  assert.doesNotMatch(choosing.title, /measuring tape/i);
+  assert.doesNotMatch(oil.title, /measuring tape/i);
+  for (const title of [choosing.title, discovery.title, oil.title]) {
+    assert.ok(title.length < 60);
+  }
 });
 
 test("product and category metadata builders use real names and concise descriptions", () => {
@@ -339,8 +447,8 @@ test("product and category metadata builders use real names and concise descript
     "DPL Gloves | Qasr Al Mabrook",
   );
   assert.equal(
-    buildProductSeoTitle("قفازات DPL", "قفازات"),
-    "قفازات DPL | Qasr Al Mabrook",
+    buildProductSeoTitle("قفازات DPL", "قفازات", "ar"),
+    "قفازات DPL | قصر المبارك",
   );
   assert.match(
     buildCategorySeoDescription("Tools", null, ["Hammer", "Tape"]),
@@ -364,7 +472,132 @@ test("product metadata honors a populated SEO title and otherwise adds its local
   });
 
   assert.equal(explicitTitle.title, "Owner-approved product title");
-  assert.equal(generatedTitle.title, "منتج تجريبي | الأدوات والقياس | Qasr Al Mabrook");
+  assert.equal(generatedTitle.title, "منتج تجريبي | الأدوات والقياس | قصر المبارك");
+});
+
+test("Arabic product metadata rejects English SEO overrides in favor of Arabic catalogue content", () => {
+  const metadata = createProductMetadata({
+    locale: "ar",
+    path: "/products/dpl-gloves",
+    productName: "قفازات DPL",
+    categoryName: "قفازات",
+    seoTitle: "DPL Gloves | Occupational gloves",
+    seoDescription: "DPL Grandeur 70 occupational gloves.",
+    shortDescription: "قفازات DPL Grandeur 70 ببطانة داخلية من الفلوك.",
+  });
+
+  assert.equal(metadata.title, "قفازات DPL | قصر المبارك");
+  assert.equal(metadata.description, "قفازات DPL Grandeur 70 ببطانة داخلية من الفلوك.");
+});
+
+test("representative English and Arabic catalogue and blog metadata uses locale canonicals", () => {
+  const hairOilsEn = createCategoryMetadata({
+    locale: "en",
+    path: "/categories/hair-oils",
+    categoryName: "Hair Oils",
+    description:
+      "This category includes Adivasi Oil, listed in the catalogue. The database does not record ingredients or applications.",
+    hasAlternate: true,
+  });
+  const hairOilsAr = createCategoryMetadata({
+    locale: "ar",
+    path: "/categories/hair-oils",
+    categoryName: "زيوت الشعر",
+    description: "تضم هذه الفئة زيت أديفاسي المدرج في الكتالوج.",
+    hasAlternate: true,
+  });
+  const mensWearEn = createCategoryMetadata({
+    locale: "en",
+    path: "/categories/mens-bottom-wear",
+    categoryName: "Men's Bottom Wear",
+    description: "Browse the Men's Bottom Wear category.",
+    hasAlternate: true,
+  });
+  const mensWearAr = createCategoryMetadata({
+    locale: "ar",
+    path: "/categories/mens-bottom-wear",
+    categoryName: "بيجاما",
+    description: "تصفح فئة البيجاما في كتالوج قصر المبارك.",
+    hasAlternate: true,
+  });
+  const glovesEn = createCategoryMetadata({
+    locale: "en",
+    path: "/categories/gloves",
+    categoryName: "Gloves",
+    description:
+      "Occupational gloves designed with a neoprene and natural rubber construction, flock lining and textured grip surfaces.",
+    hasAlternate: true,
+  });
+  const glovesAr = createCategoryMetadata({
+    locale: "ar",
+    path: "/categories/gloves",
+    categoryName: "قفازات",
+    description:
+      "قفازات مهنية مصممة من النيوبرين والمطاط الطبيعي، مع بطانة داخلية من الفلوك وأسطح مزودة بنقشة لتحسين التماسك.",
+    hasAlternate: true,
+  });
+  const productEn = createProductMetadata({
+    locale: "en",
+    path: "/products/dpl-gloves",
+    productName: "DPL Gloves",
+    categoryName: "Gloves",
+    shortDescription:
+      "DPL Grandeur 70 occupational gloves made from chlorine-washed neoprene/natural rubber with a flock-lined interior and textured grip surface.",
+    hasAlternate: true,
+  });
+  const productAr = createProductMetadata({
+    locale: "ar",
+    path: "/products/dpl-gloves",
+    productName: "قفازات DPL",
+    categoryName: "قفازات",
+    shortDescription:
+      "قفازات DPL Grandeur 70 مهنية مصنوعة من النيوبرين والمطاط الطبيعي المغسول بالكلور، مع بطانة داخلية من الفلوك وسطح مزود بنقشة لتحسين التماسك.",
+    hasAlternate: true,
+  });
+  const articleEn = getBlogArticleBySlug("en", "adivasi-oil-overview");
+  const articleAr = getBlogArticleBySlug("ar", "adivasi-oil-overview");
+  assert.ok(articleEn);
+  assert.ok(articleAr);
+  const blogEn = createPublicPageMetadata({
+    locale: "en",
+    path: "/blog/adivasi-oil-overview",
+    title: articleEn.seoTitle,
+    description: articleEn.seoDescription,
+    hasAlternate: true,
+  });
+  const blogAr = createPublicPageMetadata({
+    locale: "ar",
+    path: "/blog/adivasi-oil-overview",
+    title: articleAr.seoTitle,
+    description: articleAr.seoDescription,
+    hasAlternate: true,
+  });
+
+  for (const [locale, metadata, path] of [
+    ["en", hairOilsEn, "/categories/hair-oils"],
+    ["ar", hairOilsAr, "/categories/hair-oils"],
+    ["en", mensWearEn, "/categories/mens-bottom-wear"],
+    ["ar", mensWearAr, "/categories/mens-bottom-wear"],
+    ["en", glovesEn, "/categories/gloves"],
+    ["ar", glovesAr, "/categories/gloves"],
+    ["en", productEn, "/products/dpl-gloves"],
+    ["ar", productAr, "/products/dpl-gloves"],
+    ["en", blogEn, "/blog/adivasi-oil-overview"],
+    ["ar", blogAr, "/blog/adivasi-oil-overview"],
+  ] as const) {
+    assert.equal(metadata.alternates?.canonical, `${baseUrl}/${locale}${path}`);
+    assert.equal(metadata.alternates?.languages?.[locale], `${baseUrl}/${locale}${path}`);
+    assert.equal(
+      metadata.alternates?.languages?.[locale === "en" ? "ar" : "en"],
+      `${baseUrl}/${locale === "en" ? "ar" : "en"}${path}`,
+    );
+    assert.doesNotMatch(metadata.description ?? "", /database|قاعدة البيانات/i);
+  }
+  assert.match(String(hairOilsAr.title), /زيوت الشعر/);
+  assert.match(String(mensWearAr.title), /بيجاما/);
+  assert.match(String(glovesAr.title), /قفازات/);
+  assert.match(String(productAr.title), /قفازات DPL/);
+  assert.match(String(blogAr.title), /زيت أديفاسي/);
 });
 
 test("FAQ and Organization structured data contain only specified actual information", () => {

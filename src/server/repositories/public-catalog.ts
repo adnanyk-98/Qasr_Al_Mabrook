@@ -7,6 +7,7 @@ import {
   mapProductCategoriesForLocale,
   mapPublishedBrands,
   mapPublishedCategories,
+  sanitizeCatalogueDescription,
 } from "@/lib/public-catalog-mapping";
 import {
   PUBLIC_CACHE_REVALIDATE_SECONDS,
@@ -366,7 +367,7 @@ async function getCategoryBySlugUncached(locale: Locale, slug: string) {
     return {
       ...rows[0].category,
       name: rows[0].translation.name,
-      description: rows[0].translation.description ?? null,
+      description: sanitizeCatalogueDescription(rows[0].translation.description),
       seoTitle: rows[0].translation.seoTitle ?? null,
       seoDescription: rows[0].translation.seoDescription ?? null,
       hasExactLocaleTranslation: true,
@@ -396,7 +397,7 @@ async function getCategoryBySlugUncached(locale: Locale, slug: string) {
   return {
     ...fallback[0].category,
     name: fallback[0].translation.name,
-    description: fallback[0].translation.description ?? null,
+    description: sanitizeCatalogueDescription(fallback[0].translation.description),
     seoTitle: fallback[0].translation.seoTitle ?? null,
     seoDescription: fallback[0].translation.seoDescription ?? null,
     hasExactLocaleTranslation: false,
@@ -609,7 +610,7 @@ async function getProductBySlugUncached(locale: Locale, slug: string) {
       ...result.product,
       name: result.translation.name,
       shortDescription: result.translation.shortDescription ?? null,
-      description: result.translation.description ?? null,
+      description: sanitizeCatalogueDescription(result.translation.description),
       applications: result.translation.applications ?? null,
       faqs: result.translation.faqs ?? [],
       seoTitle: result.translation.seoTitle ?? null,
@@ -653,7 +654,7 @@ async function getProductBySlugUncached(locale: Locale, slug: string) {
     ...fallbackResult.product,
     name: fallbackResult.translation.name,
     shortDescription: fallbackResult.translation.shortDescription ?? null,
-    description: fallbackResult.translation.description ?? null,
+    description: sanitizeCatalogueDescription(fallbackResult.translation.description),
     applications: fallbackResult.translation.applications ?? null,
     faqs: fallbackResult.translation.faqs ?? [],
     seoTitle: fallbackResult.translation.seoTitle ?? null,

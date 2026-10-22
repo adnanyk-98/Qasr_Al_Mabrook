@@ -73,35 +73,35 @@ function arabicCategoryName(category: Category) {
 function buildProductCopy(product: Product) {
   const name = product.slug.replaceAll("-", " ");
   let englishShortDescription = `${name} is identified by its established catalogue name.`;
-  let englishDescription = `${name} is an item in the Qasr Al Mabrook catalogue, identified by its established product name. The current database record does not include further technical specifications or a detailed application for this item.`;
+  let englishDescription = `${name} is listed in the Qasr Al Mabrook catalogue.`;
   let arabicShortDescription = `${arabicProductName(product)} معروف باسمه المعتمد في الكتالوج.`;
-  let arabicDescription = `${arabicProductName(product)} منتج مسجل في كتالوج قصر المبارك باسمه المعتمد. لا يتضمن سجل قاعدة البيانات الحالي مواصفات فنية إضافية أو استخداماً تفصيلياً لهذا المنتج.`;
+  let arabicDescription = `${arabicProductName(product)} مدرج في كتالوج قصر المبارك.`;
 
   if (product.slug.includes("measuring-tape")) {
     englishShortDescription = `${name} is a measuring tape with a recorded length and color for measuring tasks.`;
-    englishDescription = `${name} is a measuring tape with the recorded length and color shown in the catalogue. It is suitable for tasks that require a tape measure. The product record does not specify additional materials, ratings, or technical features.`;
+    englishDescription = `${name} is a measuring tape identified in the catalogue by its length and color.`;
     arabicShortDescription = `${arabicProductName(product)} شريط قياس محدد بالطول واللون المسجلين له، لمهام القياس.`;
-    arabicDescription = `${arabicProductName(product)} شريط قياس محدد في الكتالوج بالطول واللون المسجلين له. يُعرض لمهام القياس التي تتطلب استخدام شريط قياس. لا يذكر سجل المنتج مواد إضافية أو تصنيفات أو خصائص فنية أخرى.`;
+    arabicDescription = `${arabicProductName(product)} شريط قياس محدد في الكتالوج بالطول واللون.`;
   } else if (product.slug === "pajama") {
     englishShortDescription = "Pajama sleepwear for personal use.";
-    englishDescription = "Pajama is sleepwear for personal use. The available database record does not specify fabric composition, sizing, or additional garment features.";
+    englishDescription = "Pajama is listed in the Qasr Al Mabrook catalogue.";
     arabicShortDescription = "بيجاما من ملابس النوم، محددة باسم المنتج المعتمد للاستخدام الشخصي.";
-    arabicDescription = "بيجاما منتج من ملابس النوم محدد باسمه المعتمد في الكتالوج. يُعرض كقطعة من الملابس للاستخدام الشخصي. لا يحدد سجل قاعدة البيانات نوع القماش أو المقاسات أو خصائص إضافية للملابس.";
+    arabicDescription = "بيجاما مدرجة في كتالوج قصر المبارك.";
   } else if (product.slug === "cloth-piece") {
     englishShortDescription = "Cloth Piece is a textile item for cloth and garment-related projects.";
-    englishDescription = "Cloth Piece is a textile item for cloth and garment-related projects. The database record does not specify the fabric composition, dimensions, or other technical properties.";
+    englishDescription = "Cloth Piece is listed in the Qasr Al Mabrook catalogue.";
     arabicShortDescription = "قطعة قماش من منتجات النسيج لمشاريع القماش والملابس.";
-    arabicDescription = "قطعة قماش منتج نسيجي محدد باسمه ومعروض لمشاريع القماش والملابس. لا يحدد سجل قاعدة البيانات نوع القماش أو الأبعاد أو الخصائص الفنية الأخرى.";
+    arabicDescription = "قطعة قماش مدرجة في كتالوج قصر المبارك.";
   } else if (product.slug === "fancy-suit") {
     englishShortDescription = "Fancy Suit is a suit garment for formal and occasion-focused clothing collections.";
-    englishDescription = "Fancy Suit is a suit garment for formal and occasion-focused clothing collections. The available database record does not specify fabric, construction, sizing, or other garment details.";
+    englishDescription = "Fancy Suit is listed in the Qasr Al Mabrook catalogue.";
     arabicShortDescription = "بدلة فاخرة من ملابس البدلات للمجموعات الرسمية ومناسبات ارتداء البدلات.";
-    arabicDescription = "بدلة فاخرة قطعة من ملابس البدلات محددة باسمها المعتمد ومعروضة للمجموعات الرسمية ومناسبات ارتداء البدلات. لا يحدد سجل قاعدة البيانات نوع القماش أو طريقة التصنيع أو المقاسات أو تفاصيل أخرى للملابس.";
+    arabicDescription = "بدلة فاخرة مدرجة في كتالوج قصر المبارك.";
   } else if (product.slug === "adivasi-oil") {
     englishShortDescription = "Adivasi Oil is an oil product listed in the catalogue.";
-    englishDescription = "Adivasi Oil is presented as an oil product in the catalogue. The current database record does not specify its ingredients, intended application, origin, or other product properties, so no additional claims are made here.";
+    englishDescription = "Adivasi Oil is listed in the Qasr Al Mabrook catalogue.";
     arabicShortDescription = "زيت أديفاسي منتج زيتي محدد باسمه المعتمد في الكتالوج.";
-    arabicDescription = "زيت أديفاسي منتج زيتي محدد باسمه المعتمد في الكتالوج. لا يحدد سجل قاعدة البيانات الحالي مكوناته أو استخدامه المقصود أو منشأه أو خصائصه الأخرى، لذلك لا تتم إضافة ادعاءات أخرى هنا.";
+    arabicDescription = "زيت أديفاسي مدرج في كتالوج قصر المبارك.";
   }
 
   return { englishShortDescription, englishDescription, arabicName: arabicProductName(product), arabicShortDescription, arabicDescription };
@@ -119,7 +119,7 @@ function buildCategoryCopy(category: Category, productNames: string[]) {
           ? `This category groups pajama sleepwear products for personal use.${productContext}`
           : category.slug === "fancy-suit"
             ? `This category groups fancy suit garments for formal and occasion-focused clothing collections.${productContext}`
-            : `This category groups the catalogue's Adivasi Oil product. The database does not record further ingredients or applications.${productContext}`,
+            : `This category includes Adivasi Oil, listed in the catalogue.${productContext}`,
     arabicName,
     arabicDescription: category.slug === "measuring-tape"
       ? `تضم هذه الفئة منتجات أشرطة القياس المحددة بالأطوال والألوان المسجلة لها.${productNames.length ? ` وتشمل المنتجات المسجلة: ${productNames.join("، ")}.` : ""}`
@@ -129,7 +129,7 @@ function buildCategoryCopy(category: Category, productNames: string[]) {
           ? `تضم هذه الفئة منتجات البيجاما من ملابس النوم للاستخدام الشخصي.${productNames.length ? ` وتشمل المنتجات المسجلة: ${productNames.join("، ")}.` : ""}`
           : category.slug === "fancy-suit"
             ? `تضم هذه الفئة بدلات فاخرة للمجموعات الرسمية ومناسبات ارتداء البدلات.${productNames.length ? ` وتشمل المنتجات المسجلة: ${productNames.join("، ")}.` : ""}`
-            : `تضم هذه الفئة منتج زيت أديفاسي المسجل في الكتالوج. لا تسجل قاعدة البيانات مكونات أو استخدامات إضافية.${productNames.length ? ` وتشمل المنتجات المسجلة: ${productNames.join("، ")}.` : ""}`,
+            : `تضم هذه الفئة زيت أديفاسي المدرج في الكتالوج.${productNames.length ? ` وتشمل المنتجات المدرجة: ${productNames.join("، ")}.` : ""}`,
   };
 }
 

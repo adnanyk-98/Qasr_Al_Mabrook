@@ -5,7 +5,7 @@ import { PublicShell } from "@/components/public/public-shell";
 import { Container, Section } from "@/components/ui/layout";
 import { getPublishedStaticPage } from "@/server/repositories/public-catalog";
 import { locales, type Locale } from "@/lib/locales";
-import { createPublicPageMetadata } from "@/lib/seo";
+import { createPublicPageMetadata, hasLocaleScript } from "@/lib/seo";
 
 export async function generateMetadata({
   params,
@@ -26,7 +26,11 @@ export async function generateMetadata({
     locale: currentLocale,
     path: "/about-us",
     title: page?.seoTitle ?? page?.title,
-    description: page?.seoDescription,
+    description: hasLocaleScript(page?.seoDescription, currentLocale)
+      ? page?.seoDescription
+      : currentLocale === "ar"
+        ? "تعرّف على قصر المبارك من خلال صفحة المعلومات التعريفية."
+        : "Learn about Qasr Al Mabrook on our company information page.",
     hasAlternate: Boolean(
       page?.hasExactLocaleTranslation && alternatePage?.hasExactLocaleTranslation,
     ),

@@ -226,8 +226,8 @@ export const blogArticles: BlogArticle[] = [
     updatedAt: "2026-10-02",
     featuredImage: "/catalogue/Cloth%20Piece/Cloth%20Piece-%2301.jpg",
     title: {
-      en: "Cloth Pieces: A Guide to the Catalogue Category",
-      ar: "قطع القماش في كتالوج قصر المبارك: دليل",
+      en: "Cloth Pieces: Catalogue Guide",
+      ar: "قطع القماش: دليل الفئة",
     },
     excerpt: {
       en: "A catalogue-focused guide explaining the Cloth Piece category and its place in garment and textile-related browsing.",
@@ -250,8 +250,8 @@ export const blogArticles: BlogArticle[] = [
       ],
     },
     seoTitle: {
-      en: "Cloth Pieces: A Guide to the Catalogue Category",
-      ar: "قطع القماش في كتالوج قصر المبارك: دليل",
+      en: "Cloth Pieces: Catalogue Guide",
+      ar: "قطع القماش: دليل الفئة",
     },
     seoDescription: {
       en: "Learn how the Cloth Piece category is presented in the Qasr Al Mabrook catalogue and review the product entry before enquiring.",
@@ -264,7 +264,7 @@ export const blogArticles: BlogArticle[] = [
     updatedAt: "2026-10-02",
     featuredImage: "/catalogue/FANCY%20SUIT/FANCY%20SUIT-%2301.jpg",
     title: {
-      en: "Exploring Fancy Suit Options in the Catalogue",
+      en: "Fancy Suit Options in the Catalogue",
       ar: "استكشاف خيارات البدلات الفاخرة في الكتالوج",
     },
     excerpt: {
@@ -288,7 +288,7 @@ export const blogArticles: BlogArticle[] = [
       ],
     },
     seoTitle: {
-      en: "Exploring Fancy Suit Options in the Catalogue",
+      en: "Fancy Suit Options in the Catalogue",
       ar: "استكشاف خيارات البدلات الفاخرة في الكتالوج",
     },
     seoDescription: {
@@ -303,7 +303,7 @@ export const blogArticles: BlogArticle[] = [
     featuredImage: "/catalogue/Adivasi%20Oil/Adivasi%20Oil-%2301.jpg",
     title: {
       en: "Adivasi Oil Overview",
-      ar: "زيت أديفاسي: نظرة عامة على المنتج ومعلومات الكتالوج",
+      ar: "زيت أديفاسي: نظرة عامة",
     },
     excerpt: {
       en: "A factual overview of the Adivasi Oil entry in the Qasr Al Mabrook catalogue, including its category placement and product listing.",
@@ -327,7 +327,7 @@ export const blogArticles: BlogArticle[] = [
     },
     seoTitle: {
       en: "Adivasi Oil Overview",
-      ar: "زيت أديفاسي: نظرة عامة على المنتج ومعلومات الكتالوج",
+      ar: "زيت أديفاسي: نظرة عامة",
     },
     seoDescription: {
       en: "Review the Adivasi Oil entry in the Qasr Al Mabrook catalogue and understand how it is presented in the published collection.",

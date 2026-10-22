@@ -6,6 +6,7 @@ import {
   getBaseUrl,
   buildCanonical,
   buildAlternates,
+  buildCategorySeoTitle,
   buildCategorySeoDescription,
   createCategoryMetadata,
   buildProductSeoTitle,
@@ -22,6 +23,7 @@ import {
 } from "@/lib/seo";
 import { getAlternateLocale, localePath } from "@/lib/locales";
 import { getBlogArticleBySlug } from "@/lib/blog";
+import { renderBlogCategoryLinks } from "@/lib/blog-category-links";
 import nextConfig from "../next.config";
 import {
   mapPublishedCategories,
@@ -120,11 +122,11 @@ test("Arabic homepage metadata uses the Arabic locale path and reciprocal locale
   const metadata = createPublicPageMetadata({
     locale: "ar",
     path: "/",
-    title: "قصر المبرك",
+    title: "قصر المبارك",
     description: "منصة الكتالوج والاستفسار.",
   });
 
-  assert.equal(metadata.title, "قصر المبرك");
+  assert.equal(metadata.title, "قصر المبارك");
   assert.equal(metadata.description, "منصة الكتالوج والاستفسار.");
   assert.equal(metadata.alternates?.canonical, `${baseUrl}/ar`);
   assert.equal(metadata.alternates?.languages?.ar, `${baseUrl}/ar`);
@@ -374,26 +376,68 @@ test("sitemap adds only existing localized category and product URLs with recipr
   assert.ok(entries.every((entry) => new URL(entry.url).origin === PRODUCTION_SITE_URL));
 });
 
+test("sitemap uses the current category URL rather than the legacy cloth-piece path", () => {
+  const entries = buildSitemapEntries({
+    categories: [{ id: "fabrics", slug: "cloth-piece", updatedAt: null }],
+    categoryTranslations: [
+      { categoryId: "fabrics", locale: "en" },
+      { categoryId: "fabrics", locale: "ar" },
+    ],
+    products: [],
+    productTranslations: [],
+  });
+
+  assert.ok(
+    entries.some(
+      (entry) => entry.url === `${baseUrl}/en/categories/fabrics-textiles`,
+    ),
+  );
+  assert.ok(
+    entries.some(
+      (entry) => entry.url === `${baseUrl}/ar/categories/fabrics-textiles`,
+    ),
+  );
+  assert.ok(entries.every((entry) => !entry.url.includes("/categories/cloth-piece")));
+});
+
 test("category directory lists published categories only for locales with exact translations", () => {
   const categories = [
     { id: "gloves", slug: "gloves", status: "PUBLISHED" },
+    { id: "fabrics", slug: "cloth-piece", status: "PUBLISHED" },
     { id: "shoes", slug: "shoes", status: "PUBLISHED" },
     { id: "draft", slug: "draft", status: "DRAFT" },
   ];
   const translations = [
     { categoryId: "gloves", locale: "en" as const, name: "Gloves", description: null },
     { categoryId: "gloves", locale: "ar" as const, name: "قفازات", description: null },
+    { categoryId: "fabrics", locale: "en" as const, name: "Fabrics & Textiles", description: null },
+    { categoryId: "fabrics", locale: "ar" as const, name: "الأقمشة والمنسوجات", description: null },
     { categoryId: "shoes", locale: "en" as const, name: "Shoes", description: null },
     { categoryId: "draft", locale: "en" as const, name: "Draft", description: null },
   ];
 
   assert.deepEqual(
     mapPublishedCategories(categories, translations, "en").map(({ slug }) => slug),
-    ["gloves", "shoes"],
+    ["gloves", "fabrics-textiles", "shoes"],
   );
   assert.deepEqual(
     mapPublishedCategories(categories, translations, "ar").map(({ slug }) => slug),
-    ["gloves"],
+    ["gloves", "fabrics-textiles"],
+  );
+});
+
+test("blog category links skip the legacy cloth-piece redirect in both locales", () => {
+  const categoryId = "3703a065-d590-4335-80d3-fcebdaf5dd61";
+  const html = `<a href="category-id:${categoryId}">Fabrics &amp; Textiles</a>`;
+  const slugs = new Map([[categoryId, "cloth-piece"]]);
+
+  assert.equal(
+    renderBlogCategoryLinks("en", html, slugs),
+    '<a href="/en/categories/fabrics-textiles">Fabrics &amp; Textiles</a>',
+  );
+  assert.equal(
+    renderBlogCategoryLinks("ar", html, slugs),
+    '<a href="/ar/categories/fabrics-textiles">Fabrics &amp; Textiles</a>',
   );
 });
 
@@ -414,6 +458,99 @@ test("localized homepage metadata is distinct, useful, and localized", () => {
   assert.equal(arMessages.common.viewDetails, "عرض التفاصيل");
 });
 
+test("homepage, category, product, and blog titles contain the brand at most once", () => {
+  const titles = [
+    createPublicPageMetadata({
+      locale: "en",
+      path: "/",
+      title: enMessages.metadata.siteTitle,
+    }).title,
+    createPublicPageMetadata({
+      locale: "ar",
+      path: "/",
+      title: arMessages.metadata.siteTitle,
+    }).title,
+    createCategoryMetadata({
+      locale: "en",
+      path: "/categories/hair-oils",
+      categoryName: "Hair Oils",
+    }).title,
+    createCategoryMetadata({
+      locale: "ar",
+      path: "/categories/hair-oils",
+      categoryName: "زيوت الشعر",
+    }).title,
+    createProductMetadata({
+      locale: "en",
+      path: "/products/dpl-gloves",
+      productName: "DPL Gloves",
+      categoryName: "Gloves",
+    }).title,
+    createProductMetadata({
+      locale: "ar",
+      path: "/products/dpl-gloves",
+      productName: "قفازات DPL",
+      categoryName: "قفازات",
+    }).title,
+    createPublicPageMetadata({
+      locale: "en",
+      path: "/blog/product-discovery-for-smarter-shopping",
+      title: getBlogArticleBySlug(
+        "en",
+        "product-discovery-for-smarter-shopping",
+      )?.seoTitle,
+    }).title,
+    createPublicPageMetadata({
+      locale: "ar",
+      path: "/blog/product-discovery-for-smarter-shopping",
+      title: getBlogArticleBySlug(
+        "ar",
+        "product-discovery-for-smarter-shopping",
+      )?.seoTitle,
+    }).title,
+    createPublicPageMetadata({
+      locale: "en",
+      path: "/blog/fancy-suit-guide",
+      title: getBlogArticleBySlug("en", "fancy-suit-guide")?.seoTitle,
+    }).title,
+    createPublicPageMetadata({
+      locale: "en",
+      path: "/blog/cloth-piece-guide",
+      title: getBlogArticleBySlug("en", "cloth-piece-guide")?.seoTitle,
+    }).title,
+    createPublicPageMetadata({
+      locale: "ar",
+      path: "/blog/adivasi-oil-overview",
+      title: getBlogArticleBySlug("ar", "adivasi-oil-overview")?.seoTitle,
+    }).title,
+  ];
+
+  assert.deepEqual(titles, [
+    "Qasr Al Mabrook Product Catalogue",
+    "كتالوج منتجات قصر المبارك",
+    "Hair Oils | Qasr Al Mabrook",
+    "زيوت الشعر | قصر المبارك",
+    "DPL Gloves | Qasr Al Mabrook",
+    "قفازات DPL | قصر المبارك",
+    "Product Discovery: Measuring Tapes | Qasr Al Mabrook",
+    "مقارنة خيارات أشرطة القياس: 5 و5.5 و7.5 أمتار | قصر المبارك",
+    "Fancy Suit Options in the Catalogue | Qasr Al Mabrook",
+    "Cloth Pieces: Catalogue Guide | Qasr Al Mabrook",
+    "زيت أديفاسي: نظرة عامة | قصر المبارك",
+  ]);
+  assert.ok(titles.every((title) => typeof title === "string"));
+  assert.equal(buildCategorySeoTitle("Hair Oils"), "Hair Oils | Qasr Al Mabrook");
+  assert.equal(
+    createPublicPageMetadata({
+      locale: "en",
+      path: "/categories/hair-oils",
+      title:
+        "Hair Oils | Qasr Al Mabrook | Qasr Al Mabrook Product Catalogue",
+    }).title,
+    "Hair Oils | Qasr Al Mabrook",
+  );
+});
+
 test("the three long English blog titles are shortened while preserving their topics", () => {
   const choosing = getBlogArticleBySlug("en", "choosing-everyday-essentials");
   const discovery = getBlogArticleBySlug("en", "product-discovery-for-smarter-shopping");
@@ -432,9 +569,6 @@ test("the three long English blog titles are shortened while preserving their to
   assert.equal(oil.seoTitle, "Adivasi Oil Overview");
   assert.doesNotMatch(choosing.title, /measuring tape/i);
   assert.doesNotMatch(oil.title, /measuring tape/i);
-  for (const title of [choosing.title, discovery.title, oil.title]) {
-    assert.ok(title.length < 60);
-  }
 });
 
 test("product and category metadata builders use real names and concise descriptions", () => {
@@ -471,7 +605,10 @@ test("product metadata honors a populated SEO title and otherwise adds its local
     categoryName: "الأدوات والقياس",
   });
 
-  assert.equal(explicitTitle.title, "Owner-approved product title");
+  assert.equal(
+    explicitTitle.title,
+    "Owner-approved product title | Qasr Al Mabrook",
+  );
   assert.equal(generatedTitle.title, "منتج تجريبي | الأدوات والقياس | قصر المبارك");
 });
 

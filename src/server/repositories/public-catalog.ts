@@ -7,6 +7,7 @@ import {
   mapProductCategoriesForLocale,
   mapPublishedBrands,
   mapPublishedCategories,
+  canonicalPublicCategorySlug,
   sanitizeCatalogueDescription,
 } from "@/lib/public-catalog-mapping";
 import {
@@ -318,7 +319,12 @@ export async function getPublishedCategorySlugsByIds(
       and(eq(categories.status, "PUBLISHED"), inArray(categories.id, [...categoryIds])),
     );
 
-  return new Map(rows.map((category) => [category.id, category.slug]));
+  return new Map(
+    rows.map((category) => [
+      category.id,
+      canonicalPublicCategorySlug(category.slug),
+    ]),
+  );
 }
 
 export function listIndexableCategories(locale: Locale) {
@@ -338,7 +344,13 @@ export function listIndexableCategories(locale: Locale) {
             eq(categoryTranslations.locale, locale),
           ),
         )
-        .orderBy(asc(categories.sortOrder), asc(categories.slug)),
+        .orderBy(asc(categories.sortOrder), asc(categories.slug))
+        .then((rows) =>
+          rows.map((category) => ({
+            ...category,
+            slug: canonicalPublicCategorySlug(category.slug),
+          })),
+        ),
     {
       revalidate: PUBLIC_CACHE_REVALIDATE_SECONDS,
       tags: [publicCacheTags.categories],

@@ -2,6 +2,7 @@ import { localePath, type Locale } from "@/lib/locales";
 import { PublicImageSlot } from "@/components/public/public-image-slot";
 import { getTranslations } from "next-intl/server";
 import { TrackedLink } from "@/components/analytics/tracked-link";
+import { canonicalPublicCategorySlug } from "@/lib/public-catalog-mapping";
 
 export async function CategoryCard({
   locale,
@@ -30,7 +31,7 @@ export async function CategoryCard({
         locale,
         source: "category-card",
       }}
-      href={localePath(locale, `/categories/${slug}`)}
+      href={localePath(locale, `/categories/${canonicalPublicCategorySlug(slug)}`)}
       aria-label={t("browseCategoryNamed", { categoryName: name })}
       className="group flex h-full flex-col rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-white p-3 shadow-[var(--shadow-sm)] transition-colors hover:border-[var(--brand-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2"
     >

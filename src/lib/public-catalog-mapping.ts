@@ -2,6 +2,14 @@ import type { Locale } from "@/lib/locales";
 
 type LocalizedRecord = { locale: Locale };
 
+const publicCategorySlugAliases: Readonly<Record<string, string>> = {
+  "cloth-piece": "fabrics-textiles",
+};
+
+export function canonicalPublicCategorySlug(slug: string): string {
+  return publicCategorySlugAliases[slug] ?? slug;
+}
+
 const internalDescriptionPatterns = [
   /\b(?:database|db)\b/i,
   /\b(?:product )?record does not\b/i,
@@ -73,6 +81,7 @@ export function mapPublishedCategories<
     return [
       {
         ...category,
+        slug: canonicalPublicCategorySlug(category.slug),
         name: translation.name,
         description: sanitizeCatalogueDescription(translation.description),
       },
@@ -81,7 +90,7 @@ export function mapPublishedCategories<
 }
 
 export function mapProductCategoriesForLocale<
-  Category extends { id: string; status: string },
+  Category extends { id: string; status: string; slug?: string },
   Translation extends { categoryId: string; locale: Locale },
 >(
   rows: readonly { category: Category }[],
@@ -95,7 +104,14 @@ export function mapProductCategoriesForLocale<
         translations.filter((candidate) => candidate.categoryId === category.id),
         locale,
       ) ?? null;
-    return [{ category, translation }];
+    return [
+      {
+        category: category.slug
+          ? { ...category, slug: canonicalPublicCategorySlug(category.slug) }
+          : category,
+        translation,
+      },
+    ];
   });
 }
 

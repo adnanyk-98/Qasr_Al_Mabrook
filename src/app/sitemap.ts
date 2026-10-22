@@ -1,5 +1,6 @@
 import { type MetadataRoute } from "next";
 import { connection } from "next/server";
+import { canonicalPublicCategorySlug } from "@/lib/public-catalog-mapping";
 import { db } from "@/db";
 import {
   categories,
@@ -76,7 +77,7 @@ export function buildSitemapEntries(data: SitemapData): MetadataRoute.Sitemap {
     addLocalizedEntries(
       entries,
       baseUrl,
-      `/categories/${category.slug}`,
+      `/categories/${canonicalPublicCategorySlug(category.slug)}`,
       locales.filter((candidate) => availableLocales.has(candidate)),
       {
         lastModified: category.updatedAt ?? undefined,

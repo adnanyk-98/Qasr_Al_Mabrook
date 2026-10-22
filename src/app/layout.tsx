@@ -26,7 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: {
       default: siteConfig.name,
-      template: `%s | ${siteConfig.name}`,
+      template: "%s",
     },
     metadataBase: new URL(getBaseUrl()),
     robots: shouldNoindexHost(host)

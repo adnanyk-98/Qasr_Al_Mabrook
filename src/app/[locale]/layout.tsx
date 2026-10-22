@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     }),
     title: {
       default: metadataMessages.siteTitle,
-      template: `%s | ${metadataMessages.siteTitle}`,
+      template: "%s",
     },
   };
 }

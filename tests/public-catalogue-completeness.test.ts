@@ -76,6 +76,26 @@ test("public product categories exclude unpublished rows and localize published 
   ]);
 });
 
+test("public product category links use the current slug for legacy category records", () => {
+  const rows = [
+    {
+      category: {
+        id: "fabrics",
+        status: "PUBLISHED",
+        slug: "cloth-piece",
+      },
+    },
+  ];
+  const translations = [
+    { categoryId: "fabrics", locale: "en" as const, name: "Fabrics & Textiles" },
+  ];
+
+  assert.equal(
+    mapProductCategoriesForLocale(rows, translations, "en")[0]?.category.slug,
+    "fabrics-textiles",
+  );
+});
+
 test("public category directories require a published category and exact-locale translation", () => {
   const categories = [
     { id: "gloves", slug: "gloves", status: "PUBLISHED" },

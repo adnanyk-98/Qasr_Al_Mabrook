@@ -121,6 +121,34 @@ function localizedBrand(locale: Locale): string {
   return locale === "ar" ? "قصر المبارك" : "Qasr Al Mabrook";
 }
 
+function ensureSingleBrand(title: string, locale: Locale): string {
+  const brandPattern = new RegExp(
+    localizedBrand(locale).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+    "giu",
+  );
+  let brandSeen = false;
+  const parts = title.split(/\s+\|\s+/u).flatMap((part) => {
+    if (!brandPattern.test(part)) return [part];
+    brandPattern.lastIndex = 0;
+    if (brandSeen) return [];
+
+    brandSeen = true;
+    let keptBrand = false;
+    return [
+      part
+        .replace(brandPattern, (match) => {
+          if (keptBrand) return "";
+          keptBrand = true;
+          return match;
+        })
+        .replace(/\s{2,}/gu, " ")
+        .trim(),
+    ];
+  });
+  const normalized = parts.filter(Boolean).join(" | ");
+  return brandSeen ? normalized : `${normalized} | ${localizedBrand(locale)}`;
+}
+
 export function buildCategorySeoTitle(
   categoryName?: string | null,
   locale: Locale = "en",
@@ -216,7 +244,10 @@ export function createPublicPageMetadata(options: CreateMetadataOptions): Metada
     hasAlternate = true,
   } = options;
 
-  const finalTitle = normalizeSeoText(title) || localizedBrand(locale);
+  const finalTitle = ensureSingleBrand(
+    normalizeSeoText(title) || localizedBrand(locale),
+    locale,
+  );
 
   const finalDescription = normalizeSeoText(description) ||
     (locale === "ar"

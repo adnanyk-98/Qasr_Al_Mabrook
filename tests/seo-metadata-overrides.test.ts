@@ -17,7 +17,7 @@ test("product SEO description overrides long and short descriptions", () => {
     hasAlternate: true,
   });
 
-  assert.equal(metadata.title, "قفازات مهنية");
+  assert.equal(metadata.title, "قفازات مهنية | قصر المبارك");
   assert.equal(metadata.description, "قفازات مهنية ببطانة داخلية.");
   assert.equal(metadata.alternates?.canonical, `${baseUrl}/ar/products/dpl-gloves`);
   assert.equal(metadata.alternates?.languages?.ar, `${baseUrl}/ar/products/dpl-gloves`);

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 import { localePath } from "@/lib/locales";
 import { TrackedLink } from "@/components/analytics/tracked-link";
+import { canonicalPublicCategorySlug } from "@/lib/public-catalog-mapping";
 
 type CategoryMarqueeItem = {
   id: string;
@@ -108,7 +109,7 @@ export function CategoryMarquee({ locale, categories }: { locale: "en" | "ar"; c
             event="category_view"
             params={{ category_id: category.id, category_name: category.name, locale, source: "category-marquee" }}
             data-category-marquee-item
-            href={localePath(locale, `/categories/${category.slug}`)}
+            href={localePath(locale, `/categories/${canonicalPublicCategorySlug(category.slug)}`)}
             aria-label={category.name}
             aria-hidden={copy >= copies}
             tabIndex={copy >= copies ? -1 : undefined}

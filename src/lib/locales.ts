@@ -1,3 +1,5 @@
+import { canonicalPublicCategorySlug } from "@/lib/public-catalog-mapping";
+
 export const locales = ["en", "ar"] as const;
 
 export type Locale = (typeof locales)[number];
@@ -26,7 +28,11 @@ export function localizedHref(locale: Locale, href: string) {
   }
 
   const normalized = href.replace(/^\/(?:en|ar)(?=\/|$)/, "") || "/";
-  return localePath(locale, normalized);
+  const canonicalPath = normalized.replace(
+    /^\/categories\/([^/?#]+)/,
+    (_path, slug: string) => `/categories/${canonicalPublicCategorySlug(slug)}`,
+  );
+  return localePath(locale, canonicalPath);
 }
 
 export function getAlternateLocale(currentLocale: Locale) {

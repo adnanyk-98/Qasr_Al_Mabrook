@@ -21,7 +21,7 @@ import {
   shouldNoindexFilteredView,
   shouldNoindexStateQuery,
 } from "@/lib/seo";
-import { getAlternateLocale, localePath } from "@/lib/locales";
+import { getAlternateLocale, localePath, localizedHref } from "@/lib/locales";
 import { getBlogArticleBySlug } from "@/lib/blog";
 import { renderBlogCategoryLinks } from "@/lib/blog-category-links";
 import nextConfig from "../next.config";
@@ -140,6 +140,14 @@ test("localized URLs preserve the configured locale routing format", () => {
   assert.equal(localePath("ar", "/products"), "/ar/products");
   assert.equal(localePath("en", "/"), "/en");
   assert.equal(localePath("ar", "/"), "/ar");
+  assert.equal(
+    localizedHref("en", "/en/categories/cloth-piece"),
+    "/en/categories/fabrics-textiles",
+  );
+  assert.equal(
+    localizedHref("ar", "/ar/categories/cloth-piece?source=hero"),
+    "/ar/categories/fabrics-textiles?source=hero",
+  );
   assert.equal(getAlternateLocale("en"), "ar");
   assert.equal(getAlternateLocale("ar"), "en");
 });

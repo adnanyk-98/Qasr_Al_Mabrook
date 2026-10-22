@@ -5,6 +5,10 @@
     "products": "Products",
     "blog": "Blog",
     "categories": "Categories",
+    "browseCategories": "Browse categories",
+    "browseCategoryNamed": "Browse {categoryName}",
+    "aboutUs": "About Us",
+    "htmlSitemap": "Site map",
     "search": "Search",
     "contact": "Contact",
     "storeLocator": "Store Locator",
@@ -208,8 +212,8 @@
     "subject": "Enquiry about {productName}"
   },
   "metadata": {
-    "siteTitle": "Qasr Al Mabrook",
-    "siteDescription": "Qasr Al Mabrook catalogue and enquiry platform.",
+    "siteTitle": "Qasr Al Mabrook Product Catalogue",
+    "siteDescription": "Explore the Qasr Al Mabrook product catalogue by category, review product details, and contact the team with an enquiry.",
     "productsTitle": "Product catalogue",
     "productsDescription": "Browse the Qasr Al Mabrook product catalogue.",
     "categoriesTitle": "Explore categories",
@@ -220,5 +224,10 @@
     "blogDescription": "Explore practical catalogue guidance, product discovery tips, and shopping insights for everyday buying decisions.",
     "requestQuoteTitle": "Request a quote",
     "contactTitle": "Contact us"
+  },
+  "sitemap": {
+    "title": "Site map",
+    "description": "Browse public pages, product categories, and products in the Qasr Al Mabrook catalogue.",
+    "pagesHeading": "Pages"
   }
 }

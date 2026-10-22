@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 import { localePath } from "@/lib/locales";
 import { TrackedLink } from "@/components/analytics/tracked-link";
+import { canonicalPublicCategorySlug } from "@/lib/public-catalog-mapping";
 
 type CategoryMarqueeItem = {
   id: string;
@@ -11,10 +12,17 @@ type CategoryMarqueeItem = {
   name: string;
 };
 
-
-export function CategoryMarquee({ locale, categories }: { locale: "en" | "ar"; categories: CategoryMarqueeItem[] }) {
+export function CategoryMarquee({
+  locale,
+  categories,
+}: {
+  locale: "en" | "ar";
+  categories: CategoryMarqueeItem[];
+}) {
   const trackRef = useRef<HTMLDivElement | null>(null);
-  const dragRef = useRef<{ pointerId: number; startX: number; baseX: number } | null>(null);
+  const dragRef = useRef<{ pointerId: number; startX: number; baseX: number } | null>(
+    null,
+  );
   const suppressClickRef = useRef(false);
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -40,7 +48,15 @@ export function CategoryMarquee({ locale, categories }: { locale: "en" | "ar"; c
       const targetMin = viewportWidth >= 1280 ? 150 : viewportWidth >= 768 ? 135 : 115;
       const targetMax = viewportWidth >= 1280 ? 165 : viewportWidth >= 768 ? 150 : 130;
       setSlotWidth(width / visible);
-      setOrbSize(Math.min(targetMax, Math.max(targetMin, viewportWidth >= 1280 ? 160 : viewportWidth >= 768 ? 145 : 125)));
+      setOrbSize(
+        Math.min(
+          targetMax,
+          Math.max(
+            targetMin,
+            viewportWidth >= 1280 ? 160 : viewportWidth >= 768 ? 145 : 125,
+          ),
+        ),
+      );
     };
 
     resize();
@@ -52,7 +68,9 @@ export function CategoryMarquee({ locale, categories }: { locale: "en" | "ar"; c
   if (!categories.length) return null;
 
   const copies = Math.max(2, Math.ceil(12 / Math.max(categories.length, 1)));
-  const loopItems = Array.from({ length: copies }, (_, copy) => categories.map((category) => ({ category, copy }))).flat();
+  const loopItems = Array.from({ length: copies }, (_, copy) =>
+    categories.map((category) => ({ category, copy })),
+  ).flat();
 
   function handlePointerDown(event: React.PointerEvent<HTMLDivElement>) {
     const track = trackRef.current;
@@ -60,7 +78,11 @@ export function CategoryMarquee({ locale, categories }: { locale: "en" | "ar"; c
     const transform = getComputedStyle(track).transform;
     const matrixValues = transform.match(/matrix\(([^)]+)\)/)?.[1].split(",");
     const matrix = transform === "none" ? 0 : Number(matrixValues?.[4] ?? 0);
-    dragRef.current = { pointerId: event.pointerId, startX: event.clientX, baseX: matrix };
+    dragRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      baseX: matrix,
+    };
     suppressClickRef.current = false;
     track.style.animationPlayState = "paused";
     track.style.transform = `translate3d(${matrix}px, 0, 0)`;
@@ -101,21 +123,35 @@ export function CategoryMarquee({ locale, categories }: { locale: "en" | "ar"; c
       onPointerUp={handlePointerEnd}
       onPointerCancel={handlePointerEnd}
     >
-      <div ref={trackRef} dir={locale === "ar" ? "rtl" : "ltr"} className={`qam-category-track flex w-max ${reducedMotion ? "[animation-play-state:paused]" : ""}`}>
+      <div
+        ref={trackRef}
+        dir={locale === "ar" ? "rtl" : "ltr"}
+        className={`qam-category-track flex w-max ${reducedMotion ? "[animation-play-state:paused]" : ""}`}
+      >
         {loopItems.map(({ category, copy }, index) => (
           <TrackedLink
             key={`${category.id}-${copy}-${index}`}
             event="category_view"
-            params={{ category_id: category.id, category_name: category.name, locale, source: "category-marquee" }}
+            params={{
+              category_id: category.id,
+              category_name: category.name,
+              locale,
+              source: "category-marquee",
+            }}
             data-category-marquee-item
-            href={localePath(locale, `/categories/${category.slug}`)}
+            href={localePath(
+              locale,
+              `/categories/${canonicalPublicCategorySlug(category.slug)}`,
+            )}
             aria-label={category.name}
             aria-hidden={copy >= copies}
             tabIndex={copy >= copies ? -1 : undefined}
-            style={{
-              width: slotWidth || undefined,
-              ["--category-float-delay" as string]: `${(index % Math.max(categories.length, 1)) * -0.7}s`,
-            } as CSSProperties}
+            style={
+              {
+                width: slotWidth || undefined,
+                ["--category-float-delay" as string]: `${(index % Math.max(categories.length, 1)) * -0.7}s`,
+              } as CSSProperties
+            }
             className="group flex shrink-0 cursor-pointer flex-col items-center text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-4"
             onClick={(event) => {
               if (suppressClickRef.current) {
@@ -125,10 +161,16 @@ export function CategoryMarquee({ locale, categories }: { locale: "en" | "ar"; c
               suppressClickRef.current = false;
             }}
           >
-            <span style={{ width: orbSize || undefined, height: orbSize || undefined }} className="qam-category-orb mx-auto flex shrink-0 cursor-pointer items-center justify-center rounded-full border border-[var(--brand-border)] bg-[radial-gradient(circle_at_35%_25%,#fff_0%,var(--brand-surface-alt)_62%,#eadfd9_100%)] px-4 text-center text-sm font-semibold text-[var(--foreground)] shadow-[0_10px_24px_rgba(91,15,19,0.1)] transition-[transform,box-shadow,border-color] duration-300 group-hover:-translate-y-1 group-hover:border-[var(--brand-primary)] group-hover:shadow-[0_14px_28px_rgba(91,15,19,0.16)] sm:px-6 sm:text-base">
+            <span
+              style={{ width: orbSize || undefined, height: orbSize || undefined }}
+              className="qam-category-orb mx-auto flex shrink-0 cursor-pointer items-center justify-center rounded-full border border-[var(--brand-border)] bg-[radial-gradient(circle_at_35%_25%,#fff_0%,var(--brand-surface-alt)_62%,#eadfd9_100%)] px-4 text-center text-sm font-semibold text-[var(--foreground)] shadow-[0_10px_24px_rgba(91,15,19,0.1)] transition-[transform,box-shadow,border-color] duration-300 group-hover:-translate-y-1 group-hover:border-[var(--brand-primary)] group-hover:shadow-[0_14px_28px_rgba(91,15,19,0.16)] sm:px-6 sm:text-base"
+            >
               <span className="flex max-w-full flex-col items-center gap-3 break-words">
                 <span className="max-w-full break-words">{category.name}</span>
-                <span aria-hidden="true" className="h-px w-8 bg-[var(--brand-primary)] opacity-70" />
+                <span
+                  aria-hidden="true"
+                  className="h-px w-8 bg-[var(--brand-primary)] opacity-70"
+                />
               </span>
             </span>
           </TrackedLink>

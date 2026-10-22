@@ -11,7 +11,9 @@ import {
   getBlogArticles,
   resolveBlogHref,
 } from "@/lib/blog";
+import { getBlogCategoryIds, renderBlogCategoryLinks } from "@/lib/blog-category-links";
 import { locales, localePath, type Locale } from "@/lib/locales";
+import { getPublishedCategorySlugsByIds } from "@/server/repositories/public-catalog";
 import {
   buildCanonical,
   createBlogPostingStructuredData,
@@ -59,6 +61,14 @@ export default async function BlogArticlePage({
   const currentLocale = locale as Locale;
   const article = getBlogArticleBySlug(currentLocale, slug);
   if (!article) notFound();
+  const categoryIds = getBlogCategoryIds(article.body);
+  const categorySlugs = await getPublishedCategorySlugsByIds(
+    currentLocale,
+    categoryIds,
+  );
+  const renderedBody = article.body.map((html) =>
+    renderBlogCategoryLinks(currentLocale, html, categorySlugs),
+  );
 
   const authorLabel = currentLocale === "ar" ? "قصر المبارك" : "Qasr Al Mabrook";
   const relatedArticleMap: Record<string, string[]> = {
@@ -171,7 +181,7 @@ export default async function BlogArticlePage({
 
           <article
             className="blog-article prose max-w-none space-y-6 text-[var(--text-muted)]"
-            dangerouslySetInnerHTML={{ __html: article.body.join("") }}
+            dangerouslySetInnerHTML={{ __html: renderedBody.join("") }}
           />
 
           <div className="rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-[var(--brand-surface-alt)] p-6">

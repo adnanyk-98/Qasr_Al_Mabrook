@@ -5,6 +5,10 @@
     "products": "المنتجات",
     "blog": "المدونة",
     "categories": "الفئات",
+    "browseCategories": "تصفح الفئات",
+    "browseCategoryNamed": "تصفح {categoryName}",
+    "aboutUs": "من نحن",
+    "htmlSitemap": "خريطة الموقع",
     "search": "بحث",
     "contact": "تواصل معنا",
     "storeLocator": "موقع المتجر",
@@ -208,8 +212,8 @@
     "subject": "استفسار عن {productName}"
   },
   "metadata": {
-    "siteTitle": "قصر المبارك",
-    "siteDescription": "كتالوج ومنصة تواصل قصر المبارك.",
+    "siteTitle": "كتالوج منتجات قصر المبارك",
+    "siteDescription": "تصفح كتالوج منتجات قصر المبارك حسب الفئة، وراجع تفاصيل المنتجات، وتواصل مع الفريق للاستفسار.",
     "productsTitle": "كتالوج المنتجات",
     "productsDescription": "تصفح كتالوج منتجات قصر المبارك.",
     "categoriesTitle": "استكشف الفئات",
@@ -220,5 +224,10 @@
     "blogDescription": "استكشف إرشادات عملية للكتالوج ونصائح لاكتشاف المنتجات وتوجيهات التسوق للقرارات اليومية.",
     "requestQuoteTitle": "طلب عرض سعر",
     "contactTitle": "تواصل معنا"
+  },
+  "sitemap": {
+    "title": "خريطة الموقع",
+    "description": "تصفح الصفحات العامة وفئات المنتجات ومنتجات كتالوج قصر المبارك.",
+    "pagesHeading": "الصفحات"
   }
 }

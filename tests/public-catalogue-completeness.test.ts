@@ -1,16 +1,16 @@
 import assert from "node:assert/strict";
-import { after, test } from "node:test";
+import { test } from "node:test";
 
-import { and, eq } from "drizzle-orm";
-
-import { db } from "@/db";
-import { brandTranslations, brands, categories, productCategories, products } from "@/db/schema";
-import { PUBLIC_CACHE_REVALIDATE_SECONDS, publicCacheTags, withPublicCache } from "@/lib/public-cache";
-import { getPublishedBrands, listProductCategoriesForProduct } from "@/server/repositories/public-catalog";
-
-after(async () => {
-  await (db as typeof db & { $client: { end: () => Promise<void> } }).$client.end();
-});
+import {
+  mapProductCategoriesForLocale,
+  mapPublishedBrands,
+  mapPublishedCategories,
+} from "@/lib/public-catalog-mapping";
+import {
+  PUBLIC_CACHE_REVALIDATE_SECONDS,
+  publicCacheTags,
+  withPublicCache,
+} from "@/lib/public-cache";
 
 test("public cache wrapper preserves production config and falls back in direct Node execution", async () => {
   assert.equal(PUBLIC_CACHE_REVALIDATE_SECONDS, 300);
@@ -18,79 +18,103 @@ test("public cache wrapper preserves production config and falls back in direct 
   assert.equal(publicCacheTags.products, "catalogue:products");
   assert.equal(publicCacheTags.product("p-1"), "catalogue:product:p-1");
   assert.equal(publicCacheTags.category("c-1"), "catalogue:category:c-1");
-  assert.equal(publicCacheTags.categorySlug("summer"), "catalogue:category-slug:summer");
+  assert.equal(
+    publicCacheTags.categorySlug("summer"),
+    "catalogue:category-slug:summer",
+  );
 
   let calls = 0;
-  const result = await withPublicCache(["wrapper-test", "en"], async () => {
-    calls += 1;
-    return { locale: "en", ok: true };
-  }, { revalidate: 600, tags: [publicCacheTags.brands] });
+  const result = await withPublicCache(
+    ["wrapper-test", "en"],
+    async () => {
+      calls += 1;
+      return { locale: "en", ok: true };
+    },
+    { revalidate: 600, tags: [publicCacheTags.brands] },
+  );
 
   assert.deepEqual(result, { locale: "en", ok: true });
   assert.equal(calls, 1);
 });
 
-test("public brands use the requested locale and English fallback", async (t) => {
-  const publishedBrands = await db
-    .select({ id: brands.id, baseName: brands.name })
-    .from(brands)
-    .where(and(eq(brands.enabled, true), eq(brands.status, "PUBLISHED")));
-  const translations = publishedBrands.length
-    ? await db.select().from(brandTranslations)
-    : [];
-  const englishByBrand = new Map(translations.filter((translation) => translation.locale === "en").map((translation) => [translation.brandId, translation.name]));
-  const arabicByBrand = new Map(translations.filter((translation) => translation.locale === "ar").map((translation) => [translation.brandId, translation.name]));
-  const english = await getPublishedBrands("en");
-  const arabic = await getPublishedBrands("ar");
+test("public brands use the requested locale and English fallback", () => {
+  const brands = [
+    { id: "brand-1", baseName: "Base brand", logoUrl: null },
+    { id: "brand-2", baseName: "Second brand", logoUrl: "/brand.png" },
+  ];
+  const translations = [
+    { brandId: "brand-1", locale: "en" as const, name: "Brand" },
+    { brandId: "brand-1", locale: "ar" as const, name: "علامة" },
+  ];
 
-  assert.deepEqual(english.map((brand) => brand.id), publishedBrands.map((brand) => brand.id));
-  for (const brand of publishedBrands) {
-    assert.equal(english.find((candidate) => candidate.id === brand.id)?.name, englishByBrand.get(brand.id) ?? brand.baseName);
-    assert.equal(arabic.find((candidate) => candidate.id === brand.id)?.name, arabicByBrand.get(brand.id) ?? englishByBrand.get(brand.id) ?? brand.baseName);
-  }
-
-  const missingArabicBrand = publishedBrands.find((brand) => !arabicByBrand.has(brand.id));
-  if (!missingArabicBrand) {
-    t.skip("current published brand data has no missing Arabic translation fixture");
-    return;
-  }
-
-  assert.equal(arabic.find((brand) => brand.id === missingArabicBrand.id)?.name, englishByBrand.get(missingArabicBrand.id) ?? missingArabicBrand.baseName);
+  assert.deepEqual(mapPublishedBrands(brands, translations, "en"), [
+    { id: "brand-1", name: "Brand", logoUrl: null },
+    { id: "brand-2", name: "Second brand", logoUrl: "/brand.png" },
+  ]);
+  assert.deepEqual(mapPublishedBrands(brands, translations, "ar"), [
+    { id: "brand-1", name: "علامة", logoUrl: null },
+    { id: "brand-2", name: "Second brand", logoUrl: "/brand.png" },
+  ]);
 });
 
-test("public product categories include only published categories", async (t) => {
-  const publishedProduct = await db
-    .select({ id: products.id })
-    .from(products)
-    .where(eq(products.status, "PUBLISHED"))
-    .limit(1);
-  assert.ok(publishedProduct[0]);
+test("public product categories exclude unpublished rows and localize published rows", () => {
+  const rows = [
+    { category: { id: "published", status: "PUBLISHED" } },
+    { category: { id: "draft", status: "DRAFT" } },
+  ];
+  const translations = [
+    { categoryId: "published", locale: "en" as const, name: "Tools" },
+    { categoryId: "published", locale: "ar" as const, name: "أدوات" },
+    { categoryId: "draft", locale: "en" as const, name: "Draft" },
+  ];
 
-  const categoriesForProduct = await listProductCategoriesForProduct(publishedProduct[0].id, "en");
-  assert.ok(categoriesForProduct.every(({ category }) => category.status === "PUBLISHED"));
+  assert.deepEqual(mapProductCategoriesForLocale(rows, translations, "en"), [
+    { category: rows[0].category, translation: translations[0] },
+  ]);
+  assert.deepEqual(mapProductCategoriesForLocale(rows, translations, "ar"), [
+    { category: rows[0].category, translation: translations[1] },
+  ]);
+});
 
-  const unpublishedRelation = await db
-    .select({ productId: productCategories.productId })
-    .from(productCategories)
-    .innerJoin(products, eq(productCategories.productId, products.id))
-    .innerJoin(categories, eq(productCategories.categoryId, categories.id))
-    .where(and(eq(products.status, "PUBLISHED"), eq(categories.status, "DRAFT")))
-    .limit(1);
-  const archivedRelation = unpublishedRelation.length
-    ? unpublishedRelation
-    : await db
-        .select({ productId: productCategories.productId })
-        .from(productCategories)
-        .innerJoin(products, eq(productCategories.productId, products.id))
-        .innerJoin(categories, eq(productCategories.categoryId, categories.id))
-        .where(and(eq(products.status, "PUBLISHED"), eq(categories.status, "ARCHIVED")))
-        .limit(1);
+test("public product category links use the current slug for legacy category records", () => {
+  const rows = [
+    {
+      category: {
+        id: "fabrics",
+        status: "PUBLISHED",
+        slug: "cloth-piece",
+      },
+    },
+  ];
+  const translations = [
+    { categoryId: "fabrics", locale: "en" as const, name: "Fabrics & Textiles" },
+  ];
 
-  if (!archivedRelation[0]) {
-    t.skip("current database has no published product linked to an unpublished category fixture");
-    return;
-  }
+  assert.equal(
+    mapProductCategoriesForLocale(rows, translations, "en")[0]?.category.slug,
+    "fabrics-textiles",
+  );
+});
 
-  const result = await listProductCategoriesForProduct(archivedRelation[0].productId, "en");
-  assert.ok(result.every(({ category }) => category.status === "PUBLISHED"));
+test("public category directories require a published category and exact-locale translation", () => {
+  const categories = [
+    { id: "gloves", slug: "gloves", status: "PUBLISHED" },
+    { id: "shoes", slug: "shoes", status: "PUBLISHED" },
+    { id: "draft", slug: "draft", status: "DRAFT" },
+  ];
+  const translations = [
+    { categoryId: "gloves", locale: "en" as const, name: "Gloves", description: null },
+    { categoryId: "gloves", locale: "ar" as const, name: "قفازات", description: null },
+    { categoryId: "shoes", locale: "en" as const, name: "Shoes", description: null },
+    { categoryId: "draft", locale: "en" as const, name: "Draft", description: null },
+  ];
+
+  assert.deepEqual(
+    mapPublishedCategories(categories, translations, "en").map(({ slug }) => slug),
+    ["gloves", "shoes"],
+  );
+  assert.deepEqual(
+    mapPublishedCategories(categories, translations, "ar").map(({ slug }) => slug),
+    ["gloves"],
+  );
 });

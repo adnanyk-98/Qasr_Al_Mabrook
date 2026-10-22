@@ -22,11 +22,13 @@ import {
 import { localePath, locales, type Locale } from "@/lib/locales";
 import {
   createBreadcrumbStructuredData,
+  createFaqStructuredData,
   createProductMetadata,
   createProductStructuredData,
   buildCanonical,
 } from "@/lib/seo";
 import { AnalyticsTracker } from "@/components/analytics/analytics-tracker";
+import { parseProductApplications } from "@/lib/product-content";
 
 export async function generateMetadata({
   params,
@@ -111,6 +113,16 @@ export default async function ProductDetailPage({
     slug: category.slug,
     name: translation?.name ?? category.slug,
   }));
+  const applications = parseProductApplications(product.applications);
+  const faqs = Array.isArray(product.faqs)
+    ? product.faqs.filter(
+        (faq) =>
+          typeof faq?.question === "string" &&
+          faq.question.trim().length > 0 &&
+          typeof faq.answer === "string" &&
+          faq.answer.trim().length > 0,
+      )
+    : [];
   const relatedHeading = productCategoryNames[0]?.name
     ? currentLocale === "ar"
       ? `استكشف المزيد من ${productCategoryNames[0].name}`
@@ -168,6 +180,14 @@ export default async function ProductDetailPage({
               }),
             }}
           />
+          {faqs.length > 0 ? (
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: createFaqStructuredData(faqs),
+              }}
+            />
+          ) : null}
           <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{
@@ -339,7 +359,10 @@ export default async function ProductDetailPage({
             className="mx-auto max-w-[820px]"
             dir={currentLocale === "ar" ? "rtl" : "ltr"}
           >
-            {specifications.length > 0 || product.description ? (
+            {specifications.length > 0 ||
+            product.description ||
+            applications.length > 0 ||
+            faqs.length > 0 ? (
               <div className="space-y-6">
                 {specifications.length > 0 ? (
                   <section className="rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-white p-6 shadow-[var(--shadow-sm)]">
@@ -371,6 +394,46 @@ export default async function ProductDetailPage({
                     </h2>
                     <div className="prose mt-5 max-w-none text-sm leading-7 text-[var(--text-muted)]">
                       <div dangerouslySetInnerHTML={{ __html: product.description }} />
+                    </div>
+                  </section>
+                ) : null}
+
+                {applications.length > 0 ? (
+                  <section className="rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-white p-6 shadow-[var(--shadow-sm)]">
+                    <h2 className="text-2xl font-semibold text-[var(--foreground)]">
+                      {currentLocale === "ar"
+                        ? "التطبيقات وحالات الاستخدام"
+                        : "Applications / Use cases"}
+                    </h2>
+                    <ul className="mt-5 list-disc space-y-2 ps-6 text-sm leading-7 text-[var(--text-muted)]">
+                      {applications.map((application, index) => (
+                        <li key={`${index}-${application}`}>{application}</li>
+                      ))}
+                    </ul>
+                  </section>
+                ) : null}
+
+                {faqs.length > 0 ? (
+                  <section className="rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-white p-6 shadow-[var(--shadow-sm)]">
+                    <h2 className="text-2xl font-semibold text-[var(--foreground)]">
+                      {currentLocale === "ar"
+                        ? "الأسئلة الشائعة"
+                        : "Frequently asked questions"}
+                    </h2>
+                    <div className="mt-5 space-y-4">
+                      {faqs.map((faq, index) => (
+                        <article
+                          key={`${index}-${faq.question}`}
+                          className="border-b border-[var(--brand-border)] pb-4 last:border-b-0"
+                        >
+                          <h3 className="font-semibold text-[var(--foreground)]">
+                            {faq.question}
+                          </h3>
+                          <p className="mt-2 text-sm leading-7 text-[var(--text-muted)]">
+                            {faq.answer}
+                          </p>
+                        </article>
+                      ))}
                     </div>
                   </section>
                 ) : null}

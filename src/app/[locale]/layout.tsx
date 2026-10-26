@@ -1,17 +1,22 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { cookies, headers } from "next/headers";
 
 import { locales, type Locale } from "@/lib/locales";
+import { AnalyticsConsentManager } from "@/components/analytics/analytics-consent-manager";
 import {
   createOrganizationStructuredData,
   createPublicPageMetadata,
   createWebSiteStructuredData,
 } from "@/lib/seo";
 import { NextIntlClientProvider } from "next-intl";
-import { GoogleAnalytics } from "@/components/analytics/google-analytics";
-
 import arMessages from "@/i18n/messages/ar.json";
 import enMessages from "@/i18n/messages/en.json";
+import {
+  ANALYTICS_CONSENT_COOKIE,
+  isCanonicalProductionHost,
+  parseAnalyticsConsent,
+} from "@/lib/analytics-consent";
 
 const messages = { en: enMessages, ar: arMessages } as const;
 
@@ -56,6 +61,13 @@ export default async function LocaleLayout({
   }
 
   const currentLocale = locale as Locale;
+  const [requestHeaders, requestCookies] = await Promise.all([headers(), cookies()]);
+  const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
+  const initialConsent = parseAnalyticsConsent(
+    requestCookies.get(ANALYTICS_CONSENT_COOKIE)?.value
+      ? `${ANALYTICS_CONSENT_COOKIE}=${requestCookies.get(ANALYTICS_CONSENT_COOKIE)?.value}`
+      : null,
+  );
 
   return (
     <div>
@@ -64,7 +76,12 @@ export default async function LocaleLayout({
         locale={currentLocale}
         messages={messages[currentLocale]}
       >
-        <GoogleAnalytics />
+        <AnalyticsConsentManager
+          canonicalProductionHost={isCanonicalProductionHost(host)}
+          copy={messages[currentLocale].analyticsConsent}
+          initialConsent={initialConsent}
+          locale={currentLocale}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: createOrganizationStructuredData() }}

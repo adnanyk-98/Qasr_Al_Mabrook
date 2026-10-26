@@ -207,6 +207,13 @@
     "email": "Email Enquiry",
     "subject": "Enquiry about {productName}"
   },
+  "analyticsConsent": {
+    "title": "Your privacy choices",
+    "description": "Optional analytics help us understand how the website is used and improve it. You can change this choice at any time.",
+    "accept": "Accept optional analytics",
+    "reject": "Reject optional analytics",
+    "manage": "Cookie preferences"
+  },
   "metadata": {
     "siteTitle": "Gloves, Measuring Tools, Fabrics & More | Qasr Al Mabrook",
     "siteDescription": "Explore occupational gloves, measuring tapes, fabrics, sleepwear and personal-care products in the Qasr Al Mabrook catalogue. Request a quote for product enquiries.",

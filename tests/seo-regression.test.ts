@@ -644,6 +644,85 @@ test("Arabic product metadata rejects English SEO overrides in favor of Arabic c
   assert.equal(metadata.description, "قفازات DPL Grandeur 70 ببطانة داخلية من الفلوك.");
 });
 
+test("about and category titles use descriptive localized page names", () => {
+  const aboutEn = createPublicPageMetadata({
+    locale: "en",
+    path: "/about-us",
+    title: "About Us",
+  });
+  const aboutAr = createPublicPageMetadata({
+    locale: "ar",
+    path: "/about-us",
+    title: "من نحن",
+  });
+  const fancySuitCategory = createCategoryMetadata({
+    locale: "en",
+    path: "/categories/fancy-suit",
+    categoryName: "Fancy Suit",
+    seoTitle: "Fancy Suit | Qasr Al Mabrook",
+  });
+  const fancySuitProduct = createProductMetadata({
+    locale: "en",
+    path: "/products/fancy-suit",
+    productName: "Fancy Suit",
+  });
+  const mensBottomWearCategory = createCategoryMetadata({
+    locale: "ar",
+    path: "/categories/mens-bottom-wear",
+    categoryName: "بيجاما",
+    seoTitle: "عنوان منتج البيجاما | قصر المبارك",
+  });
+
+  assert.equal(aboutEn.title, "About Us | Qasr Al Mabrook");
+  assert.equal(aboutAr.title, "من نحن | قصر المبارك");
+  assert.equal(fancySuitCategory.title, "Fancy Suit Collection | Qasr Al Mabrook");
+  assert.notEqual(fancySuitCategory.title, fancySuitProduct.title);
+  assert.equal(mensBottomWearCategory.title, "بيجاما | قصر المبارك");
+  assert.doesNotMatch(String(mensBottomWearCategory.title), /عنوان منتج/u);
+});
+
+test("the four flagged English metadata descriptions are shortened to 140 characters", () => {
+  const longDescription =
+    "This category includes occupational products made from neoprene and natural rubber with flock lining and textured grip surfaces for work environments where durable hand coverage and grip are important.";
+  const categoryGloves = createCategoryMetadata({
+    locale: "en",
+    path: "/categories/gloves",
+    categoryName: "Gloves",
+    description: longDescription,
+  });
+  const categoryMensBottomWear = createCategoryMetadata({
+    locale: "en",
+    path: "/categories/mens-bottom-wear",
+    categoryName: "Men's Bottom Wear",
+    description:
+      "This category groups pajama sleepwear products for personal use. Products currently listed include the Pajama product in the catalogue.",
+  });
+  const product5m = createProductMetadata({
+    locale: "en",
+    path: "/products/5m-measuring-tape-green",
+    productName: "5M Measuring Tape Green",
+    shortDescription:
+      "The Yokohama 5M/18FT measuring tape keeps the focus on the range most often needed for everyday measurement jobs. Its compact format is identified on the product packaging.",
+  });
+  const product75m = createProductMetadata({
+    locale: "en",
+    path: "/products/7-5m-measuring-tape-green",
+    productName: "7.5M Measuring Tape Green",
+    shortDescription:
+      "The Yokohama 7.5M/25FT measuring tape is the longest-range option in this collection, built around a 25-foot reach for measurements that move beyond the shorter tape.",
+  });
+
+  for (const metadata of [
+    categoryGloves,
+    categoryMensBottomWear,
+    product5m,
+    product75m,
+  ]) {
+    assert.ok((metadata.description?.length ?? 0) <= 140);
+    assert.ok(metadata.description?.endsWith("…"));
+  }
+});
+
 test("representative English and Arabic catalogue and blog metadata uses locale canonicals", () => {
   const hairOilsEn = createCategoryMetadata({
     locale: "en",

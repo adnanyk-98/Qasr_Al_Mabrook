@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import Image from "next/image";
 import Link from "next/link";
+import { isNextImageOptimizableSource } from "@/lib/image-optimization";
 import { localizedHref } from "@/lib/locales";
 import { trackEvent } from "@/lib/analytics";
 
@@ -566,7 +567,11 @@ export function HeroCarousel({
                             fill
                             sizes="(max-width: 767px) 100vw, 100vw"
                             loading={index === 1 ? "eager" : "lazy"}
-                            unoptimized
+                            unoptimized={
+                              !isNextImageOptimizableSource(
+                                banner.desktopImageUrl ?? banner.imageUrl,
+                              )
+                            }
                           />
                         </picture>
                       </div>
@@ -594,7 +599,11 @@ export function HeroCarousel({
                             fill
                             sizes="(max-width: 767px) 100vw, 100vw"
                             loading={index === 1 ? "eager" : "lazy"}
-                            unoptimized
+                            unoptimized={
+                              !isNextImageOptimizableSource(
+                                banner.desktopImageUrl ?? banner.imageUrl,
+                              )
+                            }
                           />
                         </picture>
                       </div>

@@ -25,7 +25,7 @@ export async function generateMetadata({
   const metadata = createPublicPageMetadata({
     locale: currentLocale,
     path: "/about-us",
-    title: page?.seoTitle ?? page?.title,
+    title: currentLocale === "ar" ? "من نحن" : "About Us",
     description: hasLocaleScript(page?.seoDescription, currentLocale)
       ? page?.seoDescription
       : currentLocale === "ar"

@@ -18,6 +18,17 @@ const mutableLocalAssetHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "media.qasralmabrook.com",
+        port: "",
+        pathname: "/**",
+        search: "",
+      },
+    ],
+  },
   htmlLimitedBots: /bot|crawler|spider/i,
   async redirects() {
     return [

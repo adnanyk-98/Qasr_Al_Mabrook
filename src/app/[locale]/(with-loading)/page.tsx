@@ -27,6 +27,7 @@ import { siteConfig } from "@/config/site";
 import { buildTelephoneHref } from "@/lib/phone-display";
 import { buildWhatsAppUrl } from "@/lib/homepage-contact";
 import { HomepageContactDialog } from "@/components/public/homepage-contact-dialog";
+import { getHomepageCatalogueLinks } from "@/lib/catalogue-landing-content";
 
 import enMessages from "@/i18n/messages/en.json";
 import arMessages from "@/i18n/messages/ar.json";
@@ -294,6 +295,29 @@ export default async function LocaleHomePage({
       />
 
       <HomeIntroSection locale={currentLocale} />
+
+      <Section className="!py-6">
+        <Container>
+          <nav
+            aria-label={
+              currentLocale === "ar"
+                ? "صفحات الكتالوج الرئيسية"
+                : "Featured catalogue pages"
+            }
+            className="flex flex-wrap justify-center gap-x-6 gap-y-3 rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-white p-5 text-center shadow-[var(--shadow-sm)]"
+          >
+            {getHomepageCatalogueLinks(currentLocale).map((link) => (
+              <Link
+                key={link.href}
+                href={localePath(currentLocale, link.href)}
+                className="font-semibold text-[var(--brand-primary)] underline underline-offset-4 hover:text-[var(--brand-primary-dark)]"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        </Container>
+      </Section>
 
       <Section className="!pt-8 !pb-8 sm:!pt-10 sm:!pb-12">
         <Container className="space-y-6">

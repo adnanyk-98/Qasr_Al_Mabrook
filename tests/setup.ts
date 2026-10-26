@@ -1,4 +1,4 @@
-import { config } from 'dotenv';
+import { config } from "dotenv";
 
 // Load .env.local before any tests run
-config({ path: '.env.local', override: true });
+config({ path: ".env.local" });

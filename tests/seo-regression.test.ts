@@ -3,11 +3,35 @@ import { after, test } from "node:test";
 
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { categories, categoryTranslations, productTranslations, products } from "@/db/schema";
+import {
+  categories,
+  categoryTranslations,
+  productTranslations,
+  products,
+} from "@/db/schema";
 import { PRODUCTION_SITE_URL, resolveSiteUrl } from "@/config/site";
-import { getBaseUrl, buildCanonical, buildAlternates, buildCategorySeoDescription, buildProductSeoTitle, createFaqStructuredData, createOrganizationStructuredData, createPublicPageMetadata, createProductMetadata, createProductStructuredData, createBreadcrumbStructuredData, shouldNoindexFilteredView, shouldNoindexStateQuery } from "@/lib/seo";
+import {
+  getBaseUrl,
+  buildCanonical,
+  buildAlternates,
+  buildCategorySeoDescription,
+  buildProductSeoTitle,
+  createFaqStructuredData,
+  createOrganizationStructuredData,
+  createPublicPageMetadata,
+  createCategoryMetadata,
+  createProductMetadata,
+  createProductStructuredData,
+  createBreadcrumbStructuredData,
+  shouldNoindexFilteredView,
+  shouldNoindexHost,
+  shouldNoindexStateQuery,
+} from "@/lib/seo";
 import { getAlternateLocale, localePath } from "@/lib/locales";
-import { getCategoryBySlug, listPublishedCategories } from "@/server/repositories/public-catalog";
+import {
+  getCategoryBySlug,
+  listPublishedCategories,
+} from "@/server/repositories/public-catalog";
 import arMessages from "@/i18n/messages/ar.json";
 import enMessages from "@/i18n/messages/en.json";
 import robots from "@/app/robots";
@@ -16,9 +40,18 @@ import sitemap from "@/app/sitemap";
 const baseUrl = getBaseUrl();
 
 test("production SEO origin stays canonical if the build-time URL is misconfigured", () => {
-  assert.equal(resolveSiteUrl("production", "http://localhost:3000"), PRODUCTION_SITE_URL);
-  assert.equal(resolveSiteUrl("production", "https://preview.example.com"), PRODUCTION_SITE_URL);
-  assert.equal(resolveSiteUrl("development", "http://localhost:3000"), "http://localhost:3000");
+  assert.equal(
+    resolveSiteUrl("production", "http://localhost:3000"),
+    PRODUCTION_SITE_URL,
+  );
+  assert.equal(
+    resolveSiteUrl("production", "https://preview.example.com"),
+    PRODUCTION_SITE_URL,
+  );
+  assert.equal(
+    resolveSiteUrl("development", "http://localhost:3000"),
+    "http://localhost:3000",
+  );
 });
 
 after(async () => {
@@ -46,11 +79,11 @@ test("Arabic homepage metadata uses the Arabic locale path and reciprocal locale
   const metadata = createPublicPageMetadata({
     locale: "ar",
     path: "/",
-    title: "قصر المبرك",
+    title: "قصر المبارك",
     description: "منصة الكتالوج والاستفسار.",
   });
 
-  assert.equal(metadata.title, "قصر المبرك");
+  assert.equal(metadata.title, "قصر المبارك");
   assert.equal(metadata.description, "منصة الكتالوج والاستفسار.");
   assert.equal(metadata.alternates?.canonical, `${baseUrl}/ar`);
   assert.equal(metadata.alternates?.languages?.ar, `${baseUrl}/ar`);
@@ -84,14 +117,23 @@ test("product metadata keeps the product identity and omits fabricated pricing o
 
   const ogImages = metadata.openGraph?.images;
   const firstOgImage = Array.isArray(ogImages) ? ogImages[0] : ogImages;
-  const ogImageUrl = typeof firstOgImage === "object" && firstOgImage !== null && "url" in firstOgImage ? firstOgImage.url : undefined;
+  const ogImageUrl =
+    typeof firstOgImage === "object" && firstOgImage !== null && "url" in firstOgImage
+      ? firstOgImage.url
+      : undefined;
 
   assert.equal(metadata.title, "Sample Product | Qasr Al Mabrook");
-  assert.equal(metadata.description, "Long description.");
+  assert.equal(metadata.description, "A premium product description.");
   assert.equal(ogImageUrl, "https://cdn.example.com/product.jpg");
   assert.equal(metadata.alternates?.canonical, `${baseUrl}/en/products/sample-product`);
-  assert.equal(metadata.alternates?.languages?.en, `${baseUrl}/en/products/sample-product`);
-  assert.equal(metadata.alternates?.languages?.ar, `${baseUrl}/ar/products/sample-product`);
+  assert.equal(
+    metadata.alternates?.languages?.en,
+    `${baseUrl}/en/products/sample-product`,
+  );
+  assert.equal(
+    metadata.alternates?.languages?.ar,
+    `${baseUrl}/ar/products/sample-product`,
+  );
 
   const json = createProductStructuredData({
     id: "product-123",
@@ -129,10 +171,20 @@ test("Open Graph image dimensions are emitted only when the source dimensions ar
     title: "Sample Category",
     ogImage: "https://cdn.example.com/category.jpg",
   });
-  const withImage = Array.isArray(withDimensions.openGraph?.images) ? withDimensions.openGraph.images[0] : withDimensions.openGraph?.images;
-  const withoutImage = Array.isArray(withoutDimensions.openGraph?.images) ? withoutDimensions.openGraph.images[0] : withoutDimensions.openGraph?.images;
+  const withImage = Array.isArray(withDimensions.openGraph?.images)
+    ? withDimensions.openGraph.images[0]
+    : withDimensions.openGraph?.images;
+  const withoutImage = Array.isArray(withoutDimensions.openGraph?.images)
+    ? withoutDimensions.openGraph.images[0]
+    : withoutDimensions.openGraph?.images;
   const getDimensions = (image: typeof withImage) => {
-    if (typeof image !== "object" || image === null || !("width" in image) || !("height" in image)) return undefined;
+    if (
+      typeof image !== "object" ||
+      image === null ||
+      !("width" in image) ||
+      !("height" in image)
+    )
+      return undefined;
     return { width: image.width, height: image.height };
   };
 
@@ -185,8 +237,14 @@ test("sitemap contains public canonical URLs and excludes admin, API, and query 
   assert.ok(urls.some((url) => url === `${baseUrl}/ar/blog`));
   assert.ok(!urls.some((url) => url.endsWith("/sitemap")));
   assert.ok(!urls.some((url) => url.endsWith("/contact-us")));
-  assert.ok(urls.some((url) => url.includes("/en/products/")) || urls.some((url) => url.includes("/ar/products/")));
-  assert.ok(urls.some((url) => url.includes("/en/categories/")) || urls.some((url) => url.includes("/ar/categories/")));
+  assert.ok(
+    urls.some((url) => url.includes("/en/products/")) ||
+      urls.some((url) => url.includes("/ar/products/")),
+  );
+  assert.ok(
+    urls.some((url) => url.includes("/en/categories/")) ||
+      urls.some((url) => url.includes("/ar/categories/")),
+  );
   assert.ok(!urls.some((url) => url.includes("/admin")));
   assert.ok(!urls.some((url) => url.includes("/api")));
   assert.ok(!urls.some((url) => url.includes("/search")));
@@ -203,11 +261,15 @@ test("sitemap contains public canonical URLs and excludes admin, API, and query 
     .from(products)
     .innerJoin(productTranslations, eq(productTranslations.productId, products.id))
     .where(eq(products.status, "PUBLISHED"));
-  const actualCategoryPaths = urls.filter((url) => /\/categories\/[^/]+$/.test(new URL(url).pathname)).sort();
+  const actualCategoryPaths = urls
+    .filter((url) => /\/categories\/[^/]+$/.test(new URL(url).pathname))
+    .sort();
   const expectedCategoryPaths = translatedCategories
     .map(({ slug, locale }) => `${baseUrl}/${locale}/categories/${slug}`)
     .sort();
-  const actualProductPaths = urls.filter((url) => /\/products\/[^/]+$/.test(new URL(url).pathname)).sort();
+  const actualProductPaths = urls
+    .filter((url) => /\/products\/[^/]+$/.test(new URL(url).pathname))
+    .sort();
   const expectedProductPaths = translatedProducts
     .map(({ slug, locale }) => `${baseUrl}/${locale}/products/${slug}`)
     .sort();
@@ -218,14 +280,26 @@ test("sitemap contains public canonical URLs and excludes admin, API, and query 
   assert.equal(homepageEn?.alternates?.languages?.en, `${baseUrl}/en`);
   assert.equal(homepageEn?.alternates?.languages?.ar, `${baseUrl}/ar`);
   assert.equal(homepageEn?.alternates?.languages?.["x-default"], `${baseUrl}/en`);
-  assert.ok(entries.filter((entry) => /\/(products|categories)\/[^/]+$/.test(new URL(entry.url).pathname)).every((entry) => entry.lastModified instanceof Date));
-  assert.ok(entries.filter((entry) => /\/blog\/[^/]+$/.test(new URL(entry.url).pathname)).every((entry) => entry.lastModified instanceof Date));
+  assert.ok(
+    entries
+      .filter((entry) =>
+        /\/(products|categories)\/[^/]+$/.test(new URL(entry.url).pathname),
+      )
+      .every((entry) => entry.lastModified instanceof Date),
+  );
+  assert.ok(
+    entries
+      .filter((entry) => /\/blog\/[^/]+$/.test(new URL(entry.url).pathname))
+      .every((entry) => entry.lastModified instanceof Date),
+  );
 });
 
 test("category directory lists only localized categories with an available detail route", async () => {
   for (const locale of ["en", "ar"] as const) {
     const listedCategories = await listPublishedCategories(locale);
-    const routes = await Promise.all(listedCategories.map(({ slug }) => getCategoryBySlug(locale, slug)));
+    const routes = await Promise.all(
+      listedCategories.map(({ slug }) => getCategoryBySlug(locale, slug)),
+    );
 
     assert.ok(routes.every((category) => category?.hasExactLocaleTranslation));
     assert.ok(!listedCategories.some(({ slug }) => slug === "shoes"));
@@ -234,10 +308,22 @@ test("category directory lists only localized categories with an available detai
 });
 
 test("localized homepage metadata and destination link labels are specific", () => {
-  assert.equal(enMessages.metadata.siteTitle, "Gloves, Measuring Tools, Fabrics & More | Qasr Al Mabrook");
-  assert.equal(enMessages.metadata.siteDescription, "Explore occupational gloves, measuring tapes, fabrics, sleepwear and personal-care products in the Qasr Al Mabrook catalogue. Request a quote for product enquiries.");
-  assert.equal(arMessages.metadata.siteTitle, "قفازات وأدوات قياس وأقمشة ومنتجات متنوعة | قصر المبارك");
-  assert.equal(arMessages.metadata.siteDescription, "استكشف القفازات المهنية وأشرطة القياس والأقمشة وملابس النوم ومنتجات العناية الشخصية في كتالوج قصر المبارك، واطلب عرض سعر للاستفسار عن المنتجات.");
+  assert.equal(
+    enMessages.metadata.siteTitle,
+    "Gloves, Measuring Tools, Fabrics & More | Qasr Al Mabrook",
+  );
+  assert.equal(
+    enMessages.metadata.siteDescription,
+    "Explore occupational gloves, measuring tapes, fabrics, sleepwear and personal-care products in the Qasr Al Mabrook catalogue. Request a quote for product enquiries.",
+  );
+  assert.equal(
+    arMessages.metadata.siteTitle,
+    "قفازات وأدوات قياس وأقمشة ومنتجات متنوعة | قصر المبارك",
+  );
+  assert.equal(
+    arMessages.metadata.siteDescription,
+    "استكشف القفازات المهنية وأشرطة القياس والأقمشة وملابس النوم ومنتجات العناية الشخصية في كتالوج قصر المبارك، واطلب عرض سعر للاستفسار عن المنتجات.",
+  );
   assert.equal(enMessages.home.browse, "Browse Catalogue");
   assert.equal(arMessages.home.browse, "تصفح الكتالوج");
   assert.equal(enMessages.common.viewDetails, "View details");
@@ -245,10 +331,22 @@ test("localized homepage metadata and destination link labels are specific", () 
 });
 
 test("product and category metadata builders use real names and concise descriptions", () => {
-  assert.equal(buildProductSeoTitle("Sample Product", "Tools"), "Sample Product | Tools | Qasr Al Mabrook");
-  assert.equal(buildProductSeoTitle("DPL Gloves", "Gloves"), "DPL Gloves | Qasr Al Mabrook");
-  assert.equal(buildProductSeoTitle("قفازات DPL", "قفازات"), "قفازات DPL | Qasr Al Mabrook");
-  assert.match(buildCategorySeoDescription("Tools", null, ["Hammer", "Tape"]), /Hammer and Tape/);
+  assert.equal(
+    buildProductSeoTitle("Sample Product", "Tools"),
+    "Sample Product | Tools | Qasr Al Mabrook",
+  );
+  assert.equal(
+    buildProductSeoTitle("DPL Gloves", "Gloves"),
+    "DPL Gloves | Qasr Al Mabrook",
+  );
+  assert.equal(
+    buildProductSeoTitle("قفازات DPL", "قفازات", "ar"),
+    "قفازات DPL | قصر المبارك",
+  );
+  assert.match(
+    buildCategorySeoDescription("Tools", null, ["Hammer", "Tape"]),
+    /Hammer and Tape/,
+  );
 });
 
 test("product metadata honors a populated SEO title and otherwise adds its localized category", () => {
@@ -266,12 +364,123 @@ test("product metadata honors a populated SEO title and otherwise adds its local
     categoryName: "الأدوات والقياس",
   });
 
-  assert.equal(explicitTitle.title, "Owner-approved product title");
-  assert.equal(generatedTitle.title, "منتج تجريبي | الأدوات والقياس | Qasr Al Mabrook");
+  assert.equal(explicitTitle.title, "Owner-approved product title | Qasr Al Mabrook");
+  assert.equal(generatedTitle.title, "منتج تجريبي | الأدوات والقياس | قصر المبارك");
+});
+
+test("SEO landing titles and descriptions are localized and retain public canonicals", () => {
+  const aboutEn = createPublicPageMetadata({
+    locale: "en",
+    path: "/about-us",
+    title: "About Us",
+  });
+  const aboutAr = createPublicPageMetadata({
+    locale: "ar",
+    path: "/about-us",
+    title: "من نحن",
+  });
+  const fancySuitCategory = createCategoryMetadata({
+    locale: "en",
+    path: "/categories/fancy-suit",
+    categoryName: "Fancy Suit",
+    seoTitle: "Fancy Suit | Qasr Al Mabrook",
+  });
+  const mensBottomWearCategory = createCategoryMetadata({
+    locale: "ar",
+    path: "/categories/mens-bottom-wear",
+    categoryName: "بيجاما",
+    seoTitle: "عنوان منتج البيجاما | قصر المبارك",
+  });
+  const dplProductEn = createProductMetadata({
+    locale: "en",
+    path: "/products/dpl-gloves",
+    productName: "DPL Gloves",
+    seoTitle: "DPL Grandeur 70 Industrial Gloves",
+    seoDescription:
+      "DPL Grandeur 70 industrial gloves with flock lining, textured grip and 28 mil (0.70 mm) thickness. Qasr Al Mabrook is based in Sharjah, UAE.",
+  });
+  const dplProductAr = createProductMetadata({
+    locale: "ar",
+    path: "/products/dpl-gloves",
+    productName: "قفازات DPL",
+    seoTitle: "قفازات DPL Grandeur 70",
+    seoDescription:
+      "قفازات DPL Grandeur 70 المهنية ببطانة فلوك وأسطح منقوشة وسمك 28 ميل أو 0.70 مم. يقع قصر المبارك في الشارقة، الإمارات.",
+    shortDescription: "DPL Grandeur 70 occupational gloves.",
+  });
+
+  assert.equal(aboutEn.title, "About Us | Qasr Al Mabrook");
+  assert.equal(aboutAr.title, "من نحن | قصر المبارك");
+  assert.equal(fancySuitCategory.title, "Fancy Suit Collection | Qasr Al Mabrook");
+  assert.equal(mensBottomWearCategory.title, "بيجاما | قصر المبارك");
+  assert.equal(
+    dplProductEn.title,
+    "DPL Grandeur 70 Industrial Gloves | Qasr Al Mabrook",
+  );
+  assert.equal(dplProductAr.title, "قفازات DPL Grandeur 70 | قصر المبارك");
+  assert.equal(
+    dplProductAr.description,
+    "قفازات DPL Grandeur 70 المهنية ببطانة فلوك وأسطح منقوشة وسمك 28 ميل أو 0.70 مم. يقع قصر المبارك في الشارقة، الإمارات.",
+  );
+  assert.equal(dplProductEn.alternates?.canonical, `${baseUrl}/en/products/dpl-gloves`);
+  assert.equal(dplProductAr.alternates?.canonical, `${baseUrl}/ar/products/dpl-gloves`);
+});
+
+test("the four flagged English metadata descriptions stay within the shortened limit", () => {
+  const longDescription =
+    "This category includes occupational products made from neoprene and natural rubber with flock lining and textured grip surfaces for work environments where durable hand coverage and grip are important.";
+  const categoryGloves = createCategoryMetadata({
+    locale: "en",
+    path: "/categories/gloves",
+    categoryName: "Gloves",
+    seoDescription: longDescription,
+  });
+  const categoryMensBottomWear = createCategoryMetadata({
+    locale: "en",
+    path: "/categories/mens-bottom-wear",
+    categoryName: "Men's Bottom Wear",
+    description:
+      "This category groups pajama sleepwear products for personal use. Products currently listed include the Pajama product in the catalogue.",
+  });
+  const product5m = createProductMetadata({
+    locale: "en",
+    path: "/products/5m-measuring-tape-green",
+    productName: "5M Measuring Tape Green",
+    shortDescription:
+      "The Yokohama 5M/18FT measuring tape keeps the focus on the range most often needed for everyday measurement jobs. Its compact format is identified on the product packaging.",
+  });
+  const product75m = createProductMetadata({
+    locale: "en",
+    path: "/products/7-5m-measuring-tape-green",
+    productName: "7.5M Measuring Tape Green",
+    shortDescription:
+      "The Yokohama 7.5M/25FT measuring tape is the longest-range option in this collection, built around a 25-foot reach for measurements that move beyond the shorter tape.",
+  });
+
+  for (const metadata of [
+    categoryGloves,
+    categoryMensBottomWear,
+    product5m,
+    product75m,
+  ]) {
+    assert.ok((metadata.description?.length ?? 0) <= 140);
+    assert.ok(metadata.description?.endsWith("…"));
+  }
+});
+
+test("only the public www host remains indexable", () => {
+  assert.equal(shouldNoindexHost("www.qasralmabrook.com"), false);
+  assert.equal(shouldNoindexHost("www.qasralmabrook.com:443"), false);
+  assert.equal(shouldNoindexHost("qasralmabrook.com"), true);
+  assert.equal(shouldNoindexHost("qasr-al-mabrook.vercel.app"), true);
+  assert.equal(shouldNoindexHost("preview-project.vercel.app"), true);
+  assert.equal(shouldNoindexHost("localhost:3000"), true);
 });
 
 test("FAQ and Organization structured data contain only specified actual information", () => {
-  const faq = JSON.parse(createFaqStructuredData([{ question: "Question?", answer: "Answer." }]));
+  const faq = JSON.parse(
+    createFaqStructuredData([{ question: "Question?", answer: "Answer." }]),
+  );
   assert.equal(faq["@type"], "FAQPage");
   assert.equal(faq.mainEntity[0].acceptedAnswer.text, "Answer.");
 
@@ -296,7 +505,11 @@ test("success and error query states are noindexed even when their values are em
 
 test("JSON-LD escapes script-closing characters while preserving parseable data", () => {
   const name = "</script><script>alert(1)</script>";
-  const json = createProductStructuredData({ id: "product-456", name, url: `${baseUrl}/en/products/sample-product` });
+  const json = createProductStructuredData({
+    id: "product-456",
+    name,
+    url: `${baseUrl}/en/products/sample-product`,
+  });
 
   assert.ok(!json.includes("</script>"));
   assert.equal(JSON.parse(json).name, name);

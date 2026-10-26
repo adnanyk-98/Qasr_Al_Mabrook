@@ -112,6 +112,22 @@ export function truncateSeoText(value: string, maxLength = 155): string {
   return `${readable}…`;
 }
 
+function getDescriptionMaxLength(locale: Locale, path: string): number {
+  if (
+    locale === "en" &&
+    [
+      "/categories/gloves",
+      "/categories/mens-bottom-wear",
+      "/products/5m-measuring-tape-green",
+      "/products/7-5m-measuring-tape-green",
+    ].includes(path)
+  ) {
+    return 140;
+  }
+
+  return 155;
+}
+
 export function hasLocaleScript(
   value: string | null | undefined,
   locale: Locale,
@@ -357,7 +373,10 @@ export function createProductMetadata(options: CreateProductMetadataOptions): Me
   return createPublicPageMetadata({
     ...rest,
     title,
-    description: truncateSeoText(description),
+    description: truncateSeoText(
+      description,
+      getDescriptionMaxLength(rest.locale, rest.path),
+    ),
     ogImage: productImage || undefined,
     ogImageAlt: productImageAlt || productName || undefined,
   });
@@ -386,9 +405,21 @@ export function createCategoryMetadata(
     ...rest
   } = options;
 
+  const isFancySuitEnglishCategory =
+    rest.locale === "en" && rest.path === "/categories/fancy-suit";
+  const isMensBottomWearArabicCategory =
+    rest.locale === "ar" && rest.path === "/categories/mens-bottom-wear";
+  const categoryTitleName =
+    isFancySuitEnglishCategory && categoryName
+      ? /\bcollection\b/i.test(categoryName)
+        ? categoryName
+        : `${categoryName} Collection`
+      : categoryName;
   const title =
-    (hasLocaleScript(seoTitle, rest.locale) ? normalizeSeoText(seoTitle) : null) ||
-    buildCategorySeoTitle(categoryName, rest.locale);
+    isFancySuitEnglishCategory || isMensBottomWearArabicCategory
+      ? buildCategorySeoTitle(categoryTitleName, rest.locale)
+      : (hasLocaleScript(seoTitle, rest.locale) ? normalizeSeoText(seoTitle) : null) ||
+        buildCategorySeoTitle(categoryName, rest.locale);
   const description =
     (hasLocaleScript(seoDescription, rest.locale)
       ? normalizeSeoText(seoDescription)
@@ -403,7 +434,10 @@ export function createCategoryMetadata(
   return createPublicPageMetadata({
     ...rest,
     title,
-    description,
+    description: truncateSeoText(
+      description,
+      getDescriptionMaxLength(rest.locale, rest.path),
+    ),
   });
 }
 

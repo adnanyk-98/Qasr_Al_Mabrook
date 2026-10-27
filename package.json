@@ -6,12 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "tsx --require ./tests/setup.ts --test \"tests/*.test.ts\"",
+    "test": "tsx --require ./tests/setup.ts --test tests/*.test.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",
     "e2e:catalogue-localization": "tsx scripts/playwright-catalogue-localization-e2e.ts",
     "e2e:locale-switch": "tsx scripts/playwright-locale-switch-e2e.ts",
+    "e2e:analytics-consent": "tsx scripts/playwright-analytics-consent-e2e.ts",
     "e2e:hero-carousel": "tsx scripts/playwright-hero-carousel-e2e.ts",
     "catalogue:populate-content": "tsx scripts/populate-catalogue-content.ts",
     "brands:seed": "tsx scripts/seed-brands.ts",
@@ -20,6 +21,7 @@
     "hero:normalize-super-market-cta": "tsx scripts/normalize-super-market-cta.ts",
     "readiness:check": "tsx scripts/check-production-readiness.ts",
     "db:migration:check": "drizzle-kit check",
+    "db:test:seed": "tsx scripts/seed-test-database.ts",
     "db:migration:verify-baseline": "tsx scripts/verify-migration-baseline.ts",
     "db:migration:adopt-baseline": "tsx scripts/adopt-migration-baseline.ts",
     "db:migration:apply": "tsx scripts/apply-migrations.ts",
@@ -27,7 +29,8 @@
     "db:reset-admin-password": "tsx scripts/reset-admin-password.ts",
     "catalogue:import": "tsx scripts/import-catalogue.ts",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "format:changed": "tsx scripts/check-changed-formatting.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.382.0",

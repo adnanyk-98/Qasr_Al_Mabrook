@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, master, develop]
+    branches: [main, master, develop, seo/yokohama-dpl-main-release]
   pull_request:
     branches: [main, master, develop]
 
@@ -10,9 +10,30 @@ jobs:
   quality:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: qam_test
+          POSTGRES_USER: qam_test
+          POSTGRES_PASSWORD: qam_test_only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U qam_test -d qam_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://qam_test:qam_test_only@127.0.0.1:5432/qam_test
+      DIRECT_DATABASE_URL: postgresql://qam_test:qam_test_only@127.0.0.1:5432/qam_test
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -23,8 +44,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install Chromium for consent browser tests
+        run: npx playwright install --with-deps chromium
+
       - name: Format check
-        run: npm run format:check
+        run: npm run format:changed
+        env:
+          FORMAT_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          FORMAT_HEAD_SHA: ${{ github.sha }}
 
       - name: Lint
         run: npm run lint
@@ -32,13 +59,27 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      - name: Apply migrations to disposable test database
+        run: npm run db:migration:apply
+        env:
+          DEPLOYMENT_STAGE: local
+
+      - name: Seed deterministic integration-test fixtures
+        run: npm run db:test:seed
+
       - name: Tests
         run: npm test
+        env:
+          NODE_ENV: test
+          CI: "true"
 
       - name: Migration consistency check
         run: npm run db:migration:check
 
       - name: Build
-        run: npm run build
+        run: npm run build -- --webpack
         env:
           NEXT_PUBLIC_SITE_URL: http://localhost:3000
+
+      - name: Browser consent interaction tests
+        run: npm run e2e:analytics-consent

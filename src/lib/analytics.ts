@@ -1,3 +1,5 @@
+import { hasAnalyticsConsent } from "@/lib/analytics-consent";
+
 export const analyticsEventNames = [
   "product_view",
   "product_request_quote",
@@ -12,19 +14,28 @@ export const analyticsEventNames = [
 ] as const;
 
 export type AnalyticsEventName = (typeof analyticsEventNames)[number];
-export type AnalyticsEventParams = Record<string, string | number | boolean | undefined>;
+export type AnalyticsEventParams = Record<
+  string,
+  string | number | boolean | undefined
+>;
 
 declare global {
   interface Window {
-    dataLayer?: Array<Record<string, unknown>>;
-    gtag?: (...args: unknown[]) => void;
+    clarity?: (...args: unknown[]) => void;
   }
 }
 
-export function trackEvent(name: AnalyticsEventName, params: AnalyticsEventParams = {}) {
-  if (typeof window === "undefined") return;
+export function trackEvent(
+  name: AnalyticsEventName,
+  params: AnalyticsEventParams = {},
+) {
+  if (typeof window === "undefined" || !hasAnalyticsConsent()) return;
 
-  const cleanParams = Object.fromEntries(Object.entries(params).filter(([, value]) => value !== undefined));
-  window.gtag?.("event", name, cleanParams);
-  window.dispatchEvent(new CustomEvent("qam:analytics", { detail: { name, params: cleanParams } }));
+  const cleanParams = Object.fromEntries(
+    Object.entries(params).filter(([, value]) => value !== undefined),
+  );
+  window.clarity?.("event", name);
+  window.dispatchEvent(
+    new CustomEvent("qam:analytics", { detail: { name, params: cleanParams } }),
+  );
 }

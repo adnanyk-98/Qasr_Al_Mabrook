@@ -27,6 +27,7 @@ import {
   buildCanonical,
 } from "@/lib/seo";
 import { AnalyticsTracker } from "@/components/analytics/analytics-tracker";
+import { getProductLandingContent } from "@/lib/catalogue-landing-content";
 
 export async function generateMetadata({
   params,
@@ -40,6 +41,7 @@ export async function generateMetadata({
   if (!product) return {};
 
   const currentLocale = locale as Locale;
+  const landingContent = getProductLandingContent(currentLocale, slug);
   const alternateProduct = await getProductBySlug(
     currentLocale === "en" ? "ar" : "en",
     slug,
@@ -53,8 +55,8 @@ export async function generateMetadata({
     locale: currentLocale,
     path: `/products/${slug}`,
     productName: product.name,
-    seoTitle: product.seoTitle,
-    seoDescription: product.seoDescription,
+    seoTitle: landingContent?.seoTitle ?? product.seoTitle,
+    seoDescription: landingContent?.seoDescription ?? product.seoDescription,
     shortDescription: product.shortDescription,
     fullDescription: product.description,
     productImage: primaryImage?.publicUrl,
@@ -85,6 +87,7 @@ export default async function ProductDetailPage({
   if (!locales.includes(locale as Locale)) notFound();
 
   const currentLocale = locale as Locale;
+  const landingContent = getProductLandingContent(currentLocale, slug);
   const t = await getTranslations({ locale: currentLocale, namespace: "product" });
   const common = await getTranslations({ locale: currentLocale, namespace: "common" });
   const product = await getProductBySlug(currentLocale, slug);
@@ -159,8 +162,11 @@ export default async function ProductDetailPage({
             dangerouslySetInnerHTML={{
               __html: createProductStructuredData({
                 id: product.id,
-                name: product.name,
-                description: product.shortDescription ?? product.description,
+                name: landingContent?.heading ?? product.name,
+                description:
+                  landingContent?.description ??
+                  product.shortDescription ??
+                  product.description,
                 image: defaultImage?.publicUrl,
                 sku: selectedVariant?.sku ?? product.defaultSku,
                 brand: product.brandName,
@@ -243,7 +249,7 @@ export default async function ProductDetailPage({
                   </p>
                 ) : null}
                 <h1 className="mt-2 text-3xl font-semibold text-[var(--foreground)] sm:text-4xl">
-                  {product.name}
+                  {landingContent?.heading ?? product.name}
                 </h1>
               </div>
 
@@ -339,7 +345,7 @@ export default async function ProductDetailPage({
             className="mx-auto max-w-[820px]"
             dir={currentLocale === "ar" ? "rtl" : "ltr"}
           >
-            {specifications.length > 0 || product.description ? (
+            {specifications.length > 0 || product.description || landingContent ? (
               <div className="space-y-6">
                 {specifications.length > 0 ? (
                   <section className="rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-white p-6 shadow-[var(--shadow-sm)]">
@@ -364,13 +370,21 @@ export default async function ProductDetailPage({
                   </section>
                 ) : null}
 
-                {product.description ? (
+                {product.description || landingContent ? (
                   <section className="rounded-[var(--radius-lg)] border border-[var(--brand-border)] bg-white p-6 shadow-[var(--shadow-sm)]">
                     <h2 className="text-2xl font-semibold text-[var(--foreground)]">
                       {t("details")}
                     </h2>
                     <div className="prose mt-5 max-w-none text-sm leading-7 text-[var(--text-muted)]">
-                      <div dangerouslySetInnerHTML={{ __html: product.description }} />
+                      {landingContent ? (
+                        <p>{landingContent.description}</p>
+                      ) : (
+                        <div
+                          dangerouslySetInnerHTML={{
+                            __html: product.description ?? "",
+                          }}
+                        />
+                      )}
                     </div>
                   </section>
                 ) : null}

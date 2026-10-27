@@ -1,26 +1,38 @@
-import { config } from 'dotenv';
-import postgres from 'postgres';
+import { config } from "dotenv";
+import postgres from "postgres";
 
-config({ path: process.env.DOTENV_CONFIG_PATH ?? '.env.local' });
+config({ path: process.env.DOTENV_CONFIG_PATH ?? ".env.local" });
 
-type MigrationTarget = 'DIRECT_DATABASE_URL' | 'DATABASE_URL';
-type Selection = { url: string; source: MigrationTarget; host: string; port: number } | null;
+type MigrationTarget = "DIRECT_DATABASE_URL" | "DATABASE_URL";
+type Selection = {
+  url: string;
+  source: MigrationTarget;
+  host: string;
+  port: number;
+} | null;
 
-const localDevelopmentHosts = new Set(['localhost', '127.0.0.1', '::1']);
-const approvedMigrationConfirmations = new Set(['APPLY_MIGRATIONS', 'ADOPT_BASELINE_0003']);
+const localDevelopmentHosts = new Set(["localhost", "127.0.0.1", "::1"]);
+const approvedMigrationConfirmations = new Set([
+  "APPLY_MIGRATIONS",
+  "ADOPT_BASELINE_0003",
+]);
 
 export function parseHostPort(connString: string) {
   try {
     const u = new URL(connString);
     return { host: u.hostname, port: Number(u.port || 5432) };
   } catch {
-    return { host: 'unknown', port: 0 };
+    return { host: "unknown", port: 0 };
   }
 }
 
 export function isLocalDevelopmentHost(hostname: string) {
   const normalized = hostname.toLowerCase();
-  return localDevelopmentHosts.has(normalized) || normalized.endsWith('.local') || normalized.endsWith('.localhost');
+  return (
+    localDevelopmentHosts.has(normalized) ||
+    normalized.endsWith(".local") ||
+    normalized.endsWith(".localhost")
+  );
 }
 
 export function evaluateMigrationTarget(
@@ -37,13 +49,17 @@ export function evaluateMigrationTarget(
   }
 
   const { host } = parseHostPort(connString);
-  const stage = (options.deploymentStage ?? '').toLowerCase();
-  const confirmation = options.migrationConfirmation ?? '';
+  const stage = (options.deploymentStage ?? "").toLowerCase();
+  const confirmation = options.migrationConfirmation ?? "";
   const confirmationApproved = approvedMigrationConfirmations.has(String(confirmation));
   const localHost = isLocalDevelopmentHost(host);
 
-  if (source === 'DATABASE_URL' && options.allowFallback !== true) {
-    return { ok: false, reason: 'DATABASE_URL fallback is disabled unless MIGRATION_ALLOW_DATABASE_URL_FALLBACK=true.' } as const;
+  if (source === "DATABASE_URL" && options.allowFallback !== true) {
+    return {
+      ok: false,
+      reason:
+        "DATABASE_URL fallback is disabled unless MIGRATION_ALLOW_DATABASE_URL_FALLBACK=true.",
+    } as const;
   }
 
   if (!localHost && !confirmationApproved) {
@@ -53,7 +69,7 @@ export function evaluateMigrationTarget(
     } as const;
   }
 
-  if ((stage === 'staging' || stage === 'production') && !confirmationApproved) {
+  if ((stage === "staging" || stage === "production") && !confirmationApproved) {
     return {
       ok: false,
       reason: `DEPLOYMENT_STAGE=${stage} requires MIGRATION_CONFIRMATION to be explicitly set.`,
@@ -66,11 +82,16 @@ export function evaluateMigrationTarget(
 async function tryConnect(url: string, timeoutMs = 5000) {
   let sql: ReturnType<typeof postgres> | undefined;
   try {
-    sql = postgres(url, { ssl: 'require' });
+    const { host } = parseHostPort(url);
+    sql = postgres(url, {
+      ssl: isLocalDevelopmentHost(host) ? false : "require",
+    });
     const p = sql`select 1 as ok`;
     await Promise.race([
       p,
-      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), timeoutMs)),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("timeout")), timeoutMs),
+      ),
     ]);
     await sql.end();
     return true;
@@ -89,10 +110,12 @@ export async function resolveMigrationDatabase(): Promise<Selection> {
   const pooler = process.env.DATABASE_URL;
   const deploymentStage = process.env.DEPLOYMENT_STAGE;
   const migrationConfirmation = process.env.MIGRATION_CONFIRMATION;
-  const allowFallback = String(process.env.MIGRATION_ALLOW_DATABASE_URL_FALLBACK ?? '').toLowerCase() === 'true';
+  const allowFallback =
+    String(process.env.MIGRATION_ALLOW_DATABASE_URL_FALLBACK ?? "").toLowerCase() ===
+    "true";
 
   if (direct) {
-    const directCheck = evaluateMigrationTarget('DIRECT_DATABASE_URL', direct, {
+    const directCheck = evaluateMigrationTarget("DIRECT_DATABASE_URL", direct, {
       deploymentStage,
       migrationConfirmation,
       allowFallback,
@@ -103,14 +126,19 @@ export async function resolveMigrationDatabase(): Promise<Selection> {
     }
 
     const { host, port } = parseHostPort(direct);
-    console.log('Database connection: source=DIRECT_DATABASE_URL, host=' + host + ', port=' + port);
+    console.log(
+      "Database connection: source=DIRECT_DATABASE_URL, host=" +
+        host +
+        ", port=" +
+        port,
+    );
     const ok = await tryConnect(direct);
-    if (ok) return { url: direct, source: 'DIRECT_DATABASE_URL', host, port };
-    console.error('DIRECT_DATABASE_URL unreachable from this process.');
+    if (ok) return { url: direct, source: "DIRECT_DATABASE_URL", host, port };
+    console.error("DIRECT_DATABASE_URL unreachable from this process.");
   }
 
   if (pooler) {
-    const poolerCheck = evaluateMigrationTarget('DATABASE_URL', pooler, {
+    const poolerCheck = evaluateMigrationTarget("DATABASE_URL", pooler, {
       deploymentStage,
       migrationConfirmation,
       allowFallback,
@@ -121,10 +149,12 @@ export async function resolveMigrationDatabase(): Promise<Selection> {
     }
 
     const { host, port } = parseHostPort(pooler);
-    console.log('Database connection: source=DATABASE_URL, host=' + host + ', port=' + port);
+    console.log(
+      "Database connection: source=DATABASE_URL, host=" + host + ", port=" + port,
+    );
     const ok = await tryConnect(pooler);
-    if (ok) return { url: pooler, source: 'DATABASE_URL', host, port };
-    console.error('DATABASE_URL fallback is unreachable from this process.');
+    if (ok) return { url: pooler, source: "DATABASE_URL", host, port };
+    console.error("DATABASE_URL fallback is unreachable from this process.");
   }
 
   return null;

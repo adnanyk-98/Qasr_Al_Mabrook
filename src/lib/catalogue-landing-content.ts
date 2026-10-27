@@ -98,6 +98,26 @@ export function getProductLandingContent(
   locale: Locale,
   slug: string,
 ): ProductLandingContent | null {
+  if (slug === "pajama") {
+    return locale === "ar"
+      ? {
+          heading: "بيجاما رجالي من Citylife",
+          seoTitle: "بيجاما رجالي من Citylife",
+          seoDescription:
+            "تعرّف على بيجاما Citylife الرجالية بقصة عادية وتصاميم مربعة ومنقوشة. يقع قصر المبارك في الشارقة، الإمارات.",
+          description:
+            "بنطال بيجاما رجالي من Citylife بقصة عادية، بتصاميم مربعة ومنقوشة تناسب النوم والارتداء المنزلي المريح.",
+        }
+      : {
+          heading: "Citylife Men's Pajama",
+          seoTitle: "Citylife Men's Pajama",
+          seoDescription:
+            "Explore Citylife men's pajama trousers in regular-fit checked and printed styles. Qasr Al Mabrook is based in Sharjah, UAE.",
+          description:
+            "Citylife men's pajama trousers are described as regular fit, with checked and printed styling for comfortable sleepwear and relaxed homewear.",
+        };
+  }
+
   if (slug !== "dpl-gloves") return null;
 
   return locale === "ar"

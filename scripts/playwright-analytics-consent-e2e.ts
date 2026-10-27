@@ -78,7 +78,7 @@ async function main() {
   let context: BrowserContext | undefined;
 
   try {
-    await waitForApplication(`${baseUrl}/en`, server);
+    await waitForApplication(`${baseUrl}/en/about-us`, server);
     browser = await chromium.launch();
     context = await browser.newContext();
 
@@ -139,7 +139,7 @@ async function main() {
       }
     });
 
-    const response = await page.goto(`${baseUrl}/en`, {
+    const response = await page.goto(`${baseUrl}/en/about-us`, {
       waitUntil: "domcontentloaded",
     });
     assert.equal(response?.status(), 200);
@@ -194,7 +194,7 @@ async function main() {
     assert.deepEqual(blockedGoogleRequests, []);
 
     await page.getByTestId("locale-switcher").click();
-    await page.waitForURL("**/ar");
+    await page.waitForURL("**/ar/about-us");
     assert.equal(await page.locator("html").getAttribute("lang"), "ar");
     await page.getByRole("button", { name: "تفضيلات ملفات تعريف الارتباط" }).waitFor();
     assert.deepEqual(blockedGoogleRequests, []);
@@ -266,7 +266,7 @@ async function main() {
     await page.reload({ waitUntil: "networkidle" });
     await assertPreference(page, "accepted");
     await page.getByTestId("locale-switcher").click();
-    await page.waitForURL("**/en");
+    await page.waitForURL("**/en/about-us");
     await assertPreference(page, "accepted");
     assert.equal(
       await page.evaluate(

@@ -3,6 +3,7 @@ import createNextIntlPlugin from "next-intl/plugin";
 
 import { legacyCategoryRedirects } from "./src/lib/legacy-category-redirects";
 import { CONTENT_SECURITY_POLICY } from "./src/lib/security-policy";
+import { HTML_LIMITED_BOTS } from "./src/lib/html-limited-bots";
 
 const securityHeaders = [
   {
@@ -20,6 +21,7 @@ const mutableLocalAssetHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  htmlLimitedBots: HTML_LIMITED_BOTS,
   images: {
     remotePatterns: [
       {

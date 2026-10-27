@@ -21,7 +21,10 @@ import {
   getPublishedBrands,
 } from "@/server/repositories/public-catalog";
 import { localePath, locales, type Locale } from "@/lib/locales";
-import { readLocalizedConfigString } from "@/lib/homepage-content";
+import {
+  readLocalizedConfigString,
+  resolveHomepageHighlightsHeadingLevel,
+} from "@/lib/homepage-content";
 import { getTranslations } from "next-intl/server";
 import { siteConfig } from "@/config/site";
 import { buildTelephoneHref } from "@/lib/phone-display";
@@ -239,9 +242,15 @@ export default async function LocaleHomePage({
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--brand-primary)]">
               {highlights("eyebrow")}
             </p>
-            <h2 className="mt-2 text-2xl font-semibold text-[var(--foreground)] sm:text-3xl">
-              {highlights("title")}
-            </h2>
+            {resolveHomepageHighlightsHeadingLevel(heroSections.length > 0) === "h1" ? (
+              <h1 className="mt-2 text-2xl font-semibold text-[var(--foreground)] sm:text-3xl">
+                {highlights("title")}
+              </h1>
+            ) : (
+              <h2 className="mt-2 text-2xl font-semibold text-[var(--foreground)] sm:text-3xl">
+                {highlights("title")}
+              </h2>
+            )}
           </div>
           <div className="mx-auto grid max-w-[1080px] grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-4">
             {[

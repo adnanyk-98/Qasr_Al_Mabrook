@@ -85,6 +85,7 @@ async function main() {
     const clarityRequests: string[] = [];
     const blockedGoogleRequests: string[] = [];
     const applicationFailures: string[] = [];
+    const expectedNavigationAborts: string[] = [];
     const consoleErrors: string[] = [];
     const pageErrors: string[] = [];
     const page = await context.newPage();
@@ -126,9 +127,15 @@ async function main() {
     });
     page.on("requestfailed", (request) => {
       if (request.url().startsWith(`${baseUrl}/`)) {
-        applicationFailures.push(
-          `${request.method()} ${request.url()}: ${request.failure()?.errorText}`,
-        );
+        const failure = `${request.method()} ${request.url()}: ${request.failure()?.errorText}`;
+        if (
+          request.failure()?.errorText === "net::ERR_ABORTED" &&
+          request.url().includes("?_rsc=")
+        ) {
+          expectedNavigationAborts.push(failure);
+        } else {
+          applicationFailures.push(failure);
+        }
       }
     });
     page.on("response", (response) => {
@@ -332,6 +339,7 @@ async function main() {
         baseUrl,
         mockedClarityRequests: clarityRequests,
         blockedGoogleAnalyticsRequests: blockedGoogleRequests,
+        expectedNavigationAborts,
         applicationFailures,
         consoleErrors,
         pageErrors,

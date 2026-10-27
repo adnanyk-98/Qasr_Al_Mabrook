@@ -145,6 +145,61 @@ test("DPL product metadata and body copy are localized and use recorded specific
   );
 });
 
+test("Citylife pajama product metadata and body copy are localized", () => {
+  const english = getProductLandingContent("en", "pajama");
+  const arabic = getProductLandingContent("ar", "pajama");
+
+  assert.ok(english);
+  assert.ok(arabic);
+  assert.equal(english.heading, "Citylife Men's Pajama");
+  assert.match(english.description, /regular fit/u);
+  assert.match(english.description, /checked and printed/u);
+  assert.match(english.seoDescription, /Sharjah, UAE/u);
+  assert.equal(arabic.heading, "بيجاما رجالي من Citylife");
+  assert.match(arabic.description, /بقصة عادية/u);
+  assert.match(arabic.description, /مربعة ومنقوشة/u);
+  assert.match(arabic.seoDescription, /الشارقة، الإمارات/u);
+  assert.doesNotMatch(arabic.seoDescription, /Sharjah|UAE/i);
+
+  const englishMetadata = createProductMetadata({
+    locale: "en",
+    path: "/products/pajama",
+    productName: "Pajama",
+    seoTitle: english.seoTitle,
+    seoDescription: english.seoDescription,
+  });
+  const arabicMetadata = createProductMetadata({
+    locale: "ar",
+    path: "/products/pajama",
+    productName: "بيجاما",
+    seoTitle: arabic.seoTitle,
+    seoDescription: arabic.seoDescription,
+  });
+
+  assert.equal(englishMetadata.title, "Citylife Men's Pajama | Qasr Al Mabrook");
+  assert.equal(englishMetadata.description, english.seoDescription);
+  assert.equal(arabicMetadata.title, "بيجاما رجالي من Citylife | قصر المبارك");
+  assert.equal(arabicMetadata.description, arabic.seoDescription);
+  assert.equal(
+    englishMetadata.alternates?.canonical,
+    `${getBaseUrl()}/en/products/pajama`,
+  );
+  assert.equal(
+    arabicMetadata.alternates?.canonical,
+    `${getBaseUrl()}/ar/products/pajama`,
+  );
+  assert.deepEqual(englishMetadata.alternates?.languages, {
+    en: `${getBaseUrl()}/en/products/pajama`,
+    ar: `${getBaseUrl()}/ar/products/pajama`,
+    "x-default": `${getBaseUrl()}/en/products/pajama`,
+  });
+  assert.deepEqual(arabicMetadata.alternates?.languages, {
+    ar: `${getBaseUrl()}/ar/products/pajama`,
+    en: `${getBaseUrl()}/en/products/pajama`,
+    "x-default": `${getBaseUrl()}/en/products/pajama`,
+  });
+});
+
 test("homepage landing links target both category groups and the DPL product in each locale", () => {
   for (const locale of ["en", "ar"] as const) {
     const links = getHomepageCatalogueLinks(locale);

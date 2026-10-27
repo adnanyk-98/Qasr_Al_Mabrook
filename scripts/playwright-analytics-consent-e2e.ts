@@ -282,6 +282,10 @@ async function main() {
     await page.getByRole("button", { name: "Cookie preferences" }).click();
     await page.getByRole("button", { name: "Reject optional analytics" }).click();
     await assertPreference(page, "rejected");
+    await page.evaluate(() => {
+      (window as Window & { __qamAnalyticsEvents?: unknown[] }).__qamAnalyticsEvents =
+        [];
+    });
     await assertNoClarityCookies(page);
     const revokedClarityCalls = await page.evaluate(
       () =>

@@ -12,6 +12,9 @@ Microsoft's documentation describes Consent API V2 and consent-mode setup:
 
 - [Clarity Consent API V2](https://learn.microsoft.com/en-us/clarity/setup-and-installation/clarity-consent-api-v2)
 - [Clarity Consent Mode](https://learn.microsoft.com/en-us/clarity/setup-and-installation/consent-mode)
+- [Clarity Content Security Policy requirements](https://learn.microsoft.com/en-us/clarity/setup-and-installation/clarity-csp)
+
+The production CSP follows Microsoft's guidance by allowing its documented Clarity load-balancing hosts in `default-src`, explicitly allowing the loader in `script-src`, and allowing Clarity collection endpoints plus `c.bing.com` in `connect-src`. The existing broad HTTPS allowance in `img-src` is unchanged; `frame-src` remains limited to Google Maps, and the existing object, origin, and form restrictions remain intact. This does not change the consent gate or production-host restriction.
 
 Automated unit tests validate the consent states and host gate. The Playwright test intercepts the Clarity endpoint and checks the local consent interactions; it does not prove that the production dashboard settings or deployed production tracking work. The consent interface alone does not guarantee legal compliance.
 

@@ -146,6 +146,24 @@ async function main() {
       }
     });
 
+    for (const locale of ["en", "ar"] as const) {
+      const destination = `/${locale}/categories/fabrics-textiles?source=legacy`;
+      const legacyResponse = await page.goto(
+        `${baseUrl}/${locale}/categories/cloth-piece?source=legacy`,
+        { waitUntil: "domcontentloaded" },
+      );
+      assert.equal(legacyResponse?.status(), 200);
+      assert.equal(
+        new URL(page.url()).pathname + new URL(page.url()).search,
+        destination,
+      );
+      await page
+        .getByRole("heading", {
+          name: locale === "en" ? "Fabrics & Textiles" : "الأقمشة والمنسوجات",
+        })
+        .waitFor();
+    }
+
     const response = await page.goto(`${baseUrl}/en/about-us`, {
       waitUntil: "domcontentloaded",
     });

@@ -44,6 +44,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install Chromium for consent browser tests
+        run: npx playwright install --with-deps chromium
+
       - name: Format check
         run: npm run format:changed
         env:
@@ -77,3 +80,6 @@ jobs:
         run: npm run build -- --webpack
         env:
           NEXT_PUBLIC_SITE_URL: http://localhost:3000
+
+      - name: Browser consent interaction tests
+        run: npm run e2e:analytics-consent

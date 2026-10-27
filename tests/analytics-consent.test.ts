@@ -1,17 +1,17 @@
 import assert from "node:assert/strict";
+import { readdirSync, readFileSync } from "node:fs";
 import test from "node:test";
+import { join } from "node:path";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { AnalyticsConsentManager } from "@/components/analytics/analytics-consent-manager";
-import enMessages from "@/i18n/messages/en.json";
 import arMessages from "@/i18n/messages/ar.json";
+import enMessages from "@/i18n/messages/en.json";
 import {
   ANALYTICS_CONSENT_COOKIE,
   CLARITY_PROJECT_ID,
   CLARITY_SCRIPT_ID,
-  GOOGLE_ANALYTICS_SCRIPT_ID,
-  GOOGLE_ANALYTICS_SOURCE_SCRIPT_ID,
   applyAnalyticsConsent,
   getAnalyticsScriptPlan,
   isCanonicalProductionHost,
@@ -19,6 +19,13 @@ import {
   saveAnalyticsConsent,
 } from "@/lib/analytics-consent";
 import { trackEvent } from "@/lib/analytics";
+
+function getSourceFiles(directory: string): string[] {
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const path = join(directory, entry.name);
+    return entry.isDirectory() ? getSourceFiles(path) : [path];
+  });
+}
 
 test("the consent prompt is localized in English and Arabic", () => {
   const english = renderToStaticMarkup(
@@ -40,45 +47,51 @@ test("the consent prompt is localized in English and Arabic", () => {
 
   assert.match(english, /Accept optional analytics/);
   assert.match(english, /Reject optional analytics/);
-  assert.doesNotMatch(english, /googletagmanager|clarity\.ms/);
   assert.match(arabic, /الموافقة على التحليلات الاختيارية/);
   assert.match(arabic, /رفض التحليلات الاختيارية/);
   assert.match(arabic, /lang="ar"/);
   assert.match(arabic, /dir="rtl"/);
 });
 
-test("no preference and rejection keep both analytics systems disabled", () => {
-  assert.equal(parseAnalyticsConsent(null), null);
-  assert.equal(parseAnalyticsConsent("other=value"), null);
-  assert.equal(getAnalyticsScriptPlan(null, true, true).googleAnalytics, false);
-  assert.equal(getAnalyticsScriptPlan(null, true, true).clarity, false);
-  assert.deepEqual(getAnalyticsScriptPlan("rejected", true, true), {
-    googleAnalytics: false,
-    clarity: false,
-  });
-  assert.deepEqual(getAnalyticsScriptPlan("accepted", false, true), {
-    googleAnalytics: true,
-    clarity: false,
-  });
+test("application source has no Google Analytics or Tag Manager integration", () => {
+  const googleAnalyticsCode =
+    /GOOGLE_ANALYTICS|GoogleAnalytics|NEXT_PUBLIC_GA_MEASUREMENT_ID|googletagmanager\.com|google-analytics\.com|gtag\s*\(/iu;
+  for (const file of getSourceFiles("src")) {
+    assert.doesNotMatch(readFileSync(file, "utf8"), googleAnalyticsCode, file);
+  }
 });
 
-test("acceptance enables configured analytics and revocation disables them again", () => {
-  assert.equal(
-    parseAnalyticsConsent(`${ANALYTICS_CONSENT_COOKIE}=accepted`),
-    "accepted",
-  );
-  assert.deepEqual(getAnalyticsScriptPlan("accepted", true, true), {
-    googleAnalytics: true,
-    clarity: true,
-  });
-  assert.deepEqual(getAnalyticsScriptPlan("rejected", true, true), {
-    googleAnalytics: false,
-    clarity: false,
-  });
-  assert.deepEqual(getAnalyticsScriptPlan("accepted", true, false), {
-    googleAnalytics: false,
-    clarity: true,
-  });
+test("a missing or rejected preference does not load Clarity", () => {
+  assert.equal(parseAnalyticsConsent(null), null);
+  assert.equal(parseAnalyticsConsent("other=value"), null);
+  assert.deepEqual(getAnalyticsScriptPlan(null, true), { clarity: false });
+  assert.deepEqual(getAnalyticsScriptPlan("rejected", true), { clarity: false });
+});
+
+test("only accepted consent on the canonical production host loads Clarity", () => {
+  assert.deepEqual(getAnalyticsScriptPlan("accepted", true), { clarity: true });
+
+  for (const host of [
+    "localhost:3000",
+    "127.0.0.1",
+    "qasr-al-mabrook.vercel.app",
+    "preview.example.com",
+    "www.qasralmabrook.com.evil.test",
+  ]) {
+    assert.equal(isCanonicalProductionHost(host), false, host);
+    assert.deepEqual(
+      getAnalyticsScriptPlan("accepted", isCanonicalProductionHost(host)),
+      { clarity: false },
+    );
+  }
+  assert.equal(isCanonicalProductionHost("www.qasralmabrook.com"), true);
+  assert.equal(isCanonicalProductionHost("www.qasralmabrook.com:443"), true);
+  assert.equal(isCanonicalProductionHost("WWW.QASRALMABROOK.COM"), true);
+});
+
+test("Clarity project and script identifiers are fixed", () => {
+  assert.equal(CLARITY_PROJECT_ID, "z3oo92tnyo");
+  assert.equal(CLARITY_SCRIPT_ID, "qam-clarity-loader");
 });
 
 test("acceptance and rejection persist as a first-party preference", () => {
@@ -103,100 +116,67 @@ test("acceptance and rejection persist as a first-party preference", () => {
 
     saveAnalyticsConsent("rejected");
     assert.match(cookie, /^qam-analytics-consent=rejected;/);
+    assert.equal(parseAnalyticsConsent(cookie), "rejected");
   } finally {
     globalThis.window = previousWindow;
     globalThis.document = previousDocument;
   }
 });
 
-test("Clarity is limited to the canonical production hostname", () => {
-  for (const host of [
-    "localhost:3000",
-    "127.0.0.1",
-    "qasr-al-mabrook.vercel.app",
-    "preview.example.com",
-    "www.qasralmabrook.com.evil.test",
-  ]) {
-    assert.equal(isCanonicalProductionHost(host), false, host);
-  }
-  assert.equal(isCanonicalProductionHost("www.qasralmabrook.com"), true);
-  assert.equal(isCanonicalProductionHost("www.qasralmabrook.com:443"), true);
-  assert.equal(isCanonicalProductionHost("WWW.QASRALMABROOK.COM"), true);
-});
-
-test("Clarity project and script identifiers are fixed and unique", () => {
-  assert.equal(CLARITY_PROJECT_ID, "z3oo92tnyo");
-  const scriptIds = [
-    CLARITY_SCRIPT_ID,
-    GOOGLE_ANALYTICS_SCRIPT_ID,
-    GOOGLE_ANALYTICS_SOURCE_SCRIPT_ID,
-  ];
-  assert.equal(new Set(scriptIds).size, scriptIds.length);
-});
-
-test("changing consent updates both systems and revocation clears Clarity cookies", () => {
+test("Clarity Consent API V2 grants analytics only after acceptance and erases cookies on revocation", () => {
   const calls: unknown[][] = [];
   const runtime = {
-    gtag: (...args: unknown[]) => calls.push(["gtag", ...args]),
-    clarity: (...args: unknown[]) => calls.push(["clarity", ...args]),
+    clarity: (...args: unknown[]) => calls.push(args),
   };
 
   applyAnalyticsConsent("accepted", runtime);
   assert.deepEqual(calls, [
-    [
-      "gtag",
-      "consent",
-      "update",
-      { analytics_storage: "granted", ad_storage: "denied" },
-    ],
-    ["clarity", "consentv2", { ad_Storage: "denied", analytics_Storage: "granted" }],
+    ["consentv2", { ad_Storage: "denied", analytics_Storage: "granted" }],
   ]);
 
   calls.length = 0;
   applyAnalyticsConsent("rejected", runtime);
   assert.deepEqual(calls, [
-    [
-      "gtag",
-      "consent",
-      "update",
-      { analytics_storage: "denied", ad_storage: "denied" },
-    ],
-    ["clarity", "consentv2", { ad_Storage: "denied", analytics_Storage: "denied" }],
-    ["clarity", "consent", false],
+    ["consentv2", { ad_Storage: "denied", analytics_Storage: "denied" }],
+    ["consent", false],
   ]);
 });
 
-test("trackEvent sends nothing until optional analytics is accepted", () => {
+test("application analytics events reach Clarity only with accepted consent", () => {
   const previousWindow = globalThis.window;
   const previousDocument = globalThis.document;
-  const events: unknown[] = [];
-  const fakeWindow = {
+  const clarityCalls: unknown[][] = [];
+  const dispatchedEvents: unknown[] = [];
+  globalThis.window = {
+    clarity: (...args: unknown[]) => clarityCalls.push(args),
     dispatchEvent: (event: CustomEvent) => {
-      events.push(event.detail);
+      dispatchedEvents.push(event.detail);
       return true;
     },
-    gtag: (...args: unknown[]) => events.push(args),
   } as unknown as Window & typeof globalThis;
   let cookie = "";
-
-  globalThis.window = fakeWindow;
   globalThis.document = {
     get cookie() {
       return cookie;
     },
   } as Document;
+
   try {
     trackEvent("product_view", { product_slug: "example" });
-    assert.deepEqual(events, []);
+    assert.deepEqual(clarityCalls, []);
+    assert.deepEqual(dispatchedEvents, []);
 
     cookie = `${ANALYTICS_CONSENT_COOKIE}=accepted`;
-    trackEvent("product_view", { product_slug: "example" });
-    assert.equal(events.length, 2);
+    trackEvent("product_view", { product_slug: "example", product_id: undefined });
+    assert.deepEqual(clarityCalls, [["event", "product_view"]]);
+    assert.deepEqual(dispatchedEvents, [
+      { name: "product_view", params: { product_slug: "example" } },
+    ]);
 
-    events.length = 0;
     cookie = `${ANALYTICS_CONSENT_COOKIE}=rejected`;
     trackEvent("product_view", { product_slug: "example" });
-    assert.deepEqual(events, []);
+    assert.equal(clarityCalls.length, 1);
+    assert.equal(dispatchedEvents.length, 1);
   } finally {
     globalThis.window = previousWindow;
     globalThis.document = previousDocument;

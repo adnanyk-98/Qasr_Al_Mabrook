@@ -21,8 +21,6 @@ export type AnalyticsEventParams = Record<
 
 declare global {
   interface Window {
-    dataLayer?: Array<Record<string, unknown>>;
-    gtag?: (...args: unknown[]) => void;
     clarity?: (...args: unknown[]) => void;
   }
 }
@@ -36,7 +34,7 @@ export function trackEvent(
   const cleanParams = Object.fromEntries(
     Object.entries(params).filter(([, value]) => value !== undefined),
   );
-  window.gtag?.("event", name, cleanParams);
+  window.clarity?.("event", name);
   window.dispatchEvent(
     new CustomEvent("qam:analytics", { detail: { name, params: cleanParams } }),
   );

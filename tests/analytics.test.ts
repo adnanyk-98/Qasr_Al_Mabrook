@@ -6,9 +6,11 @@ import { ANALYTICS_CONSENT_COOKIE } from "@/lib/analytics-consent";
 
 test("dispatches analytics events without undefined parameters", () => {
   const events: unknown[] = [];
+  const clarityCalls: unknown[][] = [];
   const previousWindow = globalThis.window;
   const previousDocument = globalThis.document;
   globalThis.window = {
+    clarity: (...args: unknown[]) => clarityCalls.push(args),
     dispatchEvent: (event: CustomEvent) => {
       events.push(event.detail);
       return true;
@@ -35,4 +37,5 @@ test("dispatches analytics events without undefined parameters", () => {
       params: { product_slug: "cloth-piece", locale: "en" },
     },
   ]);
+  assert.deepEqual(clarityCalls, [["event", "product_request_quote"]]);
 });

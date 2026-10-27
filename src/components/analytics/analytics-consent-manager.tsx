@@ -3,7 +3,6 @@
 import { useRef, useState } from "react";
 
 import { ClarityAnalytics } from "@/components/analytics/clarity-analytics";
-import { GoogleAnalytics } from "@/components/analytics/google-analytics";
 import {
   getAnalyticsScriptPlan,
   applyAnalyticsConsent,
@@ -23,11 +22,8 @@ type ConsentCopy = {
 declare global {
   interface Window {
     clarity?: (...args: unknown[]) => void;
-    gtag?: (...args: unknown[]) => void;
   }
 }
-
-const googleAnalyticsConfigured = Boolean(process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID);
 
 export function AnalyticsConsentManager({
   initialConsent,
@@ -44,11 +40,7 @@ export function AnalyticsConsentManager({
   const [isOpen, setIsOpen] = useState(initialConsent === null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const manageRef = useRef<HTMLButtonElement>(null);
-  const plan = getAnalyticsScriptPlan(
-    consent,
-    canonicalProductionHost,
-    googleAnalyticsConfigured,
-  );
+  const plan = getAnalyticsScriptPlan(consent, canonicalProductionHost);
 
   function chooseConsent(nextConsent: Exclude<AnalyticsConsent, null>) {
     saveAnalyticsConsent(nextConsent);
@@ -65,7 +57,6 @@ export function AnalyticsConsentManager({
 
   return (
     <>
-      {plan.googleAnalytics && <GoogleAnalytics />}
       {plan.clarity && <ClarityAnalytics />}
       {isOpen ? (
         <section

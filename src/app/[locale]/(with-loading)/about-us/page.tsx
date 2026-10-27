@@ -5,7 +5,7 @@ import { PublicShell } from "@/components/public/public-shell";
 import { Container, Section } from "@/components/ui/layout";
 import { getPublishedStaticPage } from "@/server/repositories/public-catalog";
 import { locales, type Locale } from "@/lib/locales";
-import { createPublicPageMetadata } from "@/lib/seo";
+import { createPublicPageMetadata, getLocalizedPageMetadataState } from "@/lib/seo";
 
 export async function generateMetadata({
   params,
@@ -21,18 +21,17 @@ export async function generateMetadata({
     currentLocale === "en" ? "ar" : "en",
     "about-us",
   );
+  const translationState = getLocalizedPageMetadataState(page, alternatePage);
 
   const metadata = createPublicPageMetadata({
     locale: currentLocale,
     path: "/about-us",
     title: currentLocale === "ar" ? "من نحن" : "About Us",
     description: page?.seoDescription,
-    hasAlternate: Boolean(
-      page?.hasExactLocaleTranslation && alternatePage?.hasExactLocaleTranslation,
-    ),
+    hasAlternate: translationState.hasAlternate,
   });
 
-  if (!page?.hasExactLocaleTranslation) metadata.robots = "noindex, follow";
+  if (translationState.shouldNoindex) metadata.robots = "noindex, follow";
   return metadata;
 }
 

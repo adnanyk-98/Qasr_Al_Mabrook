@@ -22,6 +22,33 @@ export function shouldNoindexHost(host?: string | null): boolean {
   return normalizedHost !== "www.qasralmabrook.com";
 }
 
+export function getLocalizedPageMetadataState(
+  page:
+    | {
+        hasExactLocaleTranslation: boolean;
+      }
+    | null
+    | undefined,
+  alternatePage:
+    | {
+        hasExactLocaleTranslation: boolean;
+      }
+    | null
+    | undefined,
+): {
+  hasExactLocaleTranslation: boolean;
+  hasAlternate: boolean;
+  shouldNoindex: boolean;
+} {
+  const hasExactLocaleTranslation = Boolean(page?.hasExactLocaleTranslation);
+  return {
+    hasExactLocaleTranslation,
+    hasAlternate:
+      hasExactLocaleTranslation && Boolean(alternatePage?.hasExactLocaleTranslation),
+    shouldNoindex: !hasExactLocaleTranslation,
+  };
+}
+
 export function createFaqStructuredData(
   faqs: Array<{ question: string; answer: string }>,
 ): string {

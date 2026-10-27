@@ -1,13 +1,10 @@
 export const ANALYTICS_CONSENT_COOKIE = "qam-analytics-consent";
 export const ANALYTICS_CONSENT_MAX_AGE = 60 * 60 * 24 * 365;
 export const CLARITY_PROJECT_ID = "z3oo92tnyo";
-export const GOOGLE_ANALYTICS_SCRIPT_ID = "qam-google-analytics";
-export const GOOGLE_ANALYTICS_SOURCE_SCRIPT_ID = "qam-google-analytics-source";
 export const CLARITY_SCRIPT_ID = "qam-clarity-loader";
 
 export type AnalyticsConsent = "accepted" | "rejected" | null;
 export type AnalyticsRuntime = {
-  gtag?: (...args: unknown[]) => void;
   clarity?: (...args: unknown[]) => void;
 };
 
@@ -35,12 +32,9 @@ export function isCanonicalProductionHost(host: string | null | undefined): bool
 export function getAnalyticsScriptPlan(
   consent: AnalyticsConsent,
   canonicalProductionHost: boolean,
-  googleAnalyticsConfigured: boolean,
 ) {
-  const enabled = consent === "accepted";
   return {
-    googleAnalytics: enabled && googleAnalyticsConfigured,
-    clarity: enabled && canonicalProductionHost,
+    clarity: consent === "accepted" && canonicalProductionHost,
   };
 }
 
@@ -49,16 +43,12 @@ export function applyAnalyticsConsent(
   runtime: AnalyticsRuntime = window,
 ): void {
   const granted = consent === "accepted";
-  runtime.gtag?.("consent", "update", {
-    analytics_storage: granted ? "granted" : "denied",
-    ad_storage: "denied",
-  });
-
   if (runtime.clarity) {
     runtime.clarity("consentv2", {
       ad_Storage: "denied",
       analytics_Storage: granted ? "granted" : "denied",
     });
+    // Clarity documents this command for erasing cookies after consent is revoked.
     if (!granted) runtime.clarity("consent", false);
   }
 }

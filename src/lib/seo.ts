@@ -125,6 +125,25 @@ export function normalizeSeoText(value?: string | null): string | null {
   return normalized.length > 0 ? normalized : null;
 }
 
+export function resolveProductSeoMetadata(
+  product: {
+    seoTitle?: string | null;
+    seoDescription?: string | null;
+  },
+  fallback?: {
+    seoTitle?: string | null;
+    seoDescription?: string | null;
+  } | null,
+) {
+  const firstNonBlank = (...values: Array<string | null | undefined>) =>
+    values.map((value) => value?.trim()).find(Boolean) ?? null;
+
+  return {
+    seoTitle: firstNonBlank(product.seoTitle, fallback?.seoTitle),
+    seoDescription: firstNonBlank(product.seoDescription, fallback?.seoDescription),
+  };
+}
+
 export function hasLocaleScript(
   value: string | null | undefined,
   locale: Locale,

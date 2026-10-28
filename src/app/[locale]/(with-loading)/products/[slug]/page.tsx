@@ -25,6 +25,7 @@ import {
   createProductMetadata,
   createProductStructuredData,
   buildCanonical,
+  resolveProductSeoMetadata,
 } from "@/lib/seo";
 import { AnalyticsTracker } from "@/components/analytics/analytics-tracker";
 import { getProductLandingContent } from "@/lib/catalogue-landing-content";
@@ -42,6 +43,7 @@ export async function generateMetadata({
 
   const currentLocale = locale as Locale;
   const landingContent = getProductLandingContent(currentLocale, slug);
+  const seoContent = resolveProductSeoMetadata(product, landingContent);
   const alternateProduct = await getProductBySlug(
     currentLocale === "en" ? "ar" : "en",
     slug,
@@ -55,8 +57,8 @@ export async function generateMetadata({
     locale: currentLocale,
     path: `/products/${slug}`,
     productName: product.name,
-    seoTitle: landingContent?.seoTitle ?? product.seoTitle,
-    seoDescription: landingContent?.seoDescription ?? product.seoDescription,
+    seoTitle: seoContent.seoTitle,
+    seoDescription: seoContent.seoDescription,
     shortDescription: product.shortDescription,
     fullDescription: product.description,
     productImage: primaryImage?.publicUrl,

@@ -135,12 +135,25 @@ export function resolveProductSeoMetadata(
     seoDescription?: string | null;
   } | null,
 ) {
+  return resolveSeoMetadata(product, fallback);
+}
+
+export function resolveSeoMetadata(
+  configured: {
+    seoTitle?: string | null;
+    seoDescription?: string | null;
+  },
+  fallback?: {
+    seoTitle?: string | null;
+    seoDescription?: string | null;
+  } | null,
+) {
   const firstNonBlank = (...values: Array<string | null | undefined>) =>
     values.map((value) => value?.trim()).find(Boolean) ?? null;
 
   return {
-    seoTitle: firstNonBlank(product.seoTitle, fallback?.seoTitle),
-    seoDescription: firstNonBlank(product.seoDescription, fallback?.seoDescription),
+    seoTitle: firstNonBlank(configured.seoTitle, fallback?.seoTitle),
+    seoDescription: firstNonBlank(configured.seoDescription, fallback?.seoDescription),
   };
 }
 
@@ -202,8 +215,6 @@ function getDescriptionMaxLength(locale: Locale, path: string): number {
   if (
     locale === "en" &&
     [
-      "/categories/gloves",
-      "/categories/mens-bottom-wear",
       "/products/5m-measuring-tape-green",
       "/products/7-5m-measuring-tape-green",
     ].includes(path)
@@ -462,10 +473,13 @@ export function createCategoryMetadata(
         : `${categoryName} Collection`
       : categoryName;
   const title =
-    isFancySuitEnglishCategory || isMensBottomWearArabicCategory
-      ? buildCategorySeoTitle(categoryTitleName, rest.locale)
-      : (hasLocaleScript(seoTitle, rest.locale) ? normalizeSeoText(seoTitle) : null) ||
-        buildCategorySeoTitle(categoryName, rest.locale);
+    (hasLocaleScript(seoTitle, rest.locale) ? normalizeSeoText(seoTitle) : null) ||
+    buildCategorySeoTitle(
+      isFancySuitEnglishCategory || isMensBottomWearArabicCategory
+        ? categoryTitleName
+        : categoryName,
+      rest.locale,
+    );
   const description =
     (hasLocaleScript(seoDescription, rest.locale)
       ? normalizeSeoText(seoDescription)

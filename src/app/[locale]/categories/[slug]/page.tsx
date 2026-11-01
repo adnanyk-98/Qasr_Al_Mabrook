@@ -10,7 +10,11 @@ import {
   listCategoryProducts,
 } from "@/server/repositories/public-catalog";
 import { localePath, locales, type Locale } from "@/lib/locales";
-import { createBreadcrumbStructuredData, createCategoryMetadata } from "@/lib/seo";
+import {
+  createBreadcrumbStructuredData,
+  createCategoryMetadata,
+  resolveSeoMetadata,
+} from "@/lib/seo";
 import { getTranslations } from "next-intl/server";
 import { AnalyticsTracker } from "@/components/analytics/analytics-tracker";
 import { getCategoryLandingContent } from "@/lib/catalogue-landing-content";
@@ -32,14 +36,17 @@ export async function generateMetadata({
     slug,
   );
   const landingContent = getCategoryLandingContent(currentLocale, slug);
+  const seoContent = resolveSeoMetadata(category, {
+    seoDescription: landingContent?.seoDescription,
+  });
 
   const metadata = createCategoryMetadata({
     locale: currentLocale,
     path: `/categories/${slug}`,
     categoryName: landingContent?.heading ?? category.name,
-    seoTitle: landingContent ? null : category.seoTitle,
-    seoDescription: landingContent?.seoDescription ?? category.seoDescription,
-    description: category.description,
+    seoTitle: seoContent.seoTitle,
+    seoDescription: seoContent.seoDescription,
+    description: category.description ?? category.shortDescription,
     ogImage: category.imagePublicUrl,
     ogImageAlt: category.name,
     hasAlternate: Boolean(

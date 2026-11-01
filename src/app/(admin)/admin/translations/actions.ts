@@ -21,7 +21,7 @@ import {
 } from "@/server/repositories/catalog-admin";
 import { requireAdminSession } from "@/server/services/admin-auth";
 import { siteConfig } from "@/config/site";
-import { productSeoFieldsSchema } from "@/lib/product-seo";
+import { categorySeoFieldsSchema, seoFieldsSchema } from "@/lib/product-seo";
 
 const idSchema = z.string().uuid();
 const localeSchema = z.enum(["en", "ar"]);
@@ -49,7 +49,7 @@ const productTranslationSchema = z.object({
     .optional()
     .default(""),
   description: translationFields.description,
-  ...productSeoFieldsSchema.shape,
+  ...seoFieldsSchema.shape,
 });
 
 const categoryTranslationSchema = z.object({
@@ -63,6 +63,7 @@ const categoryTranslationSchema = z.object({
     .optional()
     .default(""),
   description: translationFields.description,
+  ...categorySeoFieldsSchema.shape,
 });
 
 const translationIdSchema = z.object({ translationId: idSchema });
@@ -245,6 +246,8 @@ export async function saveCategoryTranslation(input: unknown): Promise<ActionRes
         name: values.name,
         shortDescription: values.shortDescription || null,
         description: values.description || null,
+        seoTitle: values.seoTitle || null,
+        seoDescription: values.seoDescription || null,
       });
     } else {
       const existing = await getCategoryTranslationForLocale(
@@ -263,6 +266,8 @@ export async function saveCategoryTranslation(input: unknown): Promise<ActionRes
         name: values.name,
         shortDescription: values.shortDescription || null,
         description: values.description || null,
+        seoTitle: values.seoTitle || null,
+        seoDescription: values.seoDescription || null,
       });
     }
 

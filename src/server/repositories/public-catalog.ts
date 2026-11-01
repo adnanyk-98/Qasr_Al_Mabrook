@@ -218,6 +218,7 @@ async function getCategoryBySlugUncached(locale: Locale, slug: string) {
     return {
       ...rows[0].category,
       name: rows[0].translation.name,
+      shortDescription: rows[0].translation.shortDescription ?? null,
       description: rows[0].translation.description ?? null,
       seoTitle: rows[0].translation.seoTitle ?? null,
       seoDescription: rows[0].translation.seoDescription ?? null,
@@ -242,6 +243,7 @@ async function getCategoryBySlugUncached(locale: Locale, slug: string) {
   return {
     ...fallback[0].category,
     name: fallback[0].translation.name,
+    shortDescription: fallback[0].translation.shortDescription ?? null,
     description: fallback[0].translation.description ?? null,
     seoTitle: fallback[0].translation.seoTitle ?? null,
     seoDescription: fallback[0].translation.seoDescription ?? null,

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const productSeoFieldsSchema = z.object({
+export const seoFieldsSchema = z.object({
   seoTitle: z
     .string()
     .trim()
@@ -11,6 +11,17 @@ export const productSeoFieldsSchema = z.object({
     .string()
     .trim()
     .max(140, "SEO description must be 140 characters or fewer.")
+    .optional()
+    .default(""),
+});
+
+export const productSeoFieldsSchema = seoFieldsSchema;
+
+export const categorySeoFieldsSchema = seoFieldsSchema.extend({
+  seoDescription: z
+    .string()
+    .trim()
+    .max(155, "SEO description must be 155 characters or fewer.")
     .optional()
     .default(""),
 });

@@ -33,6 +33,8 @@ type CategoryTranslation = {
   name: string;
   shortDescription: string | null;
   description: string | null;
+  seoTitle: string | null;
+  seoDescription: string | null;
 };
 type Feedback = { kind: "success" | "error"; message: string } | null;
 type DeleteTarget = { kind: "product" | "category"; id: string; label: string } | null;
@@ -111,6 +113,8 @@ export function TranslationManager({
         name: String(values.get("name") ?? ""),
         shortDescription: String(values.get("shortDescription") ?? ""),
         description: String(values.get("description") ?? ""),
+        seoTitle: String(values.get("seoTitle") ?? ""),
+        seoDescription: String(values.get("seoDescription") ?? ""),
       });
       setCategoryFeedback({
         kind: result.ok ? "success" : "error",
@@ -383,6 +387,38 @@ export function TranslationManager({
                   defaultValue={categoryEdit?.description ?? ""}
                 />
               </div>
+              <fieldset className="space-y-4 rounded-[var(--radius-md)] border border-[var(--brand-border)] p-4">
+                <legend className="px-1 text-sm font-semibold text-[var(--foreground)]">
+                  Search engine metadata ({categoryEdit?.locale ?? "selected locale"})
+                </legend>
+                <div>
+                  <Label htmlFor="category-translation-seo-title">SEO title</Label>
+                  <Input
+                    id="category-translation-seo-title"
+                    name="seoTitle"
+                    placeholder="Optional page title"
+                    maxLength={255}
+                    defaultValue={categoryEdit?.seoTitle ?? ""}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="category-translation-seo-description">
+                    Meta description
+                  </Label>
+                  <Textarea
+                    id="category-translation-seo-description"
+                    name="seoDescription"
+                    placeholder="Optional search result description"
+                    rows={3}
+                    maxLength={155}
+                    defaultValue={categoryEdit?.seoDescription ?? ""}
+                  />
+                  <p className="mt-1 text-xs text-[var(--text-muted)]">
+                    Optional; up to 155 characters. Leave blank to use the generated
+                    description.
+                  </p>
+                </div>
+              </fieldset>
               <div className="flex flex-wrap gap-3">
                 <Button type="submit" disabled={pending}>
                   {pending
@@ -530,6 +566,16 @@ export function TranslationManager({
                     {entry.description ? (
                       <p className="mt-2 text-sm text-[var(--text-muted)]">
                         {entry.description}
+                      </p>
+                    ) : null}
+                    {entry.seoTitle ? (
+                      <p className="mt-1 text-sm text-[var(--text-muted)]">
+                        SEO title: {entry.seoTitle}
+                      </p>
+                    ) : null}
+                    {entry.seoDescription ? (
+                      <p className="mt-1 text-sm text-[var(--text-muted)]">
+                        Meta description: {entry.seoDescription}
                       </p>
                     ) : null}
                   </div>

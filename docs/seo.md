@@ -55,6 +55,11 @@ Every indexable page should have:
 
 Product/category metadata should be configurable.
 
+Product SEO fields are managed on the default-locale Product form and alternate
+locales in Admin → Translations. Category SEO fields are managed on each locale's
+category translation in Admin → Translations. SEO title and description are
+independent and optional; blank values use generated localized metadata.
+
 ## 6. Sitemap
 
 Use Next.js sitemap generation.

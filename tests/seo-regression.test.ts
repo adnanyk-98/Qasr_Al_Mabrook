@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { after, test } from "node:test";
+import { randomUUID } from "node:crypto";
+import { after, before, test } from "node:test";
 
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
@@ -38,6 +39,60 @@ import robots from "@/app/robots";
 import sitemap from "@/app/sitemap";
 
 const baseUrl = getBaseUrl();
+const databaseUrl = process.env.DATABASE_URL;
+const isDisposableCiDatabase = (() => {
+  if (process.env.CI !== "true" || process.env.NODE_ENV !== "test" || !databaseUrl) {
+    return false;
+  }
+  try {
+    const url = new URL(databaseUrl);
+    return (
+      ["127.0.0.1", "localhost"].includes(url.hostname) &&
+      url.pathname.replace(/^\//u, "") === "qam_test"
+    );
+  } catch {
+    return false;
+  }
+})();
+const sitemapFixtureCategorySlug = `seo-sitemap-category-${randomUUID()}`;
+const sitemapFixtureProductSlug = `seo-sitemap-product-${randomUUID()}`;
+let sitemapFixtureCategoryId: string | null = null;
+let sitemapFixtureProductId: string | null = null;
+
+before(async () => {
+  if (!isDisposableCiDatabase) return;
+
+  const repository = await import("@/server/repositories/catalog-admin");
+  const category = await repository.createCategory({
+    slug: sitemapFixtureCategorySlug,
+    status: "PUBLISHED",
+  });
+  assert.ok(category);
+  sitemapFixtureCategoryId = category.id;
+  const product = await repository.createProduct({
+    slug: sitemapFixtureProductSlug,
+    status: "PUBLISHED",
+  });
+  assert.ok(product);
+  sitemapFixtureProductId = product.id;
+
+  for (const locale of ["en", "ar"] as const) {
+    assert.ok(
+      await repository.createCategoryTranslation({
+        categoryId: category.id,
+        locale,
+        name: locale === "en" ? "SEO Sitemap Test Category" : "فئة اختبار خريطة الموقع",
+      }),
+    );
+    assert.ok(
+      await repository.createProductTranslation({
+        productId: product.id,
+        locale,
+        name: locale === "en" ? "SEO Sitemap Test Product" : "منتج اختبار خريطة الموقع",
+      }),
+    );
+  }
+});
 
 test("production SEO origin stays canonical if the build-time URL is misconfigured", () => {
   assert.equal(
@@ -55,7 +110,17 @@ test("production SEO origin stays canonical if the build-time URL is misconfigur
 });
 
 after(async () => {
-  await (db as typeof db & { $client: { end: () => Promise<void> } }).$client.end();
+  try {
+    if (sitemapFixtureProductId) {
+      await db.delete(products).where(eq(products.id, sitemapFixtureProductId));
+    }
+    if (sitemapFixtureCategoryId) {
+      const repository = await import("@/server/repositories/catalog-admin");
+      await repository.deleteCategoryById(sitemapFixtureCategoryId);
+    }
+  } finally {
+    await (db as typeof db & { $client: { end: () => Promise<void> } }).$client.end();
+  }
 });
 
 test("English homepage metadata uses the configured site origin and locale alternates", () => {
@@ -222,77 +287,107 @@ test("robots.txt allows public catalogue pages and blocks admin and API paths", 
   assert.equal(rules.sitemap, `${baseUrl}/sitemap.xml`);
 });
 
-test("sitemap contains public canonical URLs and excludes admin, API, and query variants", async () => {
-  const entries = await sitemap();
-  const urls = entries.map((entry) => entry.url);
+test(
+  "sitemap contains public canonical URLs and localized product/category alternates",
+  { skip: !isDisposableCiDatabase },
+  async () => {
+    const entries = await sitemap();
+    const urls = entries.map((entry) => entry.url);
 
-  assert.ok(urls.every((url) => url.startsWith(baseUrl)));
-  assert.equal(new Set(urls).size, urls.length);
-  assert.ok(urls.every((url) => new URL(url).origin === new URL(baseUrl).origin));
-  assert.ok(urls.some((url) => url === `${baseUrl}/en`));
-  assert.ok(urls.some((url) => url === `${baseUrl}/ar`));
-  assert.ok(urls.some((url) => url === `${baseUrl}/en/store-locator`));
-  assert.ok(urls.some((url) => url === `${baseUrl}/ar/store-locator`));
-  assert.ok(urls.some((url) => url === `${baseUrl}/en/blog`));
-  assert.ok(urls.some((url) => url === `${baseUrl}/ar/blog`));
-  assert.ok(!urls.some((url) => url.endsWith("/sitemap")));
-  assert.ok(!urls.some((url) => url.endsWith("/contact-us")));
-  assert.ok(
-    urls.some((url) => url.includes("/en/products/")) ||
-      urls.some((url) => url.includes("/ar/products/")),
-  );
-  assert.ok(
-    urls.some((url) => url.includes("/en/categories/")) ||
-      urls.some((url) => url.includes("/ar/categories/")),
-  );
-  assert.ok(!urls.some((url) => url.includes("/admin")));
-  assert.ok(!urls.some((url) => url.includes("/api")));
-  assert.ok(!urls.some((url) => url.includes("/search")));
-  assert.ok(!urls.some((url) => url.includes("/request-quote")));
-  assert.ok(!urls.some((url) => url.includes("?")));
+    assert.ok(urls.every((url) => url.startsWith(baseUrl)));
+    assert.equal(new Set(urls).size, urls.length);
+    assert.ok(urls.every((url) => new URL(url).origin === new URL(baseUrl).origin));
+    assert.ok(urls.some((url) => url === `${baseUrl}/en`));
+    assert.ok(urls.some((url) => url === `${baseUrl}/ar`));
+    assert.ok(urls.some((url) => url === `${baseUrl}/en/store-locator`));
+    assert.ok(urls.some((url) => url === `${baseUrl}/ar/store-locator`));
+    assert.ok(urls.some((url) => url === `${baseUrl}/en/blog`));
+    assert.ok(urls.some((url) => url === `${baseUrl}/ar/blog`));
+    assert.ok(!urls.some((url) => url.endsWith("/sitemap")));
+    assert.ok(!urls.some((url) => url.endsWith("/contact-us")));
+    assert.ok(
+      urls.some((url) => url.includes("/en/products/")) ||
+        urls.some((url) => url.includes("/ar/products/")),
+    );
+    assert.ok(
+      urls.some((url) => url.includes("/en/categories/")) ||
+        urls.some((url) => url.includes("/ar/categories/")),
+    );
+    assert.ok(!urls.some((url) => url.includes("/admin")));
+    assert.ok(!urls.some((url) => url.includes("/api")));
+    assert.ok(!urls.some((url) => url.includes("/search")));
+    assert.ok(!urls.some((url) => url.includes("/request-quote")));
+    assert.ok(!urls.some((url) => url.includes("?")));
 
-  const translatedCategories = await db
-    .select({ slug: categories.slug, locale: categoryTranslations.locale })
-    .from(categories)
-    .innerJoin(categoryTranslations, eq(categoryTranslations.categoryId, categories.id))
-    .where(eq(categories.status, "PUBLISHED"));
-  const translatedProducts = await db
-    .select({ slug: products.slug, locale: productTranslations.locale })
-    .from(products)
-    .innerJoin(productTranslations, eq(productTranslations.productId, products.id))
-    .where(eq(products.status, "PUBLISHED"));
-  const actualCategoryPaths = urls
-    .filter((url) => /\/categories\/[^/]+$/.test(new URL(url).pathname))
-    .sort();
-  const expectedCategoryPaths = translatedCategories
-    .map(({ slug, locale }) => `${baseUrl}/${locale}/categories/${slug}`)
-    .sort();
-  const actualProductPaths = urls
-    .filter((url) => /\/products\/[^/]+$/.test(new URL(url).pathname))
-    .sort();
-  const expectedProductPaths = translatedProducts
-    .map(({ slug, locale }) => `${baseUrl}/${locale}/products/${slug}`)
-    .sort();
-
-  assert.deepEqual(actualCategoryPaths, expectedCategoryPaths);
-  assert.deepEqual(actualProductPaths, expectedProductPaths);
-  const homepageEn = entries.find((entry) => entry.url === `${baseUrl}/en`);
-  assert.equal(homepageEn?.alternates?.languages?.en, `${baseUrl}/en`);
-  assert.equal(homepageEn?.alternates?.languages?.ar, `${baseUrl}/ar`);
-  assert.equal(homepageEn?.alternates?.languages?.["x-default"], `${baseUrl}/en`);
-  assert.ok(
-    entries
-      .filter((entry) =>
-        /\/(products|categories)\/[^/]+$/.test(new URL(entry.url).pathname),
+    const translatedCategories = await db
+      .select({ slug: categories.slug, locale: categoryTranslations.locale })
+      .from(categories)
+      .innerJoin(
+        categoryTranslations,
+        eq(categoryTranslations.categoryId, categories.id),
       )
-      .every((entry) => entry.lastModified instanceof Date),
-  );
-  assert.ok(
-    entries
-      .filter((entry) => /\/blog\/[^/]+$/.test(new URL(entry.url).pathname))
-      .every((entry) => entry.lastModified instanceof Date),
-  );
-});
+      .where(eq(categories.status, "PUBLISHED"));
+    const translatedProducts = await db
+      .select({ slug: products.slug, locale: productTranslations.locale })
+      .from(products)
+      .innerJoin(productTranslations, eq(productTranslations.productId, products.id))
+      .where(eq(products.status, "PUBLISHED"));
+    const actualCategoryPaths = urls
+      .filter((url) => /\/categories\/[^/]+$/.test(new URL(url).pathname))
+      .sort();
+    const expectedCategoryPaths = translatedCategories
+      .map(({ slug, locale }) => `${baseUrl}/${locale}/categories/${slug}`)
+      .sort();
+    const actualProductPaths = urls
+      .filter((url) => /\/products\/[^/]+$/.test(new URL(url).pathname))
+      .sort();
+    const expectedProductPaths = translatedProducts
+      .map(({ slug, locale }) => `${baseUrl}/${locale}/products/${slug}`)
+      .sort();
+
+    assert.deepEqual(actualCategoryPaths, expectedCategoryPaths);
+    assert.deepEqual(actualProductPaths, expectedProductPaths);
+    const homepageEn = entries.find((entry) => entry.url === `${baseUrl}/en`);
+    assert.equal(homepageEn?.alternates?.languages?.en, `${baseUrl}/en`);
+    assert.equal(homepageEn?.alternates?.languages?.ar, `${baseUrl}/ar`);
+    assert.equal(homepageEn?.alternates?.languages?.["x-default"], `${baseUrl}/en`);
+
+    for (const [type, slug] of [
+      ["categories", sitemapFixtureCategorySlug],
+      ["products", sitemapFixtureProductSlug],
+    ] as const) {
+      const englishUrl = `${baseUrl}/en/${type}/${slug}`;
+      const arabicUrl = `${baseUrl}/ar/${type}/${slug}`;
+      const localizedEntries = entries.filter(
+        (entry) => entry.url === englishUrl || entry.url === arabicUrl,
+      );
+      assert.deepEqual(
+        localizedEntries.map((entry) => entry.url).sort(),
+        [arabicUrl, englishUrl].sort(),
+      );
+      for (const entry of localizedEntries) {
+        assert.deepEqual(entry.alternates?.languages, {
+          en: englishUrl,
+          ar: arabicUrl,
+          "x-default": englishUrl,
+        });
+      }
+    }
+
+    assert.ok(
+      entries
+        .filter((entry) =>
+          /\/(products|categories)\/[^/]+$/.test(new URL(entry.url).pathname),
+        )
+        .every((entry) => entry.lastModified instanceof Date),
+    );
+    assert.ok(
+      entries
+        .filter((entry) => /\/blog\/[^/]+$/.test(new URL(entry.url).pathname))
+        .every((entry) => entry.lastModified instanceof Date),
+    );
+  },
+);
 
 test("category directory lists only localized categories with an available detail route", async () => {
   for (const locale of ["en", "ar"] as const) {
@@ -411,8 +506,8 @@ test("SEO landing titles and descriptions are localized and retain public canoni
 
   assert.equal(aboutEn.title, "About Us | Qasr Al Mabrook");
   assert.equal(aboutAr.title, "من نحن | قصر المبارك");
-  assert.equal(fancySuitCategory.title, "Fancy Suit Collection | Qasr Al Mabrook");
-  assert.equal(mensBottomWearCategory.title, "بيجاما | قصر المبارك");
+  assert.equal(fancySuitCategory.title, "Fancy Suit | Qasr Al Mabrook");
+  assert.equal(mensBottomWearCategory.title, "عنوان منتج البيجاما | قصر المبارك");
   assert.equal(
     dplProductEn.title,
     "DPL Grandeur 70 Industrial Gloves | Qasr Al Mabrook",
@@ -426,7 +521,7 @@ test("SEO landing titles and descriptions are localized and retain public canoni
   assert.equal(dplProductAr.alternates?.canonical, `${baseUrl}/ar/products/dpl-gloves`);
 });
 
-test("the four flagged English metadata descriptions stay within the shortened limit", () => {
+test("category descriptions use the standard metadata limit while flagged products stay shortened", () => {
   const longDescription =
     "This category includes occupational products made from neoprene and natural rubber with flock lining and textured grip surfaces for work environments where durable hand coverage and grip are important.";
   const categoryGloves = createCategoryMetadata({
@@ -457,12 +552,11 @@ test("the four flagged English metadata descriptions stay within the shortened l
       "The Yokohama 7.5M/25FT measuring tape is the longest-range option in this collection, built around a 25-foot reach for measurements that move beyond the shorter tape.",
   });
 
-  for (const metadata of [
-    categoryGloves,
-    categoryMensBottomWear,
-    product5m,
-    product75m,
-  ]) {
+  for (const metadata of [categoryGloves, categoryMensBottomWear]) {
+    assert.ok((metadata.description?.length ?? 0) <= 155);
+    assert.ok(metadata.description?.endsWith("…"));
+  }
+  for (const metadata of [product5m, product75m]) {
     assert.ok((metadata.description?.length ?? 0) <= 140);
     assert.ok(metadata.description?.endsWith("…"));
   }

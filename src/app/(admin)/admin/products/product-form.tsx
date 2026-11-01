@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
@@ -54,6 +54,10 @@ export function ProductForm({
   defaultLocale: "en" | "ar";
 }) {
   const router = useRouter();
+  const [seoTitle, setSeoTitle] = useState(translation?.seoTitle ?? "");
+  const [seoDescription, setSeoDescription] = useState(
+    translation?.seoDescription ?? "",
+  );
   const [state, formAction, pending] = useActionState<ProductActionState, FormData>(
     upsertProductAction,
     { status: "idle" },
@@ -134,7 +138,8 @@ export function ProductForm({
             name="seoTitle"
             placeholder="Optional page title"
             maxLength={255}
-            defaultValue={translation?.seoTitle ?? ""}
+            value={seoTitle}
+            onChange={(event) => setSeoTitle(event.target.value)}
             aria-invalid={Boolean(errorFor("seoTitle"))}
           />
           {errorFor("seoTitle") ? (
@@ -149,7 +154,8 @@ export function ProductForm({
             placeholder="Optional search result description"
             rows={3}
             maxLength={140}
-            defaultValue={translation?.seoDescription ?? ""}
+            value={seoDescription}
+            onChange={(event) => setSeoDescription(event.target.value)}
             aria-invalid={Boolean(errorFor("seoDescription"))}
           />
           <p className="mt-1 text-xs text-[var(--text-muted)]">

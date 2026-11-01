@@ -67,13 +67,24 @@ export default async function TranslationsPage() {
             }),
           )}
           categoryTranslations={categoryTranslations.map(
-            ({ id, categoryId, locale, name, shortDescription, description }) => ({
+            ({
               id,
               categoryId,
               locale,
               name,
               shortDescription,
               description,
+              seoTitle,
+              seoDescription,
+            }) => ({
+              id,
+              categoryId,
+              locale,
+              name,
+              shortDescription,
+              description,
+              seoTitle,
+              seoDescription,
             }),
           )}
         />

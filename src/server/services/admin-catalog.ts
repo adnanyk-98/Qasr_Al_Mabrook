@@ -36,7 +36,7 @@ import {
 } from "@/server/repositories/catalog-admin";
 import { requireAdminSession } from "@/server/services/admin-auth";
 import { siteConfig } from "@/config/site";
-import { productSeoFieldsSchema } from "@/lib/product-seo";
+import { categorySeoFieldsSchema, productSeoFieldsSchema } from "@/lib/product-seo";
 import { resolvePrimaryProductImageId } from "@/lib/product-image-primary";
 import {
   invalidateBrandPublicCache,
@@ -620,22 +620,50 @@ export { resolvePrimaryProductImageId };
 
 export async function upsertCategoryTranslationAction(formData: FormData) {
   await authorizeAdminMutation();
-  const categoryId = String(formData.get("categoryId") ?? "");
-  if (!idSchema.safeParse(categoryId).success) {
+  const parsed = z
+    .object({
+      categoryId: idSchema,
+      locale: localeSchema,
+      name: z
+        .string()
+        .trim()
+        .min(1, "Name is required.")
+        .max(255, "Name must be 255 characters or fewer."),
+      shortDescription: z
+        .string()
+        .max(10000, "Short description must be 10,000 characters or fewer.")
+        .optional()
+        .default(""),
+      description: z
+        .string()
+        .max(10000, "Description must be 10,000 characters or fewer.")
+        .optional()
+        .default(""),
+      ...categorySeoFieldsSchema.shape,
+    })
+    .safeParse({
+      categoryId: String(formData.get("categoryId") ?? ""),
+      locale: String(formData.get("locale") ?? "en"),
+      name: String(formData.get("name") ?? ""),
+      shortDescription: String(formData.get("shortDescription") ?? ""),
+      description: String(formData.get("description") ?? ""),
+      seoTitle: String(formData.get("seoTitle") ?? ""),
+      seoDescription: String(formData.get("seoDescription") ?? ""),
+    });
+  if (!parsed.success) {
     redirect("/admin/translations");
   }
 
   const input = {
-    categoryId,
-    locale: localeSchema.parse(String(formData.get("locale") ?? "en")),
-    name: String(formData.get("name") ?? "").trim(),
-    description: String(formData.get("description") ?? "") || null,
-    seoTitle: String(formData.get("seoTitle") ?? "") || null,
-    seoDescription: String(formData.get("seoDescription") ?? "") || null,
+    ...parsed.data,
+    shortDescription: parsed.data.shortDescription || null,
+    description: parsed.data.description || null,
+    seoTitle: parsed.data.seoTitle || null,
+    seoDescription: parsed.data.seoDescription || null,
   };
   const updatedTranslation = await upsertCategoryTranslation(input);
   if (updatedTranslation) {
-    const category = await getCategoryById(categoryId);
+    const category = await getCategoryById(input.categoryId);
     if (category) await invalidateCategoryPublicCache(category.id, category.slug);
   }
 

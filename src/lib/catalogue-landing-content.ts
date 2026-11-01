@@ -72,22 +72,24 @@ export function getCategoryLandingContent(
   if (slug === "gloves") {
     return locale === "ar"
       ? {
-          heading: "قفازات DPL الصناعية",
+          heading: "قفازات DPL الصناعية المطاطية",
           seoDescription:
             "تعرّف على قفازات DPL المهنية، ومنها Grandeur 70 ببطانة فلوك ونقشة لتحسين التماسك. يقع قصر المبارك في الشارقة، الإمارات.",
           intro:
             "تضم فئة القفازات قفازات DPL Grandeur 70 المهنية. وتُظهر بيانات المنتج تركيبة من النيوبرين والمطاط الطبيعي، وبطانة داخلية من الفلوك، وسمكًا يبلغ 28 ميل أو 0.70 مم، وأسطحًا منقوشة على راحة اليد والأصابع. يقع قصر المبارك في الشارقة، الإمارات العربية المتحدة.",
-          linkHeading: "تعرّف على منتج DPL Grandeur 70",
+          linkHeading: "تعرّف على قفازات DPL الصناعية",
           links: [{ href: "/products/dpl-gloves", label: "قفازات DPL Grandeur 70" }],
         }
       : {
-          heading: "DPL Industrial Gloves",
+          heading: "Industrial Rubber Gloves",
           seoDescription:
             "DPL industrial gloves: Grandeur 70 uses neoprene/natural rubber, flock lining and textured grip. Qasr Al Mabrook, Sharjah, UAE.",
           intro:
-            "The Gloves category features DPL Grandeur 70 industrial gloves. Product details list neoprene and natural rubber construction, a flock-lined interior, 28 mil (0.70 mm) thickness, and textured palm and finger surfaces. Qasr Al Mabrook is based in Sharjah, UAE.",
-          linkHeading: "View the DPL Grandeur 70 product",
-          links: [{ href: "/products/dpl-gloves", label: "DPL Grandeur 70 Gloves" }],
+            "This category features DPL Grandeur 70 industrial rubber gloves. The product listing describes a neoprene and natural rubber construction, a flock-lined interior, 28 mil (0.70 mm) thickness, and textured palm and finger surfaces. Qasr Al Mabrook is based in Sharjah, UAE.",
+          linkHeading: "View DPL industrial rubber gloves",
+          links: [
+            { href: "/products/dpl-gloves", label: "DPL Industrial Rubber Gloves" },
+          ],
         };
   }
 
@@ -122,7 +124,7 @@ export function getProductLandingContent(
 
   return locale === "ar"
     ? {
-        heading: "قفازات DPL الصناعية",
+        heading: "قفازات DPL الصناعية المطاطية",
         seoTitle: "قفازات DPL Grandeur 70",
         seoDescription:
           "قفازات DPL Grandeur 70 المهنية ببطانة فلوك وأسطح منقوشة وسمك 28 ميل أو 0.70 مم. يقع قصر المبارك في الشارقة، الإمارات.",
@@ -130,12 +132,12 @@ export function getProductLandingContent(
           "قفازات DPL Grandeur 70 الصناعية مصنوعة من النيوبرين والمطاط الطبيعي، مع بطانة داخلية من الفلوك. يبلغ سمكها 28 ميل أو 0.70 مم، وتتميز راحة اليد والأصابع بأسطح منقوشة. القفازات مغسولة بالكلور وتحمل علامات Type A: AKLMNPT وEN 388:2016 – 3110X ومعايير EN ISO 374. ويوفر الكف الممتد تغطية إضافية حول المعصم وأسفل اليد. يقع قصر المبارك في الشارقة، الإمارات العربية المتحدة.",
       }
     : {
-        heading: "DPL Industrial Gloves",
+        heading: "DPL Industrial Rubber Gloves",
         seoTitle: "DPL Grandeur 70 Industrial Gloves",
         seoDescription:
           "DPL Grandeur 70 industrial gloves with flock lining, textured grip and 28 mil (0.70 mm) thickness. Qasr Al Mabrook is based in Sharjah, UAE.",
         description:
-          "DPL Grandeur 70 industrial gloves are made from neoprene and natural rubber with a flock-lined interior. They are 28 mil (0.70 mm) thick, with textured surfaces across the palm and fingers. The gloves are chlorine washed and marked Type A: AKLMNPT, EN 388:2016 – 3110X and EN ISO 374. Their extended cuff provides additional coverage around the wrist and lower hand. Qasr Al Mabrook is based in Sharjah, UAE.",
+          "DPL Grandeur 70 industrial rubber gloves are made from neoprene and natural rubber with a flock-lined interior. They are 28 mil (0.70 mm) thick, with textured surfaces across the palm and fingers. The gloves are chlorine washed and marked Type A: AKLMNPT, EN 388:2016 – 3110X and EN ISO 374. Their extended cuff provides additional coverage around the wrist and lower hand. Qasr Al Mabrook is based in Sharjah, UAE.",
       };
 }
 

@@ -1094,6 +1094,8 @@ export async function updateCategoryTranslationById(
     name: string;
     shortDescription?: string | null;
     description?: string | null;
+    seoTitle?: string | null;
+    seoDescription?: string | null;
   },
 ) {
   const rows = await db
@@ -1102,6 +1104,8 @@ export async function updateCategoryTranslationById(
       name: input.name,
       shortDescription: input.shortDescription ?? null,
       description: input.description ?? null,
+      seoTitle: input.seoTitle ?? null,
+      seoDescription: input.seoDescription ?? null,
       updatedAt: new Date(),
     })
     .where(eq(categoryTranslations.id, id))

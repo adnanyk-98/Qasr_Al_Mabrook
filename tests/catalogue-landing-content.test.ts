@@ -55,14 +55,15 @@ test("gloves landing page introduces DPL industrial gloves and links the product
 
   assert.ok(english);
   assert.ok(arabic);
-  assert.equal(english.heading, "DPL Industrial Gloves");
+  assert.equal(english.heading, "Industrial Rubber Gloves");
+  assert.match(english.intro, /DPL Grandeur 70 industrial rubber gloves/u);
   assert.match(english.intro, /neoprene and natural rubber/u);
   assert.match(english.intro, /28 mil \(0\.70 mm\)/u);
   assert.match(english.intro, /Sharjah, UAE/u);
   assert.deepEqual(english.links, [
-    { href: "/products/dpl-gloves", label: "DPL Grandeur 70 Gloves" },
+    { href: "/products/dpl-gloves", label: "DPL Industrial Rubber Gloves" },
   ]);
-  assert.equal(arabic.heading, "قفازات DPL الصناعية");
+  assert.equal(arabic.heading, "قفازات DPL الصناعية المطاطية");
   assert.doesNotMatch(arabic.seoDescription, /industrial gloves|Sharjah|UAE/i);
   assert.deepEqual(arabic.links, [
     { href: "/products/dpl-gloves", label: "قفازات DPL Grandeur 70" },
@@ -80,9 +81,9 @@ test("gloves landing page introduces DPL industrial gloves and links the product
     categoryName: arabic.heading,
     seoDescription: arabic.seoDescription,
   });
-  assert.equal(englishMetadata.title, "DPL Industrial Gloves | Qasr Al Mabrook");
+  assert.equal(englishMetadata.title, "Industrial Rubber Gloves | Qasr Al Mabrook");
   assert.equal(englishMetadata.description, english.seoDescription);
-  assert.equal(arabicMetadata.title, "قفازات DPL الصناعية | قصر المبارك");
+  assert.equal(arabicMetadata.title, "قفازات DPL الصناعية المطاطية | قصر المبارك");
   assert.equal(arabicMetadata.description, arabic.seoDescription);
   assert.equal(
     englishMetadata.alternates?.canonical,
@@ -100,7 +101,7 @@ test("DPL product metadata and body copy are localized and use recorded specific
 
   assert.ok(english);
   assert.ok(arabic);
-  assert.equal(english.heading, "DPL Industrial Gloves");
+  assert.equal(english.heading, "DPL Industrial Rubber Gloves");
   assert.match(english.seoTitle, /DPL Grandeur 70 Industrial Gloves/u);
   assert.match(english.seoDescription, /DPL Grandeur 70 industrial gloves/u);
   assert.match(english.seoDescription, /Sharjah, UAE/u);
@@ -108,6 +109,7 @@ test("DPL product metadata and body copy are localized and use recorded specific
   assert.match(english.description, /EN 388:2016 – 3110X/u);
   assert.match(english.description, /EN ISO 374/u);
   assert.match(english.description, /28 mil \(0\.70 mm\)/u);
+  assert.match(english.description, /industrial rubber gloves/u);
 
   const englishMetadata = createProductMetadata({
     locale: "en",

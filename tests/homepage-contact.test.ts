@@ -21,7 +21,10 @@ test("contact popup uses the configured mobile number for calls and WhatsApp", (
   assert.equal(whatsapp.hostname, "wa.me");
   assert.equal(whatsapp.pathname, `/${phoneHref?.slice("tel:+".length)}`);
   assert.equal(whatsapp.searchParams.get("text"), "Hi!");
-  assert.equal(siteConfig.contact.mapsUrl, "https://maps.app.goo.gl/AGAHaCeodMY7gPAY9");
+  assert.equal(
+    siteConfig.contact.mapsUrl,
+    "https://www.google.com/maps/place/Qasr+Al+Mabrook+Trading+LLC/@25.3595724,55.3887041,17z/data=!3m1!4b1!4m6!3m5!1s0x3e5f5a31d351dcf7:0x45b5fd047feac859!8m2!3d25.3595676!4d55.391279!16s%2Fg%2F11bbwps06h?entry=ttu&g_ep=EgoyMDI2MTEwMi4wIKXMDSoASAFQAw%3D%3D",
+  );
 });
 
 test("WhatsApp URL normalizes an international number and pre-fills exactly Hi!", () => {

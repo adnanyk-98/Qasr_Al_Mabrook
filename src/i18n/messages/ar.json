@@ -204,6 +204,8 @@
   "sales": {
     "whatsapp": "واتساب",
     "call": "اتصل بالمبيعات",
+    "getItNow": "احصل عليه الآن",
+    "bulkOrdersCallUs": "للطلبات بالجملة؟ اتصل بنا",
     "email": "البريد الإلكتروني",
     "subject": "استفسار عن {productName}"
   },

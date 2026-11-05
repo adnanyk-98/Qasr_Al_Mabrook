@@ -204,6 +204,8 @@
   "sales": {
     "whatsapp": "WhatsApp",
     "call": "Call Sales",
+    "getItNow": "Get it Now",
+    "bulkOrdersCallUs": "Bulk Orders? Call Us",
     "email": "Email Enquiry",
     "subject": "Enquiry about {productName}"
   },

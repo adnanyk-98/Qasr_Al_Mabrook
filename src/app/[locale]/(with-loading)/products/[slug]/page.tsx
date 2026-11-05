@@ -305,7 +305,6 @@ export default async function ProductDetailPage({
 
               <SalesActions
                 locale={currentLocale}
-                phone={contactSettings.business_phone}
                 email={contactSettings.business_email}
                 whatsapp={contactSettings.whatsapp_number}
                 productName={product.name}
@@ -407,29 +406,6 @@ export default async function ProductDetailPage({
             </section>
           ) : null}
 
-          <section
-            className="border-t border-[var(--brand-border)] pt-8"
-            dir={currentLocale === "ar" ? "rtl" : "ltr"}
-          >
-            <div className="mx-auto max-w-xl text-center">
-              <p className="text-lg font-medium text-[var(--foreground)]">
-                {currentLocale === "ar"
-                  ? "هل أنت مهتم بهذا المنتج؟"
-                  : "Interested in this product?"}
-              </p>
-              <div className="mt-4 flex justify-center">
-                <SalesActions
-                  locale={currentLocale}
-                  phone={contactSettings.business_phone}
-                  email={contactSettings.business_email}
-                  whatsapp={contactSettings.whatsapp_number}
-                  productName={product.name}
-                  productSlug={product.slug}
-                  variantId={selectedVariant?.id}
-                />
-              </div>
-            </div>
-          </section>
         </Container>
       </Section>
     </PublicShell>

@@ -1,7 +1,16 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
+import { siteConfig } from "../src/config/site";
 import { buildTelephoneHref, formatPublicPhoneNumber } from "../src/lib/phone-display";
+
+test("homepage and product map actions use the official Google Maps listing", () => {
+  const expectedMapsUrl =
+    "https://www.google.com/maps/place/Qasr+Al+Mabrook+Trading+LLC/@25.3595724,55.3887041,17z/data=!3m1!4b1!4m6!3m5!1s0x3e5f5a31d351dcf7:0x45b5fd047feac859!8m2!3d25.3595676!4d55.391279!16s%2Fg%2F11bbwps06h?entry=ttu&g_ep=EgoyMDI2MTEwMi4wIKXMDSoASAFQAw%3D%3D";
+
+  assert.equal(siteConfig.contact.mapsUrl, expectedMapsUrl);
+  assert.equal(buildTelephoneHref(siteConfig.contact.phone), "tel:+971503093800");
+});
 
 test("UAE international numbers are spaced for display without changing their telephone destination", () => {
   assert.equal(formatPublicPhoneNumber("+971503093800"), "+971 50 309 3800");
@@ -32,11 +41,7 @@ test("invalid phone values are not converted into telephone links", () => {
   ];
 
   for (const phone of invalidNumbers) {
-    assert.equal(
-      buildTelephoneHref(phone),
-      null,
-      `expected ${JSON.stringify(phone)} to be rejected`,
-    );
+    assert.equal(buildTelephoneHref(phone), null, `expected ${JSON.stringify(phone)} to be rejected`);
     assert.equal(formatPublicPhoneNumber(phone), phone);
   }
 });

@@ -50,12 +50,15 @@ export async function generateMetadata({
     ogImage: category.imagePublicUrl,
     ogImageAlt: category.name,
     hasAlternate: Boolean(
-      category.hasExactLocaleTranslation &&
-      alternateCategory?.hasExactLocaleTranslation,
+      (category.hasExactLocaleTranslation &&
+        alternateCategory?.hasExactLocaleTranslation) ||
+      Boolean(landingContent),
     ),
   });
 
-  if (!category.hasExactLocaleTranslation) metadata.robots = "noindex, follow";
+  if (!category.hasExactLocaleTranslation && !landingContent) {
+    metadata.robots = "noindex, follow";
+  }
   return metadata;
 }
 

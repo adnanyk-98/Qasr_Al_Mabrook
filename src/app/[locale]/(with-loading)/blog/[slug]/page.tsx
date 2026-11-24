@@ -62,6 +62,10 @@ export default async function BlogArticlePage({
 
   const authorLabel = currentLocale === "ar" ? "قصر المبارك" : "Qasr Al Mabrook";
   const relatedArticleMap: Record<string, string[]> = {
+    "choose-safety-shoes-industrial-work-uae": [
+      "shopping-guide",
+      "choosing-everyday-essentials",
+    ],
     "shopping-guide": [
       "choosing-everyday-essentials",
       "product-discovery-for-smarter-shopping",

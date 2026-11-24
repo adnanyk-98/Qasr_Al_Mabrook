@@ -18,6 +18,7 @@ type ProductLandingContent = {
   seoTitle: string;
   seoDescription: string;
   description: string;
+  imageAlt?: string;
 };
 
 export function getCategoryLandingContent(
@@ -93,6 +94,32 @@ export function getCategoryLandingContent(
         };
   }
 
+  if (slug === "safety-shoes") {
+    return locale === "ar"
+      ? {
+          heading: "أحذية سلامة VAULTEX",
+          seoDescription:
+            "تعرّف على أحذية سلامة VAULTEX VTI البنية للاستخدام الصناعي ومواقع البناء والمستودعات في الإمارات.",
+          intro:
+            "تضم هذه الفئة أحذية سلامة VAULTEX VTI البنية، المتاحة للاستفسار لدى قصر المبارك في الشارقة والإمارات العربية المتحدة.",
+          linkHeading: "استكشف أحذية السلامة المدرجة",
+          links: [
+            { href: "/products/vaultex-safety-shoes", label: "VAULTEX SAFETY SHOES" },
+          ],
+        }
+      : {
+          heading: "VAULTEX SAFETY SHOES",
+          seoDescription:
+            "Explore Vaultex VTI brown safety shoes in the UAE for industrial, construction and warehouse workplaces.",
+          intro:
+            "This category features Vaultex VTI brown safety shoes, available to enquire about at Qasr Al Mabrook in Sharjah, UAE.",
+          linkHeading: "Explore listed safety shoes",
+          links: [
+            { href: "/products/vaultex-safety-shoes", label: "VAULTEX SAFETY SHOES" },
+          ],
+        };
+  }
+
   return null;
 }
 
@@ -100,6 +127,29 @@ export function getProductLandingContent(
   locale: Locale,
   slug: string,
 ): ProductLandingContent | null {
+  if (slug === "vaultex-safety-shoes") {
+    return locale === "ar"
+      ? {
+          heading: "أحذية سلامة VAULTEX",
+          seoTitle: "أحذية سلامة VAULTEX في الإمارات | قصر المبارك",
+          seoDescription:
+            "تعرّف على أحذية السلامة البنية من VAULTEX VTI لدى قصر المبارك للاستخدام الصناعي ومواقع البناء والمستودعات.",
+          description:
+            "أحذية السلامة البنية من VAULTEX VTI مخصصة للاستخدام الصناعي ومواقع البناء والمستودعات وبيئات العمل اليومية، ومتاحة للاستفسار لدى قصر المبارك في الشارقة والإمارات.",
+          imageAlt: "حذاء سلامة VAULTEX VTI بني مع عبوة الأحذية الواقية",
+        }
+      : {
+          heading: "VAULTEX SAFETY SHOES",
+          seoTitle: "Vaultex Safety Shoes in UAE | Qasr Al Mabrook",
+          seoDescription:
+            "Explore Vaultex VTI brown safety shoes at Qasr Al Mabrook. Suitable for industrial, construction and warehouse workplaces. Contact us for enquiries.",
+          description:
+            "Vaultex VTI brown safety shoes are presented for industrial work, construction sites, warehouses and daily workplace use. Contact Qasr Al Mabrook in Sharjah for current product information and enquiries.",
+          imageAlt:
+            "Vaultex VTI brown safety shoes with protective footwear packaging",
+        };
+  }
+
   if (slug === "pajama") {
     return locale === "ar"
       ? {

@@ -5,7 +5,7 @@ export type LocalizedText = Record<Locale, string>;
 export type BlogArticle = {
   slug: string;
   publishedAt: string;
-  updatedAt: string;
+  updatedAt?: string;
   featuredImage: string;
   title: LocalizedText;
   excerpt: LocalizedText;
@@ -294,6 +294,46 @@ export const blogArticles: BlogArticle[] = [
     seoDescription: {
       en: "Review the Fancy Suit category and product entry in the Qasr Al Mabrook catalogue before you enquire about the item.",
       ar: "راجع فئة البدلات الفاخرة وإدخال المنتج في كتالوج قصر المبارك قبل الاستفسار عن العنصر.",
+    },
+  },
+  {
+    slug: "choose-safety-shoes-industrial-work-uae",
+    publishedAt: "2026-11-23",
+    updatedAt: "2026-11-23",
+    featuredImage: "",
+    title: {
+      en: "How to Choose the Right Safety Shoes for Industrial Work in the UAE",
+      ar: "كيفية اختيار أحذية السلامة المناسبة للعمل الصناعي في الإمارات",
+    },
+    excerpt: {
+      en: "A practical guide to checking workplace requirements, fit, comfort and footwear features before choosing safety shoes in the UAE.",
+      ar: "دليل عملي لفحص متطلبات مكان العمل والمقاس والراحة وميزات الأحذية قبل اختيار أحذية السلامة في الإمارات.",
+    },
+    summary: {
+      en: "Start with the real hazards of the workplace, verify the claimed protection features, and then assess fit and comfort before selecting a suitable pair.",
+      ar: "ابدأ بالمخاطر الفعلية في مكان العمل، وتحقق من مزايا الحماية المعلنة، ثم قيّم المقاس والراحة قبل اختيار الحذاء المناسب.",
+    },
+    body: {
+      en: [
+        "<h2>Start with the workplace requirement</h2><p>Choosing safety shoes begins with the environment rather than colour or appearance. Construction, warehouses, factories and outdoor work can expose workers to different risks. Check the site risk assessment and your employer's footwear policy before comparing models.</p><p>Before deciding, confirm whether the job requires protection against particular hazards and ask for the relevant product documentation. Do not assume that every safety shoe has the same rating or certification.</p>",
+        "<h2>Verify protection features</h2><p>Review the product description and ask the supplier to confirm features that matter for the task, such as toe protection, slip resistance, puncture resistance or electrical-hazard protection. Where safety standards are shown, verify them directly from the product information or packaging.</p><p>For a brown safety shoe option, see <a href=\"/en/products/vaultex-safety-shoes\">Vaultex VTI Brown Safety Shoes</a>. The listing should be used as the source of confirmed specifications; additional claims should not be assumed without written evidence.</p>",
+        "<h2>Fit, comfort and durability</h2><p>A correct fit should allow comfortable movement without excessive pressure or heel movement. Try footwear with the socks normally used at work, check the toe room and walking comfort, and allow for the length of a normal working shift.</p><p>Durability depends on construction and regular care. Inspect the upper, sole, stitching and closures, then follow the manufacturer's cleaning and storage guidance. Workplace footwear may need replacement sooner if it becomes damaged or no longer fits securely.</p>",
+        "<h2>Choose for the work environment</h2><p>For construction sites, consider the environment and the documented task hazards. For warehouses and factories, consider shift length, walking distance and the surfaces present. Outdoor or wet areas may require a different combination of features than a dry indoor workplace.</p><p>Browse the <a href=\"/en/categories/safety-shoes\">Safety Shoes category</a> and compare the available catalogue entries. <a href=\"/en/products/vaultex-safety-shoes\">Contact Qasr Al Mabrook</a> to enquire about Vaultex VTI Brown Safety Shoes, current specifications and availability in the UAE.</p>",
+      ],
+      ar: [
+        "<h2>ابدأ بمتطلبات مكان العمل</h2><p>يبدأ اختيار أحذية السلامة من بيئة العمل لا من الشكل أو اللون. قد تعرض مواقع البناء والمستودعات والمصانع والعمل الخارجي العاملين لمخاطر مختلفة. راجع تقييم المخاطر في الموقع وسياسة مكان العمل الخاصة بالأحذية قبل مقارنة الطرز.</p><p>تأكد من معرفة الحماية المطلوبة للمهمة، واطلب الوثائق ذات الصلة بالمنتج. لا تفترض أن جميع أحذية السلامة تحمل التصنيفات أو الاعتمادات نفسها.</p>",
+        "<h2>تحقق من ميزات الحماية</h2><p>راجع وصف المنتج واسأل المورد عن الميزات المهمة للمهمة، مثل حماية الأصابع ومقاومة الانزلاق ومقاومة الاختراق والحماية من المخاطر الكهربائية. وإذا وُجدت معايير سلامة، تحقق منها مباشرة من معلومات المنتج أو العبوة.</p><p>يمكنك مراجعة <a href=\"/ar/products/vaultex-safety-shoes\">حذاء VAULTEX VTI البني</a>. يجب استخدام صفحة الإدخال كمصدر للمواصفات المؤكدة، ولا يُفترض إضافة ادعاءات إضافية دون دليل مكتوب.</p>",
+        "<h2>المقاس والراحة والمتانة</h2><p>يجب أن يسمح المقاس الصحيح بالحركة دون ضغط زائد أو حركة مفرطة للكعب. جرّب الحذاء بالجوارب المستخدمة في العمل، وتحقق من مساحة الأصابع والراحة عند المشي، مع مراعاة طول نوبة العمل المعتادة.</p><p>تعتمد المتانة على جودة الصنع والعناية المنتظمة. افحص السطح العلوي والنعل والخياطة والإغلاق، واتبع تعليمات التنظيف والتخزين للشركة المصنعة. قد يلزم استبدال الحذاء مبكرًا إذا تضرر أو فقد الثبات المطلوب.</p>",
+        "<h2>اختر حسب بيئة العمل</h2><p>في مواقع البناء، راجع بيئة العمل والمخاطر الموثقة للمهمة. وفي المستودعات والمصانع، ضع في الاعتبار طول المناوبة ومسافة المشي والأسطح المتاحة. قد تحتاج المناطق الخارجية أو الرطبة إلى مجموعة ميزات تختلف عن مكان عمل داخلي جاف.</p><p>تصفح <a href=\"/ar/categories/safety-shoes\">فئة أحذية السلامة</a> وقارن إدخالات الكتالوج المتاحة. <a href=\"/ar/products/vaultex-safety-shoes\">تواصل مع قصر المبارك</a> للاستفسار عن أحذية VAULTEX VTI البنية والمواصفات المتوفرة وحالة التوافر في الإمارات.</p>",
+      ],
+    },
+    seoTitle: {
+      en: "How to Choose Safety Shoes for Industrial Work in the UAE",
+      ar: "اختيار أحذية السلامة للعمل الصناعي في الإمارات",
+    },
+    seoDescription: {
+      en: "Learn how to assess workplace hazards, verify footwear features, and choose comfortable safety shoes for industrial work in the UAE.",
+      ar: "تعرف على تقييم مخاطر العمل والتحقق من ميزات الأحذية واختيار أحذية سلامة مريحة للعمل الصناعي في الإمارات.",
     },
   },
   {

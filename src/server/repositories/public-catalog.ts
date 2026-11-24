@@ -2,6 +2,7 @@ import { aliasedTable } from "drizzle-orm";
 import { and, asc, desc, eq, exists, ilike, inArray, or, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { type Locale } from "@/lib/locales";
+import { getCategoryLandingContent } from "@/lib/catalogue-landing-content";
 import { PUBLIC_CACHE_REVALIDATE_SECONDS, publicCacheTags, withPublicCache } from "@/lib/public-cache";
 import {
   attributeTranslations,
@@ -237,7 +238,17 @@ async function getCategoryBySlugUncached(locale: Locale, slug: string) {
     .limit(1);
 
   if (!fallback[0]?.translation) {
-    return null;
+    if (!fallback[0]?.category) return null;
+    const landingContent = getCategoryLandingContent(locale, slug);
+    return {
+      ...fallback[0].category,
+      name: landingContent?.heading ?? fallback[0].category.slug,
+      shortDescription: landingContent?.seoDescription ?? null,
+      description: landingContent?.intro ?? null,
+      seoTitle: null,
+      seoDescription: landingContent?.seoDescription ?? null,
+      hasExactLocaleTranslation: Boolean(landingContent),
+    };
   }
 
   return {

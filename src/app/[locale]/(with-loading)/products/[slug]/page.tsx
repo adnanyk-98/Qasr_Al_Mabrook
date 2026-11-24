@@ -62,11 +62,13 @@ export async function generateMetadata({
     shortDescription: product.shortDescription,
     fullDescription: product.description,
     productImage: primaryImage?.publicUrl,
-    productImageAlt: primaryImage
-      ? currentLocale === "ar"
-        ? (primaryImage.altTextAr ?? primaryImage.altTextEn)
-        : (primaryImage.altTextEn ?? primaryImage.altTextAr)
-      : undefined,
+    productImageAlt:
+      landingContent?.imageAlt ??
+      (primaryImage
+        ? currentLocale === "ar"
+          ? (primaryImage.altTextAr ?? primaryImage.altTextEn)
+          : (primaryImage.altTextEn ?? primaryImage.altTextAr)
+        : undefined),
     hasAlternate: Boolean(
       product.hasExactLocaleTranslation && alternateProduct?.hasExactLocaleTranslation,
     ),
@@ -236,7 +238,7 @@ export default async function ProductDetailPage({
                   isPrimary: img.isPrimary,
                 }))}
                 locale={currentLocale}
-                productName={product.name}
+                productName={landingContent?.imageAlt ?? product.name}
               />
             </div>
 

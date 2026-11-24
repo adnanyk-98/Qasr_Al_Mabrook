@@ -7,6 +7,7 @@ import { blogArticles } from "@/lib/blog";
 import { getBaseUrl } from "@/lib/seo";
 import { localePath, locales, type Locale } from "@/lib/locales";
 import { reportServerError } from "@/lib/observability";
+import { getCategoryLandingContent } from "@/lib/catalogue-landing-content";
 
 function addLocalizedEntries(
   entries: MetadataRoute.Sitemap,
@@ -67,6 +68,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           .filter((translation) => translation.categoryId === category.id)
           .map((translation) => translation.locale)
       );
+      for (const locale of locales) {
+        if (getCategoryLandingContent(locale, category.slug)) {
+          availableLocales.add(locale);
+        }
+      }
       addLocalizedEntries(
         sitemapEntries,
         baseUrl,
@@ -108,7 +114,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .select({ updatedAt: siteSettings.updatedAt })
       .from(siteSettings)
       .where(eq(siteSettings.key, "business_phone"));
-    const blogLastModified = latestDate(blogArticles.map((article) => article.updatedAt));
+    const blogLastModified = latestDate(
+      blogArticles.map((article) => article.updatedAt ?? article.publishedAt),
+    );
     const categoriesLastModified = latestDate(publishedCategories.map((category) => category.updatedAt));
     const productsLastModified = latestDate(publishedProducts.map((product) => product.updatedAt));
     const homepageLastModified = latestDate([
@@ -124,7 +132,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     for (const article of blogArticles) {
       addLocalizedEntries(sitemapEntries, baseUrl, `/blog/${article.slug}`, locales, {
-        lastModified: new Date(article.updatedAt),
+        lastModified: article.updatedAt ?? article.publishedAt,
         changeFrequency: "monthly",
         priority: 0.7,
       });
